@@ -7,8 +7,7 @@
   <!-- Favicon utama -->
   <link rel="icon" type="image/png" href="icons/logo.png">
   <script src="https://cdn.jsdelivr.net/npm/idb@7/build/umd.js"></script>
-  <!-- NOTE: removed supabase-js from client (use Netlify Function / server for auth) -->
-
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- PWA manifest & meta -->
   <meta name="theme-color" content="#2b6cb0">
   <link rel="manifest" href="/manifest.json">
@@ -137,11 +136,11 @@
 <body>
   <div class="login-container">
     <div class="login-logo">
-    <img src="icons/logo.png" alt="Logo Kharisma" width="85" height="100">
-    <h1>Simponi Kharisma</h1>
-  </div>
+	  <img src="icons/logo.png" alt="Logo Kharisma" width="85" height="100">
+	  <h1>Simponi Kharisma</h1>
+	</div>
 
-    <form id="loginForm">
+		<form id="loginForm">
       <div class="login-form-group">
         <label for="loginEmail">Email</label>
         <input type="email" id="loginEmail" required placeholder="Masukkan email">
@@ -154,9 +153,9 @@
       <button type="submit" class="login-btn" id="loginBtn">
         <span id="loginBtnText">Login</span>
       </button>
-    </form>
+    </form>  
 
-  <div style="margin-top:10px; text-align:center; font-size:14px;">
+	<div style="margin-top:10px; text-align:center; font-size:14px;">
   <a href="privacy.html">Kebijakan Privasi</a> | 
   <a href="contact.html">Kontak</a>
 </div>
@@ -167,7 +166,12 @@
   </div>
 
   <script>
-    // --- IndexedDB untuk auth_session (tetap dipakai) ---
+    const SUPABASE_URL = "https://oflkibeaesvwzdzyvdfy.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9mbGtpYmVhZXN2d3pkenl2ZGZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4NDIyOTQsImV4cCI6MjA3MDQxODI5NH0.MMcdx7g54R9kqFdfkDPP57gNPCnxGLKWHhexTAcJ2io";
+    const { createClient } = supabase;
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // IndexedDB untuk auth_session
     const dbPromise = idb.openDB("KharismaDB", 1, {
       upgrade(db) {
         if (!db.objectStoreNames.contains("auth_session")) {
@@ -193,47 +197,37 @@
     }
 
     function getRedirectPage(email) {
-      const normalizedEmail = email.toLowerCase().trim();
-      if (normalizedEmail === "syaherkhofsoh@gmail.com") {
-        return { page: "jindex.html", role: "admin" };
-      } else {
-        return { page: "jindex.html", role: "user" };
-      }
-    }
+	  const normalizedEmail = email.toLowerCase().trim();
+	  if (normalizedEmail === "syaherkhofsoh@gmail.com") {
+		return { page: "jindex.html", role: "admin" };
+	  } else {
+		return { page: "jindex.html", role: "user" };
+	  }
+	}
 
     async function saveAuthSession(session) {
-      if (!session) return;
-      let toSave = session;
-      if (!session.id) {
-        toSave = { id: session.user?.id || session.access_token || Date.now().toString(), ...session };
-      }
-      await saveToDB("auth_session", [toSave]);
-      try { localStorage.setItem('supabaseSession', JSON.stringify(session)); } catch(e) {}
+      if (session) await saveToDB("auth_session", [session]);
     }
 
     async function checkSession() {
       try {
-        const offlineSession = await getFromDB("auth_session");
-        if (offlineSession && offlineSession.length > 0) {
-          console.log("Memakai session offline:", offlineSession[0].user?.email || offlineSession[0].email);
+        const { data } = await supabaseClient.auth.getSession();
+        if (data.session) {
           window.location.href = "jindex.html";
           return;
         }
       } catch (err) {
-        console.log("IndexedDB auth_session kosong:", err);
+        console.log("Supabase session tidak ada:", err);
       }
 
       try {
-        const local = localStorage.getItem('supabaseSession');
-        if (local) {
-          const parsed = JSON.parse(local);
-          if (parsed && (parsed.user || parsed.access_token || parsed.session)) {
-            window.location.href = "jindex.html";
-            return;
-          }
+        const offlineSession = await getFromDB("auth_session");
+        if (offlineSession && offlineSession.length > 0) {
+          console.log("Memakai session offline:", offlineSession[0].user.email);
+          window.location.href = "jindex.html";
         }
       } catch (err) {
-        console.log('localStorage session check error', err);
+        console.log("IndexedDB auth_session kosong:", err);
       }
     }
 
@@ -244,25 +238,18 @@
       loginBtnText.innerHTML = "🔄 memproses...";
 
       try {
-        const res = await fetch('/api/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
-        });
-
-        const result = await res.json();
-        if (!res.ok) throw new Error(result.error || 'Login gagal');
-
-        const session = result.session || result.data?.session || result;
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        if (error) throw new Error("Email atau password salah");
 
         const redirectInfo = getRedirectPage(email);
-        localStorage.setItem("userRole", redirectInfo.role);
-        await saveAuthSession(session);
+		localStorage.setItem("userRole", redirectInfo.role);
+		await saveAuthSession(data.session);
+
 
         showAlert("success", `Login berhasil sebagai ${redirectInfo.role}!`);
         setTimeout(() => { window.location.href = redirectInfo.page; }, 1000);
       } catch (error) {
-        showAlert("error", error.message || String(error));
+        showAlert("error", error.message);
       } finally {
         loginBtn.disabled = false;
         loginBtnText.innerHTML = "Login";
@@ -291,7 +278,7 @@
     });
 
     document.addEventListener("DOMContentLoaded", () => {
-      checkSession();
+      checkSession(); // langsung cek session
       setupPasswordToggle();
     });
 
