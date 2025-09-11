@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Offline - Simponi Kharisma</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --primary-color: #1a73e8;
+      --secondary-color: #3f51b5;
+      --text-color: #333;
+      --bg-color: #f5f7fa;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 1.5rem;
+      text-align: center;
+    }
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      padding: 2rem;
+      max-width: 420px;
+      width: 100%;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    .logo {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+      border-radius: 12px;
+      margin-bottom: 1rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .icon {
+      font-size: 3rem;
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+    }
+    h2 {
+      margin: 0.5rem 0;
+      color: var(--secondary-color);
+    }
+    p {
+      margin: 0.5rem 0 1.5rem;
+      font-size: 1rem;
+      opacity: 0.85;
+    }
+    button {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 0.7rem 1.5rem;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <img src="https://i.imgur.com/Irgu32G.png" alt="Logo Lembaga" class="logo">
+    <div class="icon">📡</div>
+    <h2>Anda sedang offline</h2>
+    <p>Koneksi internet tidak tersedia.<br>Silakan periksa jaringan Anda.</p>
+    <button onclick="cobaLagi()">Coba Lagi</button>
+  </div>
+
+  <script>
+    function cobaLagi() {
+      if (navigator.onLine) {
+        window.location.href = "/jindex.html"; // kalau sudah online, langsung ke jindex
+      } else {
+        alert("Anda masih offline, silakan cek koneksi internet.");
+      }
+    }
+
+    // Auto-redirect begitu online
+    window.addEventListener("online", () => {
+      window.location.href = "/jindex.html";
+    });
+  </script>
+</body>
+</html>

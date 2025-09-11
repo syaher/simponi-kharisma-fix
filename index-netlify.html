@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - Simponi Kharisma</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Favicon utama -->
+  <link rel="icon" type="image/png" href="icons/logo.png">
+  <script src="https://cdn.jsdelivr.net/npm/idb@7/build/umd.js"></script>
+  <!-- NOTE: removed supabase-js from client (use Netlify Function / server for auth) -->
+
+  <!-- PWA manifest & meta -->
+  <meta name="theme-color" content="#2b6cb0">
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Icons -->
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png">
+
+  <!-- iOS Support -->
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <meta name="apple-mobile-web-app-title" content="Simponi Kharisma">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1a73e8, #3f51b5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .login-container {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 340px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      color: white;
+      text-align: center;
+      animation: fadeIn 0.8s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(-10px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+    .login-logo img { height: 80px; margin-bottom: 0.5rem; }
+    .login-logo h1 { font-size: 1.5rem; margin-bottom: 1rem; }
+
+    .login-form-group {
+      margin-bottom: 1rem;
+      text-align: left;
+      width: 100%;
+      position: relative;
+    }
+
+    .login-form-group label {
+      display: block;
+      margin-bottom: 0.3rem;
+      font-size: 0.9rem;
+      color: #fff;
+    }
+
+    .login-form-group input {
+      width: 100%;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      box-sizing: border-box;
+      padding-right: 45px;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      top: 38px;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #666;
+      font-size: 18px;
+      padding: 4px;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: background-color 0.2s;
+    }
+
+    .password-toggle:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 0.8rem;
+      background: #ff9800;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .login-btn:hover { background: #fb8c00; transform: translateY(-2px); }
+    .login-btn:active { transform: scale(0.97); }
+
+    .alert {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-weight: bold;
+      display: none;
+      z-index: 999;
+      animation: slideIn 0.5s ease;
+    }
+    .alert.error { background: #f44336; color: white; }
+    .alert.success { background: #4caf50; color: white; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(100%); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-logo">
+    <img src="icons/logo.png" alt="Logo Kharisma" width="85" height="100">
+    <h1>Simponi Kharisma</h1>
+  </div>
+
+    <form id="loginForm">
+      <div class="login-form-group">
+        <label for="loginEmail">Email</label>
+        <input type="email" id="loginEmail" required placeholder="Masukkan email">
+      </div>
+      <div class="login-form-group">
+        <label for="loginPassword">Password</label>
+        <input type="password" id="loginPassword" required placeholder="Masukkan password">
+        <button type="button" id="togglePassword" class="password-toggle">👁️</button>
+      </div>
+      <button type="submit" class="login-btn" id="loginBtn">
+        <span id="loginBtnText">Login</span>
+      </button>
+    </form>
+
+  <div style="margin-top:10px; text-align:center; font-size:14px;">
+  <a href="privacy.html">Kebijakan Privasi</a> | 
+  <a href="contact.html">Kontak</a>
+</div>
+
+    <!-- Notifikasi -->
+    <div class="alert error" id="alertError"></div>
+    <div class="alert success" id="alertSuccess"></div>
+  </div>
+
+  <script>
+    // --- IndexedDB untuk auth_session (tetap dipakai) ---
+    const dbPromise = idb.openDB("KharismaDB", 1, {
+      upgrade(db) {
+        if (!db.objectStoreNames.contains("auth_session")) {
+          db.createObjectStore("auth_session", { keyPath: "id" });
+        }
+      }
+    });
+
+    async function saveToDB(storeName, data) {
+      const db = await dbPromise;
+      data.forEach(item => db.put(storeName, item));
+    }
+    async function getFromDB(storeName) {
+      const db = await dbPromise;
+      return await db.getAll(storeName);
+    }
+
+    function showAlert(type, message) {
+      const alertBox = type === "error" ? document.getElementById("alertError") : document.getElementById("alertSuccess");
+      alertBox.textContent = message;
+      alertBox.style.display = "block";
+      setTimeout(() => { alertBox.style.display = "none"; }, 3000);
+    }
+
+    function getRedirectPage(email) {
+      const normalizedEmail = email.toLowerCase().trim();
+      if (normalizedEmail === "syaherkhofsoh@gmail.com") {
+        return { page: "jindex.html", role: "admin" };
+      } else {
+        return { page: "jindex.html", role: "user" };
+      }
+    }
+
+    async function saveAuthSession(session) {
+      if (!session) return;
+      let toSave = session;
+      if (!session.id) {
+        toSave = { id: session.user?.id || session.access_token || Date.now().toString(), ...session };
+      }
+      await saveToDB("auth_session", [toSave]);
+      try { localStorage.setItem('supabaseSession', JSON.stringify(session)); } catch(e) {}
+    }
+
+    async function checkSession() {
+      try {
+        const offlineSession = await getFromDB("auth_session");
+        if (offlineSession && offlineSession.length > 0) {
+          console.log("Memakai session offline:", offlineSession[0].user?.email || offlineSession[0].email);
+          window.location.href = "jindex.html";
+          return;
+        }
+      } catch (err) {
+        console.log("IndexedDB auth_session kosong:", err);
+      }
+
+      try {
+        const local = localStorage.getItem('supabaseSession');
+        if (local) {
+          const parsed = JSON.parse(local);
+          if (parsed && (parsed.user || parsed.access_token || parsed.session)) {
+            window.location.href = "jindex.html";
+            return;
+          }
+        }
+      } catch (err) {
+        console.log('localStorage session check error', err);
+      }
+    }
+
+    async function handleLogin(email, password) {
+      const loginBtn = document.getElementById("loginBtn");
+      const loginBtnText = document.getElementById("loginBtnText");
+      loginBtn.disabled = true;
+      loginBtnText.innerHTML = "🔄 memproses...";
+
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Login gagal');
+
+        const session = result.session || result.data?.session || result;
+
+        const redirectInfo = getRedirectPage(email);
+        localStorage.setItem("userRole", redirectInfo.role);
+        await saveAuthSession(session);
+
+        showAlert("success", `Login berhasil sebagai ${redirectInfo.role}!`);
+        setTimeout(() => { window.location.href = redirectInfo.page; }, 1000);
+      } catch (error) {
+        showAlert("error", error.message || String(error));
+      } finally {
+        loginBtn.disabled = false;
+        loginBtnText.innerHTML = "Login";
+      }
+    }
+
+    function setupPasswordToggle() {
+      const toggleButton = document.getElementById('togglePassword');
+      const passwordInput = document.getElementById('loginPassword');
+      toggleButton.addEventListener('click', function() {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        toggleButton.textContent = type === 'password' ? '👁️' : '👁️‍🗨️';
+      });
+    }
+
+    document.getElementById("loginForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const email = document.getElementById("loginEmail").value;
+      const password = document.getElementById("loginPassword").value;
+      if (!email || !password) {
+        showAlert("error", "Email dan password harus diisi");
+        return;
+      }
+      handleLogin(email, password);
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+      checkSession();
+      setupPasswordToggle();
+    });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(reg => console.log("SW registered:", reg.scope))
+          .catch(err => console.error("SW registration failed:", err));
+      });
+    }
+  </script>
+</body>
+</html>
