@@ -2,7 +2,10 @@
   publish = "."
   functions = "netlify/functions"
 
-# Redirect API supaya lebih rapi
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["@supabase/supabase-js"]
+
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
