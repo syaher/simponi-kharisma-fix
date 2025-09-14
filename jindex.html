@@ -1910,6 +1910,14 @@ button:active {
         </select>
       </div>
     </div>
+	
+	<div class="filter-group">
+	  <label for="absensiTahunAjaran">Tahun Ajaran:</label>
+	  <select id="absensiTahunAjaran" onchange="loadAbsensiData()">
+		<option value="semua">Semua Tahun</option>
+	  </select>
+	</div>
+
     
     <label>
       <input type="checkbox" id="filterMerahCheckbox" onchange="loadAbsensiData()"> 
@@ -2166,44 +2174,37 @@ button:active {
 </div>
 
 
-  <script>
-   
-document.addEventListener("DOMContentLoaded", () => {
+<script>
+  // Konfigurasi Supabase
+  const SUPABASE_URL = "https://oflkibeaesvwzdzyvdfy.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9mbGtpYmVhZXN2d3pkenl2ZGZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4NDIyOTQsImV4cCI6MjA3MDQxODI5NH0.MMcdx7g54R9kqFdfkDPP57gNPCnxGLKWHhexTAcJ2io";
+  const { createClient } = supabase;
+  const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // Ambil role dari localStorage
   const userRole = localStorage.getItem("userRole") || "user";
 
-  supabaseClient.auth.getUser().then(({ data }) => {
-    if (data.user) {
-      // Role ditampilkan di atas
+  document.addEventListener("DOMContentLoaded", async () => {
+    // Tampilkan tombol admin sesuai role
+    if (userRole === "admin") {
+      document.querySelectorAll(".admin-only").forEach(btn => btn.style.display = "inline-block");
+    } else {
+      document.querySelectorAll(".admin-only").forEach(btn => btn.style.display = "none");
+    }
+
+    // Ambil user login dari Supabase
+    const { data, error } = await supabaseClient.auth.getUser();
+    if (data?.user) {
       document.getElementById("userRoleText").textContent =
         (userRole === "admin") ? "Admin" : "User";
 
-      // Email ditampilkan di bawah
       document.getElementById("userEmail").textContent = data.user.email;
+    } else {
+      console.warn("User belum login atau gagal getUser:", error);
     }
   });
-});
 
 
-  
-  const userRole = localStorage.getItem("userRole") || "user";
-
-document.addEventListener("DOMContentLoaded", () => {
-  if (userRole === "admin") {
-    document.querySelectorAll(".admin-only").forEach(btn => btn.style.display = "inline-block");
-  } else {
-    document.querySelectorAll(".admin-only").forEach(btn => btn.style.display = "none");
-  }
-});
-
-  
- 
-
-    // Konfigurasi Supabase
-    const SUPABASE_URL = "https://oflkibeaesvwzdzyvdfy.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9mbGtpYmVhZXN2d3pkenl2ZGZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4NDIyOTQsImV4cCI6MjA3MDQxODI5NH0.MMcdx7g54R9kqFdfkDPP57gNPCnxGLKWHhexTAcJ2io";
-
-    const { createClient } = supabase;
-    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
     
     // Variabel global
 	const pageSize = 50;
@@ -2232,6 +2233,9 @@ document.addEventListener("DOMContentLoaded", () => {
 	let lastFilteredData = [];      // simpan hasil filter terakhir
 	let currentSortColumn = null;
 	let sortDirection = 'asc';
+	let absensiCurrentPage = 1;
+	const absensiRowsPerPage = 10;
+	let absensiLoading = false;
 
 
     
@@ -2325,7 +2329,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		if (moduleName === 'santri') {
 		  renderSantriCards(allSantriData);
-		} else if (moduleName === 'absensi') {
+		} else if (moduleName === 'absensi1') {
 		  loadAbsensiData();
 		} else if (moduleName === 'inventaris') {
 		  loadInventaris();
@@ -2355,60 +2359,70 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById('main-grid').style.display = 'block';
     }
     
-    // Fungsi untuk memuat data awal dari Supabase dengan fallback IndexedDB
-	async function loadInitialData() {
-	  showLoading(true);
-	  try {
-		// === Ambil data santri ===
-		const { data: santriData, error: santriError } = await supabaseClient
-		  .from('santri_kharisma')
-		  .select('*, Mulai_Ngabdi');
-		
-		if (santriError) throw santriError;
-		allSantriData = santriData;
+// Fungsi untuk memuat data awal dari Supabase dengan fallback IndexedDB
+async function loadInitialData() {
+  showLoading(true);
+  try {
+    // === Ambil data santri (master) ===
+    const { data: santriData, error: santriError } = await supabaseClient
+      .from('santri_kharisma')
+      .select('Stambuk,Nama_Lengkap,Kelas,Unit_Ndalem,Status,Bagian,Foto,Mulai_Ngabdi');
+    if (santriError) throw santriError;
 
-		// Simpan ke IndexedDB
-		await saveToDB('santri_kharisma', santriData);
+    allSantriData = (santriData || []).map(s => ({
+      Stambuk: (s.Stambuk ?? '').toString().trim(),
+      Nama_Lengkap: s.Nama_Lengkap,
+      Kelas: s.Kelas,
+      Unit_Ndalem: s.Unit_Ndalem,
+      Status: (s.Status ?? '').toLowerCase(),
+      Bagian: s.Bagian,
+      Foto: s.Foto,
+      Mulai_Ngabdi: s.Mulai_Ngabdi
+    }));
 
-		// === Ambil data absensi ===
-		const { data: absensiData, error: absensiError } = await supabaseClient
-		  .from('absensi')
-		  .select('*');
-		
-		if (absensiError) throw absensiError;
-		allAbsensiData = absensiData;
+    await saveToDB('santri_kharisma', allSantriData);
 
-		// Simpan ke IndexedDB
-		await saveToDB('absensi', absensiData);
+    // === Ambil data absensi dari absensi1 ===
+    const { data: absensiData, error: absensiError } = await supabaseClient
+      .from('absensi1')
+      .select('Stambuk,Bulan,Tahun_Ajaran,Sakit,Izin,Tanpa_Izin');
+    if (absensiError) throw absensiError;
 
-		// Isi dropdown Kelas dan Unit Ndalem
-		populateDropdowns();
+    allAbsensiData = (absensiData || []).map(r => ({
+	  Stambuk: (r.Stambuk ?? r.stambuk ?? '').toString().trim(),
+	  Bulan: r.Bulan,
+	  Tahun_Ajaran: r.Tahun_Ajaran,
+	  Sakit: Number(r.Sakit || 0),
+	  Izin: Number(r.Izin || 0),
+	  Tanpa_Izin: Number(r.Tanpa_Izin || 0),
+	  id: r.id
+	}));
 
-	  } catch (error) {
-		console.warn("Gagal load Supabase, coba dari IndexedDB:", error);
 
-		// === Fallback ambil data dari IndexedDB ===
-		const cachedSantri = await getFromDB('santri_kharisma');
-		if (cachedSantri.length > 0) {
-		  allSantriData = cachedSantri;
-		}
 
-		const cachedAbsensi = await getFromDB('absensi');
-		if (cachedAbsensi.length > 0) {
-		  allAbsensiData = cachedAbsensi;
-		}
+    await saveToDB('absensi1', allAbsensiData);
 
-		// Kalau masih kosong semua, tampilkan error
-		if (cachedSantri.length === 0 && cachedAbsensi.length === 0) {
-		  showError("Tidak ada data offline tersimpan. Silakan login saat online dulu.");
-		} else {
-		  populateDropdowns();
-		}
+    // === Isi dropdown ===
+    populateAbsensiDropdowns();
+    initTahunAjaranDropdown();
+    loadAbsensiData();
 
-	  } finally {
-		showLoading(false);
-	  }
-	}
+  } catch (error) {
+    console.warn("Gagal load Supabase, coba dari IndexedDB:", error);
+
+    const cachedSantri = await getFromDB('santri_kharisma');
+    if (cachedSantri.length) allSantriData = cachedSantri;
+
+    const cachedAbsensi = await getFromDB('absensi1');
+    if (cachedAbsensi.length) allAbsensiData = cachedAbsensi;
+
+    populateAbsensiDropdowns();
+    initTahunAjaranDropdown();
+    loadAbsensiData();
+  } finally {
+    showLoading(false);
+  }
+}
 
 
     // ========== POPULATE DROPDOWNS (TIDAK RESET PILIHAN) ==========
@@ -2814,178 +2828,265 @@ function renderFullTable(data, page = 1) {
   }
 }
 
-
+// Dropdown Kelas & Unit (hanya santri aktif)
+// Dropdown Kelas & Unit
 function populateAbsensiDropdowns() {
   const kelasDropdown = document.getElementById('absensiSearchKelas');
   const unitDropdown = document.getElementById('absensiSearchUnit');
   if (!kelasDropdown || !unitDropdown) return;
 
-  // build kelas options from allSantriData
-  const kelasSet = new Set();
-  allSantriData.forEach(s => { if (s.Kelas) kelasSet.add(s.Kelas); });
-  const sortedKelas = Array.from(kelasSet).sort((a,b)=>{
-    const ia = kelasOrder.indexOf(a);
-    const ib = kelasOrder.indexOf(b);
-    return (ia===-1?999:ia)-(ib===-1?999:ib);
+  const activeSantri = (allSantriData || []).filter(s => s.Status === 'aktif');
+
+  const kelasSet = new Set(activeSantri.map(s => s.Kelas).filter(Boolean));
+  const unitSet = new Set(activeSantri.map(s => s.Unit_Ndalem).filter(Boolean));
+
+  const sortedKelas = Array.from(kelasSet).sort((a, b) => {
+    const ia = kelasOrder.indexOf(a), ib = kelasOrder.indexOf(b);
+    return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
   });
   kelasDropdown.innerHTML = '<option value="semua">Semua Kelas</option>';
-  sortedKelas.forEach(k=>{
-    const count = allSantriData.filter(s=>s.Kelas===k).length;
-    const opt = document.createElement('option');
-    opt.value = k;
-    opt.textContent = `${k} (${count})`;
-    kelasDropdown.appendChild(opt);
-  });
+  sortedKelas.forEach(k => kelasDropdown.appendChild(new Option(k, k)));
 
-  // build unit options from allSantriData
-  const unitSet = new Set();
-  allSantriData.forEach(s => { if (s.Unit_Ndalem) unitSet.add(s.Unit_Ndalem); });
   const sortedUnits = Array.from(unitSet).sort();
   unitDropdown.innerHTML = '<option value="semua">Semua Unit</option>';
-  sortedUnits.forEach(u=>{
-    const count = allSantriData.filter(s=>s.Unit_Ndalem===u).length;
-    const opt = document.createElement('option');
-    opt.value = u;
-    opt.textContent = `${u} (${count})`;
-    unitDropdown.appendChild(opt);
+  sortedUnits.forEach(u => unitDropdown.appendChild(new Option(u, u)));
+}
+// Inisialisasi dropdown Tahun Ajaran
+// Dropdown Tahun Ajaran
+function initTahunAjaranDropdown() {
+  const sel = document.getElementById('absensiTahunAjaran');
+  if (!sel) return;
+
+  const years = Array.from(new Set((allAbsensiData || []).map(r => r.Tahun_Ajaran).filter(Boolean)));
+  years.sort().reverse();
+  sel.innerHTML = '<option value="semua">Semua Tahun</option>';
+  years.forEach(y => sel.appendChild(new Option(y, y)));
+
+  const currentYear = (new Date()).getFullYear().toString();
+  const found = years.find(y => y.includes(currentYear));
+  if (found) sel.value = found;
+  else if (years.length) sel.value = years[0];
+}
+
+/* robust loader */
+async function loadAbsensiData() {
+  if (absensiLoading) return;
+  absensiLoading = true;
+  showLoading(true);
+
+  try {
+    const filterMerah   = document.getElementById('filterMerahCheckbox')?.checked;
+    const searchTerm    = (document.getElementById('absensiSearchNama')?.value || '').toLowerCase();
+    const selectedKelas = document.getElementById('absensiSearchKelas')?.value || 'semua';
+    const selectedUnit  = document.getElementById('absensiSearchUnit')?.value || 'semua';
+
+    // base filter on santri list (fast, local)
+    let filteredData = (allSantriData || []).filter(s => {
+      if ((s.Status || '').toLowerCase() !== 'aktif') return false;
+      const namaMatch  = (s.Nama_Lengkap || '').toLowerCase().includes(searchTerm);
+      const kelasMatch = selectedKelas === 'semua' || s.Kelas === selectedKelas;
+      const unitMatch  = selectedUnit === 'semua' || s.Unit_Ndalem === selectedUnit;
+      return namaMatch && kelasMatch && unitMatch;
+    });
+
+    if (filterMerah) {
+      // fetch absensi for the filteredData in parallel with limited concurrency
+      const mapped = await mapWithConcurrency(filteredData, async s => {
+        const rows = await getAbsensiByStambuk(s.Stambuk);
+        const totalTanpa = rows.reduce((sum, a) => sum + (parseInt(a.Tanpa_Izin) || 0), 0);
+        return { s, rows, totalTanpa };
+      }, 8);
+
+      // merge, filter and sort
+      let temp = mapped.map(m => ({ ...m.s, absensi: m.rows, totalTanpaIzin: m.totalTanpa }));
+      filteredData = temp.filter(x => x.totalTanpaIzin >= 3).sort((a, b) => b.totalTanpaIzin - a.totalTanpaIzin);
+    } else {
+      // just sort santri by kelas order
+      filteredData.sort((a, b) => {
+        const ia = kelasOrder.indexOf(a.Kelas), ib = kelasOrder.indexOf(b.Kelas);
+        if (ia === -1 && ib === -1) return 0;
+        if (ia === -1) return 1;
+        if (ib === -1) return -1;
+        return ia - ib;
+      });
+    }
+
+    await renderAbsensiTable(filteredData);
+  } catch (err) {
+    console.error('loadAbsensiData error', err);
+    showError('Gagal memuat data absensi.');
+  } finally {
+    absensiLoading = false;
+    showLoading(false);
+  }
+}
+
+// Ambil absensi langsung dari Supabase
+/* replace with async supabase fetch (robust) */
+async function getAbsensiByStambuk(stambuk) {
+  if (!stambuk) return [];
+  const selYear = document.getElementById('absensiTahunAjaran')?.value || 'semua';
+  let query = supabaseClient
+    .from('absensi1')
+    .select('Stambuk,Bulan,Tahun_Ajaran,Sakit,Izin,Tanpa_Izin')
+    .eq('Stambuk', (stambuk ?? '').trim());
+
+  if (selYear !== 'semua') query = query.eq('Tahun_Ajaran', selYear);
+
+  const { data, error } = await query;
+  if (error) {
+    console.error('getAbsensiByStambuk error', error);
+    return [];
+  }
+
+  // safe sort: put unknown bulan di akhir
+  const order = (typeof bulanAbsensi !== 'undefined' && Array.isArray(bulanAbsensi)) ? bulanAbsensi : [];
+  data.sort((a, b) => {
+    const ia = order.indexOf((a.Bulan ?? '').trim());
+    const ib = order.indexOf((b.Bulan ?? '').trim());
+    return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+  });
+
+  return data || [];
+}
+
+/* debounce helper */
+function debounce(fn, ms = 300) {
+  let t;
+  return (...args) => {
+    clearTimeout(t);
+    t = setTimeout(() => fn(...args), ms);
+  };
+}
+
+/* concurrency mapper (simple) */
+async function mapWithConcurrency(items, mapper, concurrency = 8) {
+  const results = new Array(items.length);
+  let i = 0;
+  const workers = Array.from({ length: Math.min(concurrency, items.length) }, async () => {
+    while (true) {
+      const idx = i++;
+      if (idx >= items.length) break;
+      results[idx] = await mapper(items[idx], idx);
+    }
+  });
+  await Promise.all(workers);
+  return results;
+}
+
+/* call when user changes any filter (resets page to 1) */
+function applyAbsensiFilters() {
+  absensiCurrentPage = 1;
+  return loadAbsensiData();
+}
+
+/* wire filter inputs once (removes inline duplicates if present) */
+function wireAbsensiFilterEvents() {
+  const name = document.getElementById('absensiSearchNama');
+  if (name) { name.removeAttribute('oninput'); name.addEventListener('input', debounce(applyAbsensiFilters, 300)); }
+
+  const ids = ['absensiSearchKelas', 'absensiSearchUnit', 'absensiTahunAjaran', 'filterMerahCheckbox'];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.removeAttribute('onchange');
+    el.addEventListener('change', applyAbsensiFilters);
   });
 }
 
-// ========== ABSENSI MODULE FUNCTIONS ==========
-    function loadAbsensiData() {
-      const filterMerah = document.getElementById('filterMerahCheckbox').checked;
-      const searchTerm = document.getElementById('absensiSearchNama').value.toLowerCase();
-      const selectedKelas = document.getElementById('absensiSearchKelas').value;
-      const selectedUnit = document.getElementById('absensiSearchUnit').value;
-      
-      // Filter data
-      let filteredData = allSantriData.filter(santri => {
-        const namaMatch = santri.Nama_Lengkap?.toLowerCase().includes(searchTerm) || false;
-        const kelasMatch = selectedKelas === 'semua' || santri.Kelas === selectedKelas;
-        const unitMatch = selectedUnit === 'semua' || santri.Unit_Ndalem === selectedUnit;
-        
-        return namaMatch && kelasMatch && unitMatch;
-      });
-    
-      // Jika filter merah aktif, filter data yang memiliki absensi merah
-      if (filterMerah) {
-        filteredData = filteredData.filter(santri => {
-          const absensi = getAbsensiByStambuk(santri.Stambuk);
-          return absensi.some(item => item.tanpaIzin >= 3);
-        });
-      }
-
-      renderAbsensiTable(filteredData);
-    }
-
-    function getAbsensiByStambuk(stambuk) {
-      const absensiRecord = allAbsensiData.find(item => item.Stambuk === stambuk);
-      if (!absensiRecord) return [];
-      
-      const absensi = [];
-      
-      for (let i = 0; i < bulanAbsensi.length; i++) {
-        const bulan = bulanAbsensi[i];
-        const sakit = absensiRecord[`S_(${bulan})`] || 0;
-        const izin = absensiRecord[`I_(${bulan})`] || 0;
-        const tanpaIzin = absensiRecord[`T_(${bulan})`] || 0;
-        
-        // Tampilkan '-' jika nilai 0 atau kosong
-        absensi.push({
-          bulan: bulan,
-          sakit: sakit === 0 || sakit === '' ? '-' : sakit,
-          izin: izin === 0 || izin === '' ? '-' : izin,
-          tanpaIzin: tanpaIzin === 0 || tanpaIzin === '' ? '-' : tanpaIzin
-        });
-      }
-      
-      return absensi;
-    }
-
-    function renderAbsensiTable(data) {
+/* render table: fetch absensi for the current page in parallel (stable render, no jump) */
+async function renderAbsensiTable(filteredData) {
   const container = document.getElementById('absensi-container');
+  container.innerHTML = `<div style="padding:20px;text-align:center">Memuat data halaman ${absensiCurrentPage}…</div>`;
+
+  const totalPages = Math.max(1, Math.ceil(filteredData.length / absensiRowsPerPage));
+  if (absensiCurrentPage > totalPages) absensiCurrentPage = totalPages;
+
+  const start = (absensiCurrentPage - 1) * absensiRowsPerPage;
+  const pageData = filteredData.slice(start, start + absensiRowsPerPage);
+
+  // fetch absensi for page in parallel
+  const rowsArr = await Promise.all(pageData.map(s => s.absensi ? Promise.resolve(s.absensi) : getAbsensiByStambuk(s.Stambuk)));
+
+  // render all at once
   container.innerHTML = '';
-
-  data.forEach((santri, index) => {
-    const absensi = getAbsensiByStambuk(santri.Stambuk) || [];
-    const imgUrl = santri.Foto || 'https://i.imgur.com/W3UiaBA.png';
-
-    // HTML absensi bulanan
-    const absensiHtml = absensi.map((abs, i) => `
-      <tr>
-        <td>${i + 1}</td>
-        <td>${abs.bulan}</td>
-        <td>${abs.sakit}</td>
-        <td>${abs.izin}</td>
-        <td class="${Number(abs.tanpaIzin) >= 3 ? 'merah' : ''}">
-          ${abs.tanpaIzin}
-        </td>
-      </tr>
-    `).join('');
-
+  for (let i = 0; i < pageData.length; i++) {
+    const s = pageData[i];
+    const rows = rowsArr[i] || [];
     const box = document.createElement('div');
     box.className = 'santri-box';
-    box.innerHTML = `
-      <!-- Info Santri -->
-      <table style="width:100%; border-collapse:collapse; margin-bottom:12px; text-align:center; border:1px solid #cce0ff; table-layout:auto;">
-        <thead>
-          <tr>
-            <th style="width:40px;">No</th>
-            <th>Foto</th>
-            <th>Nama</th>
-            <th>Kls</th>
-            <th>Bag</th>
-            <th>Unit</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>${index + 1}</td>
-            <td>
-              <img src="${imgUrl}" alt="Foto ${santri.Nama_Lengkap || 'Santri'}"
-                   style="width: 70px; height: 95px; object-fit: cover; border: 1px solid #1a73e8;"
-                   onerror="this.style.display='none'">
-            </td>
-            <td>${santri.Nama_Lengkap || '-'}</td>
-            <td>${santri.Kelas || '-'}</td>
-            <td>${santri.Bagian || '-'}</td>
-            <td>${santri.Unit_Ndalem || '-'}</td>
-          </tr>
-        </tbody>
-      </table>
 
-      <!-- Tabel Absensi -->
-      <table style="width:100%; border-collapse:collapse; text-align:center; border:1px solid #cce0ff;">
+    let html = `
+      <table>
         <thead>
+          <tr><th colspan="5">${s.Nama_Lengkap || '-'} (${s.Kelas || '-'})</th></tr>
+          <tr><td colspan="5" style="text-align:center"><img src="${s.Foto || 'img/default.png'}" width="80" alt="foto"></td></tr>
           <tr>
-            <th>No</th>
-            <th>Bulan</th>
-            <th>Sakit</th>
-            <th>Izin</th>
-            <th>Tanpa Izin</th>
+            <th>No</th><th>Bulan</th><th>Sakit</th><th>Izin</th><th>Tanpa Izin</th>
           </tr>
         </thead>
         <tbody>
-          ${absensiHtml}
-        </tbody>
-      </table>
     `;
-    container.appendChild(box);
-  });
 
-  // CSS khusus nilai merah
-  const style = document.createElement('style');
-  style.textContent = `
-    .merah {
-      background-color: #ffcccc !important;
-      color: #cc0000 !important;
-      font-weight: bold;
+    if (rows.length > 0) {
+      rows.forEach((r, idx) => {
+        html += `<tr>
+                   <td>${idx + 1}</td>
+                   <td style="text-align:left">${r.Bulan || '-'}</td>
+                   <td>${r.Sakit ?? 0}</td>
+                   <td>${r.Izin ?? 0}</td>
+                   <td>${r.Tanpa_Izin ?? 0}</td>
+                 </tr>`;
+      });
+    } else {
+      html += `<tr><td colspan="5">Belum ada data absensi</td></tr>`;
     }
-  `;
-  container.appendChild(style);
+
+    html += '</tbody></table>';
+    box.innerHTML = html;
+    container.appendChild(box);
+  }
+
+  renderAbsensiPagination(totalPages);
 }
 
+/* safer page setter to avoid racing */
+function setAbsensiPage(n) {
+  if (typeof n !== 'number' || n < 1) return;
+  absensiCurrentPage = n;
+  loadAbsensiData();
+}
 
+/* render pagination controls using setAbsensiPage */
+function renderAbsensiPagination(totalPages) {
+  let pagDiv = document.getElementById('absensi-pagination');
+  if (!pagDiv) {
+    pagDiv = document.createElement('div');
+    pagDiv.id = 'absensi-pagination';
+    pagDiv.className = 'pagination';
+    document.getElementById('absensi-container').after(pagDiv);
+  }
+
+  if (totalPages <= 1) { pagDiv.innerHTML = ''; return; }
+
+  const prevDisabled = absensiCurrentPage === 1 ? 'disabled' : '';
+  const nextDisabled = absensiCurrentPage === totalPages ? 'disabled' : '';
+
+  // build buttons (use data-* to avoid inline increment)
+  pagDiv.innerHTML = `
+    <div class="pagination-info">Halaman ${absensiCurrentPage} dari ${totalPages}</div>
+    <div class="pagination-controls">
+      <button ${prevDisabled} id="abs-prev">Prev</button>
+      <button ${nextDisabled} id="abs-next">Next</button>
+    </div>
+  `;
+
+  document.getElementById('abs-prev')?.addEventListener('click', () => { if (absensiCurrentPage>1) setAbsensiPage(absensiCurrentPage-1); });
+  document.getElementById('abs-next')?.addEventListener('click', () => { if (absensiCurrentPage<totalPages) setAbsensiPage(absensiCurrentPage+1); });
+}
+
+/* call this on init */
+wireAbsensiFilterEvents();
 
 // ========== UTILITY FUNCTIONS ==========
     function showLoading(show) {
@@ -3301,25 +3402,29 @@ async function loadReferensiUnit() {
 }
 
 // ================== LOAD DATA ==================
-
-// 1. Ambil semua santri sekali saja
+// Ganti / update fungsi loadSantri()
 async function loadSantri() {
   const rows = await fetchAllRows(
     "santri_kharisma",
-    "Stambuk, Nama_Lengkap, Kelas, Unit_Ndalem"
+    // pastikan mengambil kolom Status juga
+    "Stambuk, Nama_Lengkap, Kelas, Unit_Ndalem, Status, Bagian, Foto"
   );
+
   santriDict = {};
-  for (const s of rows) {
+  for (const s of (rows || [])) {
     santriDict[s.Stambuk] = {
-      Nama_Lengkap: s.Nama_Lengkap,
-      Kelas: s.Kelas,
-      Unit_Ndalem: s.Unit_Ndalem
+      Nama_Lengkap: s.Nama_Lengkap || null,
+      Kelas: s.Kelas || null,
+      Unit_Ndalem: s.Unit_Ndalem || null,
+      // simpan status normalized (lowercase, trim)
+      Status: (s.Status || '').toString().trim().toLowerCase(),
+      Bagian: s.Bagian || null,
+      Foto: s.Foto || null
     };
   }
   console.log("✅ santriDict terisi:", santriDict);
 }
 
-// 2. Load nilai + tempelkan Nama_Lengkap, Kelas, Unit dari santriDict
 // ================== LOAD NILAI ==================
 async function loadNilai() {
   showLoading(true);
@@ -3333,8 +3438,9 @@ async function loadNilai() {
             santriDict[s.Stambuk] = {
               Nama_Lengkap: s.Nama_Lengkap || null,
               Kelas: s.Kelas || null,
-              Bagian: s.Bagian || null,          // ← ikut Bagian
-              Unit_Ndalem: s.Unit_Ndalem || null
+              Bagian: s.Bagian || null,
+              Unit_Ndalem: s.Unit_Ndalem || null,
+              Status: s.Status || null
             };
           }
         }
@@ -3346,24 +3452,28 @@ async function loadNilai() {
     // --- ambil semua nilai ---
     const rows = await fetchAllRows("nilai", "*");
 
-    // --- merge dengan santriDict supaya ada Nama/Kelas/Bagian/Unit ---
+    // --- merge dengan santriDict supaya ada Nama/Kelas/Bagian/Unit/Status ---
     allNilaiData = (rows || []).map(r => {
       const ref    = santriDict[r.Stambuk] || {};
       const nama   = ref.Nama_Lengkap ?? r.Nama_Lengkap ?? "-";
       const kelas  = ref.Kelas ?? r.Kelas ?? "-";
       const bagian = ref.Bagian ?? r.Bagian ?? "-";
       const unit   = ref.Unit_Ndalem ?? r.Unit_Ndalem ?? "-";
+      const status = ref.Status ?? r.Status ?? null;
 
       return {
         ...r,
         Nama_Lengkap: nama,
         Kelas: kelas,
-        Bagian: bagian,          // ← disimpan di allNilaiData
+        Bagian: bagian,
         Unit_Ndalem: unit,
+        Status: status,
         Nilai: toNumber(r.Nilai),
         __key: r.Stambuk || `${nama}|${kelas}`
       };
-    });
+    })
+    // ✅ hanya santri aktif
+    .filter(r => r.Status && r.Status.toLowerCase() === "aktif");
 
     // --- simpan offline di IndexedDB ---
     await saveToDB("nilai", allNilaiData);
@@ -3395,8 +3505,6 @@ async function loadNilai() {
 }
 
 
-
-
 // 3. Urutan inisialisasi modul nilai
 async function initNilaiModule() {
   try {
@@ -3425,7 +3533,7 @@ function initNilaiFilters() {
     + kelasOrder.map(k => `<option value="${k}">${k}</option>`).join('');
 
   // isi opsi unit dari data
-  const units = Array.from(new Set(allNilaiData.map(r => r.Unit_Ndalem).filter(Boolean))).sort();
+  const units = Array.from(new Set(getActiveNilaiRows().map(r => r.Unit_Ndalem).filter(Boolean))).sort();
   unitSelect.innerHTML = '<option value="semua">Semua Unit</option>'
     + units.map(u => `<option value="${u}">${u}</option>`).join('');
 
@@ -3434,10 +3542,21 @@ function initNilaiFilters() {
   namaInput.oninput = () => renderNilaiTable();
 }
 
+// RETURN semua baris nilai yang mapping ke santri aktif di master
+function getActiveNilaiRows() {
+  return (allNilaiData || []).filter(r => {
+    const st = r.Stambuk;
+    if (!st) return false;
+    const master = santriDict[st];
+    if (!master) return false;
+    return String(master.Status || '').toLowerCase() === 'aktif';
+  });
+}
+
 // ================== GROUPING & AGREGASI ==================
 function buildStudentAgg() {
-  const agg = new Map(); // key: Stambuk, value: {sum,count,avg, Nama_Lengkap, Kelas, Unit_Ndalem}
-  for (const r of allNilaiData) {
+  const agg = new Map();
+  for (const r of getActiveNilaiRows()) {
     const key = r.Stambuk || `${r.Nama_Lengkap}|${r.Kelas}`;
     if (!agg.has(key)) agg.set(key, { sum:0, count:0, avg:0, Nama_Lengkap: r.Nama_Lengkap, Kelas: r.Kelas, Unit_Ndalem: r.Unit_Ndalem });
     const a = agg.get(key);
@@ -3447,6 +3566,7 @@ function buildStudentAgg() {
   }
   return agg;
 }
+
 
 // ================== TABEL NILAI ==================
 function renderNilaiTable(page = 1) {
@@ -3459,20 +3579,21 @@ function renderNilaiTable(page = 1) {
 
   // === Group by siswa ===
   const grouped = new Map();
-  for (const r of allNilaiData) {
+  for (const r of getActiveNilaiRows()) {
     const key = r.__key;
     if (!grouped.has(key)) {
       grouped.set(key, {
         Stambuk: r.Stambuk,
         Nama_Lengkap: r.Nama_Lengkap,
         Kelas: r.Kelas,
-        Bagian: r.Bagian,            // ← ditambahkan
+        Bagian: r.Bagian,
         Unit_Ndalem: r.Unit_Ndalem,
         NilaiList: []
       });
     }
     grouped.get(key).NilaiList.push({ mapel: r.Mata_Pelajaran, nilai: r.Nilai });
   }
+
 
   // Hitung jumlah & rata-rata
   const students = [...grouped.values()].map(d => {
@@ -3833,9 +3954,6 @@ const valueLabelPlugin = {
   });
 }
 
-
-
-
 // ===== Helpers untuk modul Nilai =====
 function cleanStr(s) {
   return (s ?? '')
@@ -3851,6 +3969,24 @@ function toNumber(x) {
     return isFinite(n) ? n : 0;
   }
   return 0;
+}
+
+// Helper: cek apakah santri aktif
+function isActiveSantri(stambuk) {
+  if (!santriDict || !stambuk) return false;
+  const s = santriDict[stambuk];
+  if (!s) return false;
+  return (String(s.Status || '').toLowerCase() === 'aktif');
+}
+
+
+// Helper: urutan bulan (pakai global bulanAbsensi jika ada, kalau tidak ambil dari data absensi)
+function getBulanOrder() {
+  if (typeof bulanAbsensi !== 'undefined' && Array.isArray(bulanAbsensi) && bulanAbsensi.length) {
+    return bulanAbsensi;
+  }
+  const set = new Set((allAbsensiData || []).map(r => (r.Bulan || '').toString()).filter(Boolean));
+  return Array.from(set);
 }
 
 // Ambil semua baris Supabase dengan paging agar tidak ke-limit 1000
@@ -4375,8 +4511,8 @@ function updateInfoPagination(totalPages, currentPage, data) {
 		if (!db.objectStoreNames.contains('Pelanggaran')) {
 		  db.createObjectStore('Pelanggaran', { keyPath: 'id' });
 		}
-		if (!db.objectStoreNames.contains('absensi')) {
-		  db.createObjectStore('absensi', { keyPath: 'id' });
+		if (!db.objectStoreNames.contains('absensi1')) {
+		  db.createObjectStore('absensi1', { keyPath: 'id' });
 		}
 		if (!db.objectStoreNames.contains('data_guru')) {
 		  db.createObjectStore('data_guru', { keyPath: 'id' });
@@ -5041,8 +5177,8 @@ async function openAddSantri() {
   document.getElementById("santriId").value = "";
   document.getElementById("fotoPreview").style.display = "none";
 
-  loadKelasOptions();            // default kosong
-  await loadUnitNdalemOptions(); // default kosong
+  loadKelasOptions();           // default kosong
+  await loadUnitNdalemOptions();// default kosong
 
   document.getElementById("santriModal").style.display = "block";
 }
@@ -5146,7 +5282,68 @@ document.getElementById("santriForm").onsubmit = async function(e) {
   }
 };
 
-// ====== Hapus ======
+
+
+// ========== PREVIEW FOTO ==========
+function previewFoto() {
+  const url = document.getElementById("Foto").value.trim();
+  const preview = document.getElementById("fotoPreview");
+  if (url && (url.endsWith(".jpg") || url.endsWith(".jpeg") || url.endsWith(".png") || url.endsWith(".gif") || url.startsWith("http"))) {
+    preview.src = url;
+    preview.style.display = "block";
+  } else {
+    preview.style.display = "none";
+  }
+}
+
+// ========== SIMPAN (TAMBAH / EDIT) ==========
+document.getElementById("santriForm").onsubmit = async function(e) {
+  e.preventDefault();
+
+  const id = document.getElementById("santriId").value;
+  const formData = {};
+  [
+    "Nama_Lengkap","Kelas","Bagian","Stambuk","Stambuk_Ndalem","Unit_Ndalem","Kode_Unit",
+    "Asal_Daerah","Himpunan","Kamar","Tgl_Lahir","Mulai_Ngabdi","Tgl_Keluar",
+    "Status","Posisi_Tugas","Jam_Tugas","Shift","Foto"
+  ].forEach(f => {
+    formData[f] = document.getElementById(f).value.trim() || null;
+  });
+
+  if (!formData.Nama_Lengkap) return alert("❌ Nama lengkap wajib diisi!");
+
+  let result;
+  if (id) {
+    result = await supabaseClient.from("santri_kharisma").update(formData).eq("id", id);
+    lastEditedId = parseInt(id);
+  } else {
+    result = await supabaseClient.from("santri_kharisma").insert([formData]).select("id").single();
+    if (!result.error && result.data) {
+      lastEditedId = result.data.id;
+    }
+  }
+
+  if (result.error) {
+    alert("❌ Gagal simpan: " + result.error.message);
+  } else {
+    alert("✅ Data berhasil disimpan!");
+    closeSantriModal();
+
+    await loadInitialData();
+    filterSantri();
+
+    // scroll ke row terakhir
+    setTimeout(() => {
+      const activeTab = document.querySelector('.tab-item.active').dataset.tab;
+      if (activeTab === "data") {
+        const row = document.querySelector(`tr[data-id='${lastEditedId}']`);
+        if (row) row.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }, 300);
+  }
+};
+
+// ========== HAPUS ==========
 async function removeSantri(id) {
   if (!confirm("Yakin hapus data ini?")) return;
 
