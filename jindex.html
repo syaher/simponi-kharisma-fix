@@ -2944,8 +2944,7 @@ async function renderFullTable(data, page = 1) {
       if (userRole === "admin") {
         const td = document.createElement("td");
         td.innerHTML = `
-          <button onclick="openEditSantri(${santri.id})">✏️ Edit</button>
-          <button onclick="removeSantri(${santri.id})">🗑️ Hapus</button>
+          <button onclick="openEditSantri(${santri.id})">✏️ Edit</button>         
         `;
         tr.appendChild(td);
       }
