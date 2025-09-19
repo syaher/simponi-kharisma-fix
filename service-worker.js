@@ -1,4 +1,4 @@
-const CACHE_NAME = "kharisma-cache-v3"; 
+const CACHE_NAME = "kharisma-cache-v4"; 
 const OFFLINE_URL = "/offline.html";
 
 // Hanya file statis non-login
@@ -17,19 +17,29 @@ self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(FILES_TO_CACHE))
   );
-  self.skipWaiting();
+  self.skipWaiting(); // langsung aktifkan SW baru
 });
 
-// Activate → hapus cache lama
+// Activate → hapus cache lama + beri tahu client
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
+    (async () => {
+      // Hapus cache lama
+      const keys = await caches.keys();
+      await Promise.all(
         keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
-      )
-    )
+      );
+
+      // Klaim kontrol semua client
+      await self.clients.claim();
+
+      // Kirim pesan ke semua client bahwa ada versi baru
+      const clients = await self.clients.matchAll({ includeUncontrolled: true });
+      clients.forEach((client) => {
+        client.postMessage({ type: "NEW_VERSION" });
+      });
+    })()
   );
-  self.clients.claim();
 });
 
 // Fetch handler
