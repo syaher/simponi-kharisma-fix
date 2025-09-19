@@ -1664,43 +1664,6 @@ button:active {
   }
 }
 
-/* CSS di style.css
-.highlight-row {
-  animation: highlightFade 3s ease forwards;
-}
-@keyframes highlightFade {
-  0%   { background-color: #fff3cd; }
-  100% { background-color: transparent; }
-}
-
-.app-header-right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  text-align: right;
-  font-size: 0.9rem;
-  line-height: 1.4;
-}
-
-#hariHijriah,
-#tanggalHijriah {
-  font-weight: 600;
-  font-size: 0.9rem;
-  opacity: 0.95;
-}
-
-/* 📱 Android responsif */
-@media (max-width: 600px) {
-  .app-header-right {
-    font-size: 0.8rem;
-    line-height: 1.2;
-  }
-  #hariHijriah,
-  #tanggalHijriah {
-    font-size: 0.8rem;
-  }
-}
-
 .autocomplete-wrapper {
   position: relative;
   display: inline-block;
@@ -1772,11 +1735,7 @@ button:active {
     <div class="app-header-left">
       <img src="icons/logo.png" alt="Logo" class="app-logo-img">
       <span class="app-title">Simponi Kharisma</span>
-    </div>
-	<div class="app-header-right">
-    <div id="hariHijriah"></div>
-    <div id="tanggalHijriah"></div>
-  </div>
+    </div>	
   </div>
 
 <!-- 🔹 User Info Bar -->
@@ -5952,48 +5911,6 @@ function showToast(message, type = "success") {
   setTimeout(() => toast.remove(), 2800);
 }
 
-
-document.addEventListener("DOMContentLoaded", () => {
-  const today = new Date();
-
-  // --- Hari dengan koma ---
-  let hari = today.toLocaleDateString("id-ID", { weekday: "long" });
-
-  // Custom hari (ubah Minggu jadi Ahad)
-  hari = hari.replace(/Minggu/i, "Ahad");
-
-  document.getElementById("hariHijriah").textContent = hari + ",";
-
-  // --- Tanggal Hijriah (default dari Intl API) ---
-  let hijriDate = new Intl.DateTimeFormat("id-TN-u-ca-islamic", {
-    day: "numeric",
-    month: "long",
-    year: "numeric"
-  }).format(today);
-
-  // Hilangkan "H" bawaan kalau ada
-  hijriDate = hijriDate.replace(/\s*H$/, "");
-
-  // Custom nama bulan Hijriah
-  hijriDate = hijriDate
-    .replace(/Muharram/i, "Muharam")
-    .replace(/Safar/i, "Shofar")
-    .replace(/Rabiulawal/i, "Robi'ul Awal")
-    .replace(/Rabiulakhir/i, "Robi'ul Akhir")
-    .replace(/Jumadilawal/i, "Jumadil Ula")
-    .replace(/Jumadilakhir/i, "Jumadil Tsani")
-    .replace(/Rajab/i, "Rajab")
-    .replace(/Sha'ban/i, "Sya'ban")
-    .replace(/Ramadhan/i, "Ramadhan")
-    .replace(/Shawwal/i, "Syawal")
-    .replace(/Dzulqa'dah/i, "Dzulqo'dah")
-    .replace(/Dzulhijjah/i, "Dzulhijjah");
-
-  // Tampilkan
-  document.getElementById("tanggalHijriah").textContent = hijriDate + " H";
-});
-
-
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
@@ -6127,7 +6044,6 @@ async function refreshAllData() {
     showLoading(false);
   }
 }
-
 
 
 </script>
