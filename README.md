@@ -1,6 +1,6 @@
 # Simponi Kharisma
 
-[![Version](https://img.shields.io/badge/version-v1.0.0-orange)]()
+[![Version](https://img.shields.io/badge/version-v2.1.1-orange)]()
 [![License](https://img.shields.io/badge/license-Proprietary-red)](./LICENSE)
 [![Status](https://img.shields.io/badge/status-Internal%20Use-blue)]()
 [![Made with Supabase](https://img.shields.io/badge/Made%20with-Supabase-green)](https://supabase.com/)
