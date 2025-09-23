@@ -5223,7 +5223,7 @@ hr{border:1px solid #000;margin:20px 0 20px;}
 <h2 style="text-align:center;font-size:16px;margin:10px 0;">${judul}</h2>
 ${filterInfo ? `<div class="filter-info">${filterInfo}</div>` : ""}
 ${bodyContent}
-<div class="footer">Admin | Simponi Kharisma –  ${today.toLocaleDateString("id-ID")} ${today.toLocaleTimeString("id-ID")}</div>
+<div class="footer">Admin – Simponi Kharisma –  ${today.toLocaleDateString("id-ID")} ${today.toLocaleTimeString("id-ID")}</div>
 </body></html>`;
 
     const blob = new Blob([content], { type: "text/html;charset=utf-8" });
@@ -5291,7 +5291,7 @@ async function downloadNilaiPDF() {
     if (th)    filename += `_${th}`;
     filename += `_${today.toISOString().replace(/[:T]/g,"-").split(".")[0]}.pdf`;
 
-    const footerText = `Admin | Simponi Kharisma – ${today.toLocaleDateString("id-ID")} ${today.toLocaleTimeString("id-ID")}`;
+    const footerText = `Admin – Simponi Kharisma – ${today.toLocaleDateString("id-ID")} ${today.toLocaleTimeString("id-ID")}`;
 
     // ==== Kop ====
     try {
@@ -5728,7 +5728,7 @@ async function downloadSantriPDF() {
 		doc.setFontSize(9);
 		doc.setTextColor(120);
 		doc.text(
-		  `Admin | Simponi Kharisma – ${new Date().toLocaleString("id-ID")}`,
+		  `Admin – Simponi Kharisma – ${new Date().toLocaleString("id-ID")}`,
 		  pageWidth - 40,
 		  pageHeight - 20,
 		  { align: "right" }
@@ -5851,7 +5851,7 @@ exportData.forEach((s, i) => {
 
 
   html += `</tbody></table>
-  <div class="footer">Admin | Simponi Kharisma – ${new Date().toLocaleString("id-ID")}</div>
+  <div class="footer">Admin – Simponi Kharisma – ${new Date().toLocaleString("id-ID")}</div>
   </body></html>`;
 
   const blob = new Blob([html], { type: "text/html" });
