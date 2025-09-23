@@ -5214,7 +5214,7 @@ hr{border:1px solid #000;margin:20px 0 20px;}
 <div class="kop">
   <img src="https://i.imgur.com/Irgu32G.png">
   <div class="identitas">
-    <h1>KHARISMA</h1>
+    <h1>KHUDAMA' KHARISMA</h1>
     <h2>Pondok Pesantren Lirboyo Kota Kediri Jawa Timur</h2>
     <p>Sekretariat: Kantor KHARISMA Gedung Nafis Lt. 03 Lirboyo Kota Kediri</p>
   </div>
@@ -5223,7 +5223,7 @@ hr{border:1px solid #000;margin:20px 0 20px;}
 <h2 style="text-align:center;font-size:16px;margin:10px 0;">${judul}</h2>
 ${filterInfo ? `<div class="filter-info">${filterInfo}</div>` : ""}
 ${bodyContent}
-<div class="footer">Simponi Kharisma – dicetak ${today.toLocaleDateString("id-ID")} ${today.toLocaleTimeString("id-ID")}</div>
+<div class="footer">Admin | Simponi Kharisma –  ${today.toLocaleDateString("id-ID")} ${today.toLocaleTimeString("id-ID")}</div>
 </body></html>`;
 
     const blob = new Blob([content], { type: "text/html;charset=utf-8" });
@@ -5291,7 +5291,7 @@ async function downloadNilaiPDF() {
     if (th)    filename += `_${th}`;
     filename += `_${today.toISOString().replace(/[:T]/g,"-").split(".")[0]}.pdf`;
 
-    const footerText = `Simponi Kharisma – dicetak ${today.toLocaleDateString("id-ID")} ${today.toLocaleTimeString("id-ID")}`;
+    const footerText = `Admin | Simponi Kharisma – ${today.toLocaleDateString("id-ID")} ${today.toLocaleTimeString("id-ID")}`;
 
     // ==== Kop ====
     try {
@@ -5302,7 +5302,7 @@ async function downloadNilaiPDF() {
 
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(22);
-    pdf.text("KHARISMA", pageWidth / 2, 60, { align: "center" });
+    pdf.text("KHUDAMA' KHARISMA", pageWidth / 2, 60, { align: "center" });
 
     pdf.setFont("helvetica", "normal");
     pdf.setFontSize(14);
@@ -5637,7 +5637,7 @@ async function downloadSantriPDF() {
 
   // ==== Header Lembaga ====
   doc.setFont("helvetica", "bold"); doc.setFontSize(22);
-  doc.text("KHARISMA", pageWidth / 2, 60, { align: "center" });
+  doc.text("KHUDAMA' KHARISMA", pageWidth / 2, 60, { align: "center" });
 
   doc.setFont("helvetica", "normal"); doc.setFontSize(14);
   doc.text("Pondok Pesantren Lirboyo Kota Kediri Jawa Timur", pageWidth / 2, 80, { align: "center" });
@@ -5728,7 +5728,7 @@ async function downloadSantriPDF() {
 		doc.setFontSize(9);
 		doc.setTextColor(120);
 		doc.text(
-		  `Simponi Kharisma – dicetak ${new Date().toLocaleString("id-ID")}`,
+		  `Admin | Simponi Kharisma – ${new Date().toLocaleString("id-ID")}`,
 		  pageWidth - 40,
 		  pageHeight - 20,
 		  { align: "right" }
@@ -5814,7 +5814,7 @@ const headers = [
   <div class="kop">
     <img src="https://i.imgur.com/Irgu32G.png">
     <div class="identitas">
-      <h1>KHARISMA</h1>
+      <h1>KHUDAMA' KHARISMA</h1>
       <h2>Pondok Pesantren Lirboyo Kota Kediri Jawa Timur</h2>
       <p>Sekretariat: Kantor KHARISMA Gedung Nafis Lt. 03 Lirboyo Kota Kediri</p>
     </div>
@@ -5851,7 +5851,7 @@ exportData.forEach((s, i) => {
 
 
   html += `</tbody></table>
-  <div class="footer">Simponi Kharisma – dicetak ${new Date().toLocaleString("id-ID")}</div>
+  <div class="footer">Admin | Simponi Kharisma – ${new Date().toLocaleString("id-ID")}</div>
   </body></html>`;
 
   const blob = new Blob([html], { type: "text/html" });
