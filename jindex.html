@@ -3766,7 +3766,7 @@ async function loadInventaris() {
     const { data, error } = await supabaseClient
       .from('inventaris')
       .select(`
-        Kode_Unit, Jenis_Kendaraan, Merk, NOPOL, Penanggung_Jawab, Keterangan, Update_Tgl,
+        Kode_Unit, Jenis_Kendaraan, Merk, NOPOL, Penanggung_Jawab, Keterangan, STNK, BPKB, Update_Tgl,
         unit:Kode_Unit (Nama_Unit)
       `);
 
@@ -3779,6 +3779,8 @@ async function loadInventaris() {
       NOPOL: row.NOPOL ?? '-',
       Penanggung_Jawab: row.Penanggung_Jawab ?? '-',
       Keterangan: row.Keterangan ?? '-',
+	  STNK: row.STNK ?? '-',
+	  BPKB: row.BPKB ?? '-',
       Update_Tgl: formatDate(row.Update_Tgl),
       Kode_Unit: row.Kode_Unit ?? '-'
     }));
@@ -3793,6 +3795,8 @@ async function loadInventaris() {
       { key: 'NOPOL', label: 'NOPOL' },
       { key: 'Penanggung_Jawab', label: 'Penanggung Jawab' },
       { key: 'Keterangan', label: 'Keterangan' },
+	  { key: 'STNK', label: 'STNK' },
+	  { key: 'BPKB', label: 'BPKB' },
       { key: 'Update_Tgl', label: 'Update Tgl' }
     ];
 
@@ -3809,6 +3813,8 @@ async function loadInventaris() {
         { key: 'NOPOL', label: 'NOPOL' },
         { key: 'Penanggung_Jawab', label: 'Penanggung Jawab' },
         { key: 'Keterangan', label: 'Keterangan' },
+		{ key: 'STNK', label: 'STNK' },
+		{ key: 'BPKB', label: 'BPKB' },
         { key: 'Update_Tgl', label: 'Update Tgl' }
       ];
       renderTable('inventaris-table', cached, cols);
