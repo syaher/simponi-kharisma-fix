@@ -166,147 +166,154 @@
   </div>
 
   <script>
-    const SUPABASE_URL = "https://oflkibeaesvwzdzyvdfy.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9mbGtpYmVhZXN2d3pkenl2ZGZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4NDIyOTQsImV4cCI6MjA3MDQxODI5NH0.MMcdx7g54R9kqFdfkDPP57gNPCnxGLKWHhexTAcJ2io";
-    const { createClient } = supabase;
-    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    // IndexedDB untuk auth_session
-    const dbPromise = idb.openDB("KharismaDB", 1, {
-      upgrade(db) {
-        if (!db.objectStoreNames.contains("auth_session")) {
-          db.createObjectStore("auth_session", { keyPath: "id" });
-        }
-      }
-    });
-
-    async function saveToDB(storeName, data) {
-      const db = await dbPromise;
-      data.forEach(item => db.put(storeName, item));
-    }
-    async function getFromDB(storeName) {
-      const db = await dbPromise;
-      return await db.getAll(storeName);
-    }
-
-    function showAlert(type, message) {
-      const alertBox = type === "error" ? document.getElementById("alertError") : document.getElementById("alertSuccess");
-      alertBox.textContent = message;
-      alertBox.style.display = "block";
-      setTimeout(() => { alertBox.style.display = "none"; }, 3000);
-    }
-
-    async function getUserRole(userId) {
-	  // Query ke tabel user_roles berdasarkan user_id (UUID)
-	  const { data, error } = await supabaseClient
-	    .from("user_roles")
-	    .select("role")
-	    .eq("user_id", userId)
-	    .single();
+	  const SUPABASE_URL = "https://oflkibeaesvwzdzyvdfy.supabase.co";
+	  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9mbGtpYmVhZXN2d3pkenl2ZGZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4NDIyOTQsImV4cCI6MjA3MDQxODI5NH0.MMcdx7g54R9kqFdfkDPP57gNPCnxGLKWHhexTAcJ2io"; // tetap pakai anon key
+	  const { createClient } = supabase;
+	  const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
 	
-	  if (error || !data) {
-	    console.error("Gagal ambil role:", error);
-	    return "user"; // fallback
+	  // IndexedDB untuk auth_session
+	  const dbPromise = idb.openDB("KharismaDB", 1, {
+	    upgrade(db) {
+	      if (!db.objectStoreNames.contains("auth_session")) {
+	        db.createObjectStore("auth_session", { keyPath: "id" });
+	      }
+	    }
+	  });
+	
+	  async function saveToDB(storeName, data) {
+	    const db = await dbPromise;
+	    data.forEach(item => db.put(storeName, item));
 	  }
-	  return data.role;
-	}
-
-    async function saveAuthSession(session) {
-      if (session) await saveToDB("auth_session", [session]);
-    }
-
-    async function checkSession() {
-      try {
-        const { data } = await supabaseClient.auth.getSession();
-        if (data.session) {
-          window.location.href = "jindex.html";
-          return;
-        }
-      } catch (err) {
-        console.log("Supabase session tidak ada:", err);
-      }
-
-      try {
-        const offlineSession = await getFromDB("auth_session");
-        if (offlineSession && offlineSession.length > 0) {
-          console.log("Memakai session offline:", offlineSession[0].user.email);
-          window.location.href = "jindex.html";
-        }
-      } catch (err) {
-        console.log("IndexedDB auth_session kosong:", err);
-      }
-    }
-
-    async function handleLogin(email, password) {
-	  const loginBtn = document.getElementById("loginBtn");
-	  const loginBtnText = document.getElementById("loginBtnText");
-	  loginBtn.disabled = true;
-	  loginBtnText.innerHTML = "🔄 memproses...";
-	
-	  try {
-	    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-	    if (error) throw new Error("Email atau password salah");
-	
-	    const session = data.session;
-	    if (!session) throw new Error("Session tidak tersedia");
-	
-	    // Ambil user_id dari session
-	    const userId = session.user.id;
-	
-	    // Ambil role dari tabel user_roles
-	    const role = await getUserRole(userId);
-	
-	    // Simpan role ke localStorage
-	    localStorage.setItem("userRole", role);
-	
-	    // Simpan session offline
-	    await saveAuthSession(session);
-	
-	    showAlert("success", `Login berhasil sebagai ${role}!`);
-	    setTimeout(() => { window.location.href = "jindex.html"; }, 1000);
-	  } catch (error) {
-	    showAlert("error", error.message);
-	  } finally {
-	    loginBtn.disabled = false;
-	    loginBtnText.innerHTML = "Login";
+	  async function getFromDB(storeName) {
+	    const db = await dbPromise;
+	    return await db.getAll(storeName);
 	  }
-	}
-
-
-    function setupPasswordToggle() {
-      const toggleButton = document.getElementById('togglePassword');
-      const passwordInput = document.getElementById('loginPassword');
-      toggleButton.addEventListener('click', function() {
-        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        passwordInput.setAttribute('type', type);
-        toggleButton.textContent = type === 'password' ? '👁️' : '👁️‍🗨️';
-      });
-    }
-
-    document.getElementById("loginForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const email = document.getElementById("loginEmail").value;
-      const password = document.getElementById("loginPassword").value;
-      if (!email || !password) {
-        showAlert("error", "Email dan password harus diisi");
-        return;
-      }
-      handleLogin(email, password);
-    });
-
-    document.addEventListener("DOMContentLoaded", () => {
-      checkSession(); // langsung cek session
-      setupPasswordToggle();
-    });
-
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js')
-          .then(reg => console.log("SW registered:", reg.scope))
-          .catch(err => console.error("SW registration failed:", err));
-      });
-    }
-  </script>
+	
+	  function showAlert(type, message) {
+	    const alertBox = type === "error" ? document.getElementById("alertError") : document.getElementById("alertSuccess");
+	    alertBox.textContent = message;
+	    alertBox.style.display = "block";
+	    setTimeout(() => { alertBox.style.display = "none"; }, 3000);
+	  }
+	
+	  // Ambil role user dari tabel user_roles
+	  async function getUserRole(userId) {
+	    const { data, error } = await supabaseClient
+	      .from("user_roles")
+	      .select("role")
+	      .eq("user_id", userId)
+	      .single();
+	
+	    if (error || !data) {
+	      console.error("Gagal ambil role:", error);
+	      return "user"; // fallback default
+	    }
+	    return data.role;
+	  }
+	
+	  async function saveAuthSession(session) {
+	    if (session) await saveToDB("auth_session", [session]);
+	  }
+	
+	  // 🔹 cek session saat halaman dimuat
+	  async function checkSession() {
+	    try {
+	      const { data } = await supabaseClient.auth.getSession();
+	      if (data.session) {
+	        const role = await getUserRole(data.session.user.id);
+	        localStorage.setItem("userRole", role);
+	        window.location.href = "jindex.html";
+	        return;
+	      }
+	    } catch (err) {
+	      console.log("Supabase session tidak ada:", err);
+	    }
+	
+	    try {
+	      const offlineSession = await getFromDB("auth_session");
+	      if (offlineSession && offlineSession.length > 0) {
+	        const userId = offlineSession[0].user.id;
+	        const role = await getUserRole(userId);
+	        localStorage.setItem("userRole", role);
+	        console.log("Memakai session offline:", offlineSession[0].user.email);
+	        window.location.href = "jindex.html";
+	      }
+	    } catch (err) {
+	      console.log("IndexedDB auth_session kosong:", err);
+	    }
+	  }
+	
+	  // 🔹 login user
+	  async function handleLogin(email, password) {
+	    const loginBtn = document.getElementById("loginBtn");
+	    const loginBtnText = document.getElementById("loginBtnText");
+	    loginBtn.disabled = true;
+	    loginBtnText.innerHTML = "🔄 memproses...";
+	
+	    try {
+	      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+	      if (error) throw new Error("Email atau password salah");
+	
+	      const session = data.session;
+	      if (!session) throw new Error("Session tidak tersedia");
+	
+	      // Ambil user_id dari session
+	      const userId = session.user.id;
+	
+	      // Ambil role dari tabel user_roles
+	      const role = await getUserRole(userId);
+	
+	      // Simpan role ke localStorage
+	      localStorage.setItem("userRole", role);
+	
+	      // Simpan session offline
+	      await saveAuthSession(session);
+	
+	      showAlert("success", `Login berhasil sebagai ${role}!`);
+	      setTimeout(() => { window.location.href = "jindex.html"; }, 1000);
+	    } catch (error) {
+	      showAlert("error", error.message);
+	    } finally {
+	      loginBtn.disabled = false;
+	      loginBtnText.innerHTML = "Login";
+	    }
+	  }
+	
+	  function setupPasswordToggle() {
+	    const toggleButton = document.getElementById('togglePassword');
+	    const passwordInput = document.getElementById('loginPassword');
+	    toggleButton.addEventListener('click', function() {
+	      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+	      passwordInput.setAttribute('type', type);
+	      toggleButton.textContent = type === 'password' ? '👁️' : '👁️‍🗨️';
+	    });
+	  }
+	
+	  document.getElementById("loginForm").addEventListener("submit", function(e) {
+	    e.preventDefault();
+	    const email = document.getElementById("loginEmail").value;
+	    const password = document.getElementById("loginPassword").value;
+	    if (!email || !password) {
+	      showAlert("error", "Email dan password harus diisi");
+	      return;
+	    }
+	    handleLogin(email, password);
+	  });
+	
+	  document.addEventListener("DOMContentLoaded", () => {
+	    checkSession(); // langsung cek session
+	    setupPasswordToggle();
+	  });
+	
+	  if ('serviceWorker' in navigator) {
+	    window.addEventListener('load', () => {
+	      navigator.serviceWorker.register('/service-worker.js')
+	        .then(reg => console.log("SW registered:", reg.scope))
+	        .catch(err => console.error("SW registration failed:", err));
+	    });
+	  }
+	</script>
 </body>
 </html>
+
 
