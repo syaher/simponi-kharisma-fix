@@ -3764,7 +3764,7 @@ async function loadInventaris() {
   showLoading(true);
   try {
     const { data, error } = await supabaseClient
-      .from('Inventaris')
+      .from('inventaris')
       .select(`
         Kode_Unit, Jenis_Kendaraan, Merk, NOPOL, Penanggung_Jawab, Keterangan, Update_Tgl,
         unit:Kode_Unit (Nama_Unit)
@@ -3784,7 +3784,7 @@ async function loadInventaris() {
     }));
 
     // Simpan ke IndexedDB
-    await saveToDB('Inventaris', mapped);
+    await saveToDB('inventaris', mapped);
 
     const cols = [
       { key: 'Nama_Unit', label: 'Unit Ndalem' },
@@ -3800,7 +3800,7 @@ async function loadInventaris() {
   } catch (err) {
     console.warn("Gagal load Inventaris dari Supabase, coba IndexedDB:", err);
 
-    const cached = await getFromDB('Inventaris');
+    const cached = await getFromDB('inventaris');
     if (cached.length > 0) {
       const cols = [
         { key: 'Nama_Unit', label: 'Unit Ndalem' },
@@ -5080,7 +5080,7 @@ function updateInfoPagination(totalPages, currentPage, data) {
 	const dbPromise = idb.openDB('KharismaDB', 1, {
 	  upgrade(db) {
 		const stores = [
-		  'santri_kharisma','Inventaris','Pelanggaran','absensi1',
+		  'santri_kharisma','inventaris','Pelanggaran','absensi1',
 		  'data_guru','informasi','nilai1','penasehat','referensi_unit_ndalem'
 		];
 		stores.forEach(s => {
