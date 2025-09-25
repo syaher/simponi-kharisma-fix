@@ -3827,7 +3827,7 @@ async function loadPelanggaran() {
   showLoading(true);
   try {
     const { data, error } = await supabaseClient
-      .from('Pelanggaran')
+      .from('pelanggaran')
       .select(`
         Tanggal, Stambuk, Kode_Unit, Pelanggaran,
         santri:Stambuk (Nama_Lengkap),
@@ -3846,7 +3846,7 @@ async function loadPelanggaran() {
     }));
 
     // Simpan hasil ke IndexedDB
-    await saveToDB('Pelanggaran', mapped);
+    await saveToDB('pelanggaran', mapped);
 
     const cols = [
       { key: 'Tanggal', label: 'Tanggal', format: (v) => {
@@ -3868,7 +3868,7 @@ async function loadPelanggaran() {
   } catch (err) {
     console.warn("Gagal load Supabase, coba dari IndexedDB:", err);
 
-    const cached = await getFromDB('Pelanggaran');
+    const cached = await getFromDB('pelanggaran');
     if (cached.length > 0) {
       const cols = [
         { key: 'Tanggal', label: 'Tanggal' },
@@ -5080,7 +5080,7 @@ function updateInfoPagination(totalPages, currentPage, data) {
 	const dbPromise = idb.openDB('KharismaDB', 1, {
 	  upgrade(db) {
 		const stores = [
-		  'santri_kharisma','inventaris','Pelanggaran','absensi1',
+		  'santri_kharisma','inventaris','pelanggaran','absensi1',
 		  'data_guru','informasi','nilai1','penasehat','referensi_unit_ndalem'
 		];
 		stores.forEach(s => {
