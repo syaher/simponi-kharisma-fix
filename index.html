@@ -196,13 +196,19 @@
       setTimeout(() => { alertBox.style.display = "none"; }, 3000);
     }
 
-    function getRedirectPage(email) {
-	  const normalizedEmail = email.toLowerCase().trim();
-	  if (normalizedEmail === "syaherkhofsoh@gmail.com") {
-		return { page: "jindex.html", role: "admin" };
-	  } else {
-		return { page: "jindex.html", role: "user" };
+    async function getUserRole(userId) {
+	  // Query ke tabel user_roles berdasarkan user_id (UUID)
+	  const { data, error } = await supabaseClient
+	    .from("user_roles")
+	    .select("role")
+	    .eq("user_id", userId)
+	    .single();
+	
+	  if (error || !data) {
+	    console.error("Gagal ambil role:", error);
+	    return "user"; // fallback
 	  }
+	  return data.role;
 	}
 
     async function saveAuthSession(session) {
@@ -232,29 +238,40 @@
     }
 
     async function handleLogin(email, password) {
-      const loginBtn = document.getElementById("loginBtn");
-      const loginBtnText = document.getElementById("loginBtnText");
-      loginBtn.disabled = true;
-      loginBtnText.innerHTML = "🔄 memproses...";
+	  const loginBtn = document.getElementById("loginBtn");
+	  const loginBtnText = document.getElementById("loginBtnText");
+	  loginBtn.disabled = true;
+	  loginBtnText.innerHTML = "🔄 memproses...";
+	
+	  try {
+	    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+	    if (error) throw new Error("Email atau password salah");
+	
+	    const session = data.session;
+	    if (!session) throw new Error("Session tidak tersedia");
+	
+	    // Ambil user_id dari session
+	    const userId = session.user.id;
+	
+	    // Ambil role dari tabel user_roles
+	    const role = await getUserRole(userId);
+	
+	    // Simpan role ke localStorage
+	    localStorage.setItem("userRole", role);
+	
+	    // Simpan session offline
+	    await saveAuthSession(session);
+	
+	    showAlert("success", `Login berhasil sebagai ${role}!`);
+	    setTimeout(() => { window.location.href = "jindex.html"; }, 1000);
+	  } catch (error) {
+	    showAlert("error", error.message);
+	  } finally {
+	    loginBtn.disabled = false;
+	    loginBtnText.innerHTML = "Login";
+	  }
+	}
 
-      try {
-        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-        if (error) throw new Error("Email atau password salah");
-
-        const redirectInfo = getRedirectPage(email);
-		localStorage.setItem("userRole", redirectInfo.role);
-		await saveAuthSession(data.session);
-
-
-        showAlert("success", `Login berhasil sebagai ${redirectInfo.role}!`);
-        setTimeout(() => { window.location.href = redirectInfo.page; }, 1000);
-      } catch (error) {
-        showAlert("error", error.message);
-      } finally {
-        loginBtn.disabled = false;
-        loginBtnText.innerHTML = "Login";
-      }
-    }
 
     function setupPasswordToggle() {
       const toggleButton = document.getElementById('togglePassword');
@@ -292,3 +309,4 @@
   </script>
 </body>
 </html>
+
