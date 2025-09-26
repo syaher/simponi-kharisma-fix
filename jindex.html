@@ -6595,11 +6595,11 @@ async function loadInventaris() {
   }
 }
 
-
-
 /* === Kolom Inventaris (PascalCase) === */
 function getInventarisCols() {
-  return [
+  const userRole = localStorage.getItem("userRole") || "user";
+
+  const cols = [
     { key: "Nama_Unit", label: "Unit Ndalem" },
     { key: "Jenis_Kendaraan", label: "Jenis" },
     { key: "Merk", label: "Merk" },
@@ -6608,8 +6608,11 @@ function getInventarisCols() {
     { key: "Keterangan", label: "Keterangan" },
     { key: "STNK", label: "STNK" },
     { key: "BPKB", label: "BPKB" },
-    { key: "Update_Tgl_display", label: "Update Tgl" },
-    {
+    { key: "Update_Tgl_display", label: "Update Tgl" }
+  ];
+
+  if (userRole === "admin") {
+    cols.push({
       key: "Aksi",
       label: "Aksi",
       format: (v, row) => {
@@ -6619,8 +6622,10 @@ function getInventarisCols() {
           <button class="crud-btn-cancel" onclick='deleteInventaris("${row.id}")'>🗑️</button>
         `;
       }
-    }
-  ];
+    });
+  }
+
+  return cols;
 }
 
 
