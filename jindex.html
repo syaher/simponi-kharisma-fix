@@ -2516,10 +2516,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     
     const kelasOrder = [
-      'SP', 'V Ibtidaiyah', 'VI Ibtidaiyah',
+      'V Ibtidaiyah', 'VI Ibtidaiyah',
       'I Tsanawiyah', 'II Tsanawiyah', 'III Tsanawiyah', 
       'I Aliyah', 'II Aliyah', 'III Aliyah',
-      "I-II Ma'had Aly", "III-IV Ma'had Aly", "V-VI Ma'had Aly"
+      "I-II Ma'had Aly", "III-IV Ma'had Aly", "V-VI Ma'had Aly", "I'dadiyah I", "I'dadiyah II", "I'dadiyah III"
     ];
 	
 	const kelasOrderGuru = [
@@ -2948,6 +2948,26 @@ function calculateMasaKhidmah(mulaiValue) {
   return `${months} bln`;
 }
 
+// ===== Hitung Usia (tampil, mirip Masa Khidmah) =====
+function calculateUsia(tglLahirValue) {
+  if (!tglLahirValue) return 'Belum terdata';
+
+  const born = (tglLahirValue instanceof Date) ? tglLahirValue : new Date(tglLahirValue);
+  if (isNaN(born)) return 'Belum terdata';
+
+  const totalMonths = monthsSince(born);
+  if (totalMonths === null) return 'Belum terdata';
+  if (totalMonths <= 0) return '< 1 bln';
+
+  const years = Math.floor(totalMonths / 12);
+  const months = totalMonths % 12;
+
+  if (years > 0 && months > 0) return `${years} th, ${months} bln`;
+  if (years > 0) return `${years} th`;
+  return `${months} bln`;
+}
+
+
 // ========== SORT TABLE ==========
 function sortTableBy(column) {
   if (currentSortColumn === column) {
@@ -2967,6 +2987,7 @@ function sortTableBy(column) {
     'Posisi Tugas': 'Posisi_Tugas',
     'Shift': 'Shift',
     'Jam Tugas': 'Jam_Tugas',
+	'Usia': 'Tgl_Lahir',
     'Masa Khidmah': 'Mulai_Ngabdi'
   };
   const field = fieldMap[column];
@@ -2983,6 +3004,22 @@ function sortTableBy(column) {
       const idxB = kelasOrder.indexOf(rawB) === -1 ? 999 : kelasOrder.indexOf(rawB);
       return sortDirection === 'asc' ? idxA - idxB : idxB - idxA;
     }
+	
+	if (field === 'Tgl_Lahir') {
+	  const dateA = rawA ? new Date(rawA) : null;
+	  const dateB = rawB ? new Date(rawB) : null;
+	  // monthsSince(born) => jumlah bulan sejak lahir (lebih besar = lebih tua)
+	  const monthsA = (dateA && !isNaN(dateA)) ? monthsSince(dateA) : null;
+	  const monthsB = (dateB && !isNaN(dateB)) ? monthsSince(dateB) : null;
+
+	  if (monthsA === null && monthsB === null) return 0;
+	  if (monthsA === null) return sortDirection === 'asc' ? -1 : 1;
+	  if (monthsB === null) return sortDirection === 'asc' ? 1 : -1;
+
+	  // ascending = dari yang paling muda (nilai bulan kecil) ke paling tua (nilai besar)
+	  return sortDirection === 'asc' ? monthsA - monthsB : monthsB - monthsA;
+	}
+
 
     if (field === 'Mulai_Ngabdi') {
       const dateA = rawA ? new Date(rawA) : null;
@@ -3052,7 +3089,7 @@ async function renderFullTable(data, page = 1) {
     const headers = [
       'No','Foto','Nama','Kelas','Bagian',
       'Asal Daerah','Himpunan','Kamar','Unit Ndalem',
-      'Posisi Tugas','Shift','Jam Tugas','Masa Khidmah'
+      'Posisi Tugas','Shift','Jam Tugas','Usia','Masa Khidmah'
     ];
     if (userRole === "admin") headers.push("Aksi");
 
@@ -3091,6 +3128,7 @@ async function renderFullTable(data, page = 1) {
         <td>${santri.Posisi_Tugas || '-'}</td>
         <td>${santri.Shift || '-'}</td>
         <td>${santri.Jam_Tugas || '-'}</td>
+		<td>${calculateUsia(santri.Tgl_Lahir)}</td>
         <td>${calculateMasaKhidmah(santri.Mulai_Ngabdi)}</td>
       `;
 
@@ -3804,7 +3842,7 @@ function wrapAbsensiContent(innerHTML) {
         <div class="identitas">
           <h1>KHUDAMA' KHARISMA</h1>
           <h2>Pondok Pesantren Lirboyo Kota Kediri Jawa Timur</h2>
-          <p>Sekretariat: Kantor KHARISMA Gedung Nafis Lt. 03 Lirboyo Kota Kediri</p>
+          <p>Sekretariat: Kantor KHARISMA Gedung Nafis Lt. 02 Lirboyo Kota Kediri</p>
         </div>
       </div>
       <hr>
@@ -5659,7 +5697,7 @@ hr{border:1px solid #000;margin:20px 0 20px;}
   <div class="identitas">
     <h1>KHUDAMA' KHARISMA</h1>
     <h2>Pondok Pesantren Lirboyo Kota Kediri Jawa Timur</h2>
-    <p>Sekretariat: Kantor KHARISMA Gedung Nafis Lt. 03 Lirboyo Kota Kediri</p>
+    <p>Sekretariat: Kantor KHARISMA Gedung Nafis Lt. 02 Lirboyo Kota Kediri</p>
   </div>
 </div>
 <hr>
@@ -5892,41 +5930,28 @@ async function loadImageToBase64(url, maxSize = 150) {
   }
 }
 
-// ================= HELPER: Load Image → Base64 =================
-async function loadImageToBase64(url, maxSize = 150) {
-  try {
-    const img = await new Promise((resolve, reject) => {
-      const i = new Image();
-      i.crossOrigin = "Anonymous";
-      i.onload = () => resolve(i);
-      i.onerror = () => reject(new Error("Image load error"));
-      i.src = url + (url.includes("?") ? "&" : "?") + "cb=" + Date.now();
-    });
-
-    let w = img.naturalWidth || img.width;
-    let h = img.naturalHeight || img.height;
-    if (w > maxSize) {
-      h = Math.round((maxSize / w) * h);
-      w = maxSize;
-    }
-
-    const canvas = document.createElement("canvas");
-    canvas.width = w;
-    canvas.height = h;
-    const ctx = canvas.getContext("2d");
-    ctx.drawImage(img, 0, 0, w, h);
-
-    return { base64: canvas.toDataURL("image/png"), w, h };
-  } catch (err) {
-    console.warn("loadImageToBase64 failed:", err?.message || err);
-    return null;
-  }
-}
-
 // ================= DOWNLOAD SANTRI PDF =================
 async function downloadSantriPDF() {
   const exportData = getExportData();
   if (!exportData.length) return alert("Tidak ada data untuk diunduh!");
+
+  // 🔹 Prompt: ambil rentang nomor
+  const startInput = prompt("Mulai dari nomor berapa? (Kosongkan untuk mulai dari 1)", "1");
+  if (startInput === null) return; // batal download
+  const endInput = prompt("Sampai nomor berapa? (Kosongkan untuk semua)", "");
+  if (endInput === null) return; // batal download
+
+  let startNo = parseInt(startInput) || 1;
+  let endNo = parseInt(endInput) || exportData.length;
+
+  // Validasi rentang
+  if (startNo < 1 || endNo < startNo || startNo > exportData.length) {
+    alert("Nomor tidak valid!");
+    return;
+  }
+
+  // 🔹 Ambil data sesuai rentang
+  const limitedData = exportData.slice(startNo - 1, endNo);
 
   // 🔹 Ambil filter
   const unitFilterRaw  = document.getElementById("searchUnit")?.value || "";
@@ -5937,151 +5962,145 @@ async function downloadSantriPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF("landscape", "pt", "a3");
   const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
   let currentY = 140;
 
-  // ==== Logo ====
+  // ==== HEADER HALAMAN PERTAMA ====
   try {
     const logoUrl = "https://i.imgur.com/Irgu32G.png";
     const logoData = await loadImageToBase64(logoUrl);
-    if (logoData) {
-      doc.addImage(logoData.base64, "PNG", 40, 30, 80, 80); // PNG → transparan
-    }
-  } catch (e) {
-    console.warn("Logo gagal dimuat:", e);
-  }
+    if (logoData) doc.addImage(logoData.base64, "PNG", 40, 30, 80, 80);
+  } catch (e) { console.warn("Logo gagal dimuat:", e); }
 
-  // ==== Header Lembaga ====
   doc.setFont("helvetica", "bold"); doc.setFontSize(22);
   doc.text("KHUDAMA' KHARISMA", pageWidth / 2, 60, { align: "center" });
-
   doc.setFont("helvetica", "normal"); doc.setFontSize(14);
   doc.text("Pondok Pesantren Lirboyo Kota Kediri Jawa Timur", pageWidth / 2, 80, { align: "center" });
-
   doc.setFont("helvetica", "italic"); doc.setFontSize(11);
-  doc.text("Sekretariat: Kantor KHARISMA Gedung Nafis Lt. 03 Lirboyo Kota Kediri", pageWidth / 2, 100, { align: "center" });
-
+  doc.text("Sekretariat: Kantor KHARISMA Gedung Nafis Lt. 02 Lirboyo Kota Kediri", pageWidth / 2, 100, { align: "center" });
   doc.setLineWidth(1);
-  doc.line(40, 125, pageWidth - 40, 110);
+  doc.line(40, 115, pageWidth - 40, 115);
 
-  // ==== Judul laporan ====
-  doc.setFont("helvetica", "bold"); doc.setFontSize(16);
-  doc.text("LAPORAN DATA SANTRI", pageWidth / 2, currentY, { align: "center" });
-  currentY += 20;
+  // 🔹 Judul laporan
+  doc.setFont("helvetica", "bold"); 
+  doc.setFontSize(16);
+  doc.text("LAPORAN DATA SANTRI", pageWidth / 2, 135, { align: "center" });
+  currentY = 155;
 
-  // ==== Filter info ====
+  // ==== STATUS FILTER ====
+  doc.setFont("helvetica", "normal"); 
+  doc.setFontSize(10);
   if (unitFilter || kelasFilter) {
-    doc.setFont("helvetica", "normal"); doc.setFontSize(10);
     let filterInfo = [];
     if (unitFilter) filterInfo.push(`Unit: ${unitFilter}`);
     if (kelasFilter) filterInfo.push(`Kelas: ${kelasFilter}`);
     doc.text(filterInfo.join("   "), 40, currentY, { align: "left" });
     currentY += 15;
+  } else {
+    const manualStatus = prompt("Tuliskan status laporan (opsional, biarkan kosong jika tidak perlu)", "");
+    if (manualStatus === null) return; // batal
+    if (manualStatus) {
+      doc.text(manualStatus, 40, currentY, { align: "left" });
+      currentY += 15;
+    }
   }
 
-  // ==== Header tabel ====
+  // ==== HEADER TABEL ====
   const headers = [
     "No","Stambuk","Foto","Nama","Kelas","Bagian",
     "Asal Daerah","Himpunan","Kamar","Unit Ndalem",
-    "Posisi Tugas","Shift","Jam Tugas","Masa Khidmah"
+    "Posisi Tugas","Shift","Jam Tugas","Usia","Masa Khidmah"
   ];
 
-  // ==== Data rows ====
-  const rows = await Promise.all(exportData.map(async (s, i) => {
+  // ==== DATA ====
+  const rows = await Promise.all(limitedData.map(async (s, i) => {
     let foto = null;
     if (s.Foto) {
-      try { foto = await loadImageToBase64(s.Foto); }
+      try { foto = await loadImageToBase64(s.Foto); } 
       catch (e) { console.warn("Gagal load foto:", s.Foto); }
     }
     return [
-      i + 1,
-      s.Stambuk || "-",
-      foto,
-      s.Nama_Lengkap || "-",
-      s.Kelas || "-",
-      s.Bagian || "-",
-      s.Asal_Daerah || "-",
-      s.Himpunan || "-",
-      s.Kamar || "-",
-      s.Unit_Ndalem || "-",
-      s.Posisi_Tugas || "-",
-      s.Shift || "-",
-      s.Jam_Tugas || "-",
+      i + 1, // tetap mulai dari 1 meskipun slice
+      s.Stambuk || "-", foto,
+      s.Nama_Lengkap || "-", s.Kelas || "-", s.Bagian || "-",
+      s.Asal_Daerah || "-", s.Himpunan || "-", s.Kamar || "-",
+      s.Unit_Ndalem || "-", s.Posisi_Tugas || "-", s.Shift || "-",
+      s.Jam_Tugas || "-", calculateUsia(s.Tgl_Lahir),
       calculateMasaKhidmah(s.Mulai_Ngabdi)
     ];
   }));
 
-  // ==== Generate tabel PDF ====
-	doc.autoTable({
-	  head: [headers],
-	  body: rows,
-	  startY: currentY,
-	  styles: {
-		fontSize: 8,
-		cellWidth: "wrap",
-		minCellHeight: 32,
-		valign: "middle",
-		halign: "center"   // default: center
-	  },
-	  headStyles: {
-		halign: "center",  // header selalu center
-		valign: "middle"
-	  },
-	  columnStyles: {
-		0: { cellWidth: 20 },   // No
-		1: { cellWidth: 55 },   // Stambuk
-		2: { cellWidth: 35 },   // Foto
-		3: { cellWidth: 100, halign: "left" } // 🔹 Nama rata kiri
-	  },
-	  willDrawCell: function (data) {
-		if (data.section === "body" && data.column.index === 2) {
-		  data.cell.text = [""];
-		}
-	  },
-	  didDrawPage: function () {
-		const pageHeight = doc.internal.pageSize.getHeight();
-		doc.setFont("helvetica", "italic");
-		doc.setFontSize(9);
-		doc.setTextColor(120);
-		doc.text(
-		  `Admin – Simponi Kharisma – ${new Date().toLocaleString("id-ID")}`,
-		  pageWidth - 40,
-		  pageHeight - 20,
-		  { align: "right" }
-		);
-		doc.setTextColor(0);
-	  },
-	  didDrawCell: function (data) {
-		if (data.section === "body" && data.column.index === 2) {
-		  const foto = data.cell.raw;
-		  if (foto && foto.base64) {
-			const padding = 2;
-			const cellW = data.cell.width - padding * 2;
-			const cellH = data.cell.height - padding * 2;
-			const x = data.cell.x + padding;
-			const y = data.cell.y + padding;
+  // ==== TABEL ====
+  doc.autoTable({
+    head: [headers],
+    body: rows,
+    startY: currentY,
+    margin: { top: 40, right: 40, bottom: 60, left: 40 },
+    styles: {
+      fontSize: 10, minCellHeight: 32,
+      halign: "center", valign: "middle",
+      lineWidth: 0.5, lineColor: [0, 0, 0]
+    },
+    headStyles: {
+      fillColor: [0, 102, 204],
+      textColor: [255, 255, 255],
+      fontStyle: "bold",
+      halign: "center",
+      valign: "middle",
+      lineWidth: 0.5,
+      lineColor: [0, 0, 0]
+    },
+    bodyStyles: { lineWidth: 0.5, lineColor: [0, 0, 0] },
+    columnStyles: {
+      0:{cellWidth:25},1:{cellWidth:55},2:{cellWidth:40},3:{cellWidth:100,halign:"left"},
+      4:{cellWidth:100},5:{cellWidth:55},6:{cellWidth:85},7:{cellWidth:75},8:{cellWidth:60},
+      9:{cellWidth:130},10:{cellWidth:100},11:{cellWidth:45},12:{cellWidth:100},
+      13:{cellWidth:70},14:{cellWidth:70}
+    },
+    rowPageBreak: "avoid",
+    willDrawCell(data) {
+      if (data.section === "body" && data.column.index === 2) data.cell.text = [""];
+    },
+    didDrawCell(data) {
+      if (data.section === "body" && data.column.index === 2) {
+        const foto = data.cell.raw;
+        if (foto && foto.base64) {
+          const pad = 2;
+          const cw = data.cell.width - pad * 2;
+          const ch = data.cell.height - pad * 2;
+          const ratio = Math.min(cw / foto.w, ch / foto.h);
+          const nw = foto.w * ratio, nh = foto.h * ratio;
+          const x = data.cell.x + (data.cell.width - nw) / 2;
+          const y = data.cell.y + (data.cell.height - nh) / 2;
+          try { doc.addImage(foto.base64, "PNG", x, y, nw, nh); } catch {}
+        }
+      }
+    }
+  });
 
-			let ratio = Math.min(cellW / foto.w, cellH / foto.h);
-			let newW = foto.w * ratio;
-			let newH = foto.h * ratio;
-			let offsetX = x + (cellW - newW) / 2;
-			let offsetY = y + (cellH - newH) / 2;
+  // ==== NOMOR HALAMAN DAN FOOTER ====
+  const pageCount = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFont("helvetica", "normal"); doc.setFontSize(10);
+    doc.text(`Halaman ${i} dari ${pageCount}`, pageWidth / 2, pageHeight - 20, { align: "center" });
+    if (i === pageCount) {
+      doc.setFont("helvetica", "italic");
+      doc.setFontSize(10);
+      doc.setTextColor(120);
+      doc.text(
+        `Admin – Simponi Kharisma – ${new Date().toLocaleString("id-ID")}`,
+        pageWidth - 40, pageHeight - 20,
+        { align: "right" }
+      );
+      doc.setTextColor(0);
+    }
+  }
 
-			try {
-			  doc.addImage(foto.base64, "PNG", offsetX, offsetY, newW, newH);
-			} catch (e) {
-			  console.warn("addImage gagal:", e);
-			}
-		  }
-		}
-	  }
-	});
-
-
-	// ==== Nama file seragam ====
-	const filters = { unit: unitFilter, kelas: kelasFilter };
-	const filename = getExportFileName("Santri", "pdf", filters);
-	doc.save(filename);
-
+  // ==== SIMPAN ====
+  const filters = { unit: unitFilter, kelas: kelasFilter };
+  const filename = getExportFileName(`Santri_${startNo}-${endNo}`, "pdf", filters);
+  doc.save(filename);
 }
 
 
@@ -6100,7 +6119,7 @@ async function downloadSantriHTML() {
 const headers = [
   "No","Stambuk","Foto","Nama","Kelas","Bagian",
   "Asal Daerah","Himpunan","Kamar","Unit Ndalem",
-  "Posisi Tugas","Shift","Jam Tugas","Masa Khidmah"
+  "Posisi Tugas","Shift","Jam Tugas","Usia","Masa Khidmah"
 ];
 
   let html = `
@@ -6129,7 +6148,7 @@ const headers = [
     <div class="identitas">
       <h1>KHUDAMA' KHARISMA</h1>
       <h2>Pondok Pesantren Lirboyo Kota Kediri Jawa Timur</h2>
-      <p>Sekretariat: Kantor KHARISMA Gedung Nafis Lt. 03 Lirboyo Kota Kediri</p>
+      <p>Sekretariat: Kantor KHARISMA Gedung Nafis Lt. 02 Lirboyo Kota Kediri</p>
     </div>
   </div>
   <hr>
@@ -6158,6 +6177,7 @@ exportData.forEach((s, i) => {
     <td>${s.Posisi_Tugas || "-"}</td>
     <td>${s.Shift || "-"}</td>
     <td>${s.Jam_Tugas || "-"}</td>
+	<td>${calculateUsia(s.Tgl_Lahir)}</td>
     <td>${calculateMasaKhidmah(s.Mulai_Ngabdi)}</td>
   </tr>`;
 });
@@ -7141,7 +7161,7 @@ async function downloadPenasehatPDF() {
     pdf.text("Pondok Pesantren Lirboyo Kota Kediri Jawa Timur", pageWidth / 2, 80, { align: "center" });
 
     pdf.setFont("helvetica", "italic"); pdf.setFontSize(11);
-    pdf.text("Sekretariat: Kantor KHARISMA Gedung Nafis Lt. 03 Lirboyo Kota Kediri", pageWidth / 2, 100, { align: "center" });
+    pdf.text("Sekretariat: Kantor KHARISMA Gedung Nafis Lt. 02 Lirboyo Kota Kediri", pageWidth / 2, 100, { align: "center" });
 
     pdf.setLineWidth(1);
     pdf.line(margin, 120, pageWidth - margin, 120);
