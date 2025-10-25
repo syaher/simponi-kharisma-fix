@@ -4733,6 +4733,22 @@ async function downloadAbsensiPNG() {
 	  color: #fff;
 	  z-index: 3;   /* lebih tinggi daripada body cell */
 	}
+
+	/* === Ringkasan Pelanggaran (desktop default) === */
+	#pelanggaran-summary {
+	  font-size: 15px;
+	  font-weight: 500;
+	  margin-bottom: 8px;
+	}
+	
+	/* === Versi Android / layar kecil === */
+	@media (max-width: 768px) {
+	  #pelanggaran-summary {
+	    font-size: 13px; /* 🔹 Lebih kecil di HP */
+	    line-height: 1.4;
+	  }
+	}
+
 	
     /* ✅ Tambahan: khusus layar kecil */
     @media (max-width: 768px) {
