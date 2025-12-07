@@ -1,13 +1,13 @@
-const CACHE_NAME = "kharisma-cache-v14"; 
+const CACHE_NAME = "kharisma-cache-v15"; 
 const OFFLINE_URL = "/offline.html";
 
 // Hanya file statis non-login
 const FILES_TO_CACHE = [
   "/index.html",
   "/jindex.html",
-  "/nadhom.html",
+  "/setoran.html",
   "/pendaftaran.html",
-  "/offline.html",  
+  OFFLINE_URL,  
   "/manifest.json",
   "/icons/icon-192.png",
   "/icons/icon-512.png",
