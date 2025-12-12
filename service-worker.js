@@ -1,4 +1,4 @@
-const CACHE_NAME = "kharisma-cache-v8"; 
+const CACHE_NAME = "kharisma-cache-v9"; 
 const OFFLINE_URL = "/offline.html";
 
 // Hanya file statis non-login
