@@ -11690,6 +11690,9 @@ function applyFilterHP() {
 
 
 
+
+let updateNotificationShown = false; // Flag untuk mencegah notifikasi double
+
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
@@ -11702,7 +11705,10 @@ if ("serviceWorker" in navigator) {
           const newWorker = reg.installing;
           newWorker.addEventListener("statechange", () => {
             if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
-              showPopupUpdate("🔔 Ada pembaruan aplikasi tersedia!");
+              if (!updateNotificationShown) {
+                updateNotificationShown = true;
+                showPopupUpdate("🔔 Ada pembaruan aplikasi tersedia!");
+              }
             }
           });
         });
@@ -11712,7 +11718,10 @@ if ("serviceWorker" in navigator) {
     // Terima pesan dari service worker
     navigator.serviceWorker.addEventListener("message", (event) => {
       if (event.data && event.data.type === "NEW_VERSION") {
-        showPopupUpdate("🔔 Ada pembaruan aplikasi tersedia!");
+        if (!updateNotificationShown) {
+          updateNotificationShown = true;
+          showPopupUpdate("🔔 Ada pembaruan aplikasi tersedia!");
+        }
       }
     });
   });
@@ -11803,6 +11812,9 @@ function showPopupUpdate(msg) {
     }
   }, 30000);
 }
+
+
+
 
 
 
