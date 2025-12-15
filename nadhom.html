@@ -4696,7 +4696,7 @@ if (btnDownloadAll) {
 
 async function loadAmiriFont() {
   // HARUS ADA FILE INI DI PROYEK ANDA → /fonts/Amiri-Regular.ttf
-  const url = "/fonts/Amiri-Regular.ttf";
+  const url = "./fonts/Amiri-Regular.ttf";
   const resp = await fetch(url);
   if (!resp.ok) throw new Error("Gagal memuat font Amiri");
   return await resp.arrayBuffer();
@@ -5176,3 +5176,4 @@ async function downloadPDFHarian() {
 </div>
 </body>
 </html>
+
