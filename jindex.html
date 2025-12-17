@@ -12020,120 +12020,126 @@ function applyFilterHP() {
 
 
 
+/* =====================================================
+   🔄 PWA UPDATE HANDLER (FINAL & STABLE)
+   ===================================================== */
 
-let updateNotificationShown = false; // Flag untuk mencegah notifikasi double
+let updateNotificationShown = false;
 
+// Guard agar popup tidak muncul lagi setelah user klik reload
+const UPDATE_ACCEPTED_KEY = "pwa_update_accepted";
+
+/* ================= REGISTER SERVICE WORKER ================= */
 if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker
-      .register("/service-worker.js")
-      .then((reg) => {
-        console.log("SW registered:", reg.scope);
+  window.addEventListener("load", async () => {
+    try {
+      const reg = await navigator.serviceWorker.register("/service-worker.js");
+      console.log("✅ SW registered:", reg.scope);
 
-        // Deteksi update service worker
-        reg.addEventListener("updatefound", () => {
-          const newWorker = reg.installing;
-          newWorker.addEventListener("statechange", () => {
-            if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
-              if (!updateNotificationShown) {
-                updateNotificationShown = true;
-                showPopupUpdate("🔔 Ada pembaruan aplikasi tersedia!");
-              }
-            }
-          });
+      // Deteksi ada SW baru
+      reg.addEventListener("updatefound", () => {
+        const newWorker = reg.installing;
+        if (!newWorker) return;
+
+        newWorker.addEventListener("statechange", () => {
+          if (
+            newWorker.state === "installed" &&
+            navigator.serviceWorker.controller
+          ) {
+            showUpdatePopupOnce();
+          }
         });
-      })
-      .catch((err) => console.error("SW registration failed:", err));
+      });
 
-    // Terima pesan dari service worker
-    navigator.serviceWorker.addEventListener("message", (event) => {
-      if (event.data && event.data.type === "NEW_VERSION") {
-        if (!updateNotificationShown) {
-          updateNotificationShown = true;
-          showPopupUpdate("🔔 Ada pembaruan aplikasi tersedia!");
-        }
-      }
-    });
+      // Jika SW baru sudah aktif → reload HARD
+      navigator.serviceWorker.addEventListener("controllerchange", () => {
+        window.location.href = window.location.href;
+      });
+    } catch (err) {
+      console.error("❌ SW registration failed:", err);
+    }
   });
 }
 
-function showPopupUpdate(msg) {
-  // Hapus popup lama kalau ada
-  const oldPopup = document.getElementById("updatePopup");
-  if (oldPopup) oldPopup.remove();
+/* ================= SHOW POPUP (ONCE ONLY) ================= */
+function showUpdatePopupOnce() {
+  if (updateNotificationShown) return;
+  if (sessionStorage.getItem(UPDATE_ACCEPTED_KEY)) return;
 
-  // Buat container popup
+  updateNotificationShown = true;
+  showPopupUpdate("Ada pembaruan aplikasi tersedia");
+}
+
+/* ================= POPUP UI ================= */
+function showPopupUpdate(msg) {
+  // Pastikan popup cuma satu
+  document.getElementById("updatePopup")?.remove();
+
   const div = document.createElement("div");
   div.id = "updatePopup";
-  div.style.position = "fixed";
-  div.style.bottom = "20px";
-  div.style.right = "20px";
-  div.style.background = "#1a73e8";
-  div.style.color = "#fff";
-  div.style.padding = "16px 20px";
-  div.style.borderRadius = "12px";
-  div.style.boxShadow = "0 6px 16px rgba(0,0,0,0.25)";
-  div.style.zIndex = "9999";
-  div.style.fontSize = "15px";
-  div.style.display = "flex";
-  div.style.flexDirection = "column";
-  div.style.gap = "10px";
-  div.style.opacity = "0";
-  div.style.transform = "translateY(20px)";
-  div.style.transition = "all 0.3s ease";
+  div.style.cssText = `
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #1a73e8;
+    color: #fff;
+    padding: 16px 20px;
+    border-radius: 12px;
+    box-shadow: 0 6px 16px rgba(0,0,0,.25);
+    z-index: 9999;
+    font-size: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all .3s ease;
+  `;
 
-  // Isi konten
   div.innerHTML = `
     <div style="font-weight:600;display:flex;align-items:center;gap:8px;">
-      <span style="font-size:18px;">🔔</span> ${msg}
+      🔔 ${msg}
     </div>
-    <div style="display:flex; gap:10px; justify-content:flex-end;">
-      <button id="btnReloadApp" style="
-        background:#ea4335; 
-        color:#fff; 
-        border:none; 
-        padding:8px 14px; 
-        border-radius:8px; 
-        cursor:pointer;
-        font-weight:500;
-        transition:all .2s;
-      ">Reload Aplikasi</button>
+    <div style="display:flex;justify-content:flex-end;">
+      <button id="btnReloadApp"
+        style="
+          background:#ea4335;
+          color:#fff;
+          border:none;
+          padding:8px 14px;
+          border-radius:8px;
+          cursor:pointer;
+          font-weight:500;
+        ">
+        Reload Aplikasi
+      </button>
     </div>
   `;
 
-  // Tambah ke body
   document.body.appendChild(div);
 
-  // Animasi masuk
   requestAnimationFrame(() => {
     div.style.opacity = "1";
     div.style.transform = "translateY(0)";
   });
 
-  // Event tombol - Reload dengan clear cache dan unregister SW
-  div.querySelector("#btnReloadApp").onclick = async () => {
-    try {
-      // Unregister semua service worker
-      if ('serviceWorker' in navigator) {
-        const registrations = await navigator.serviceWorker.getRegistrations();
-        await Promise.all(registrations.map(r => r.unregister()));
-      }
-      
-      // Hapus semua cache
-      if ('caches' in window) {
-        const cacheNames = await caches.keys();
-        await Promise.all(cacheNames.map(name => caches.delete(name)));
-      }
-      
-      // Reload aplikasi
-      location.reload(true);
-    } catch (err) {
-      console.error("Error during reload:", err);
-      location.reload(true);
+  /* ================= BUTTON ACTION ================= */
+  div.querySelector("#btnReloadApp").onclick = () => {
+    // Tutup popup
+    div.remove();
+
+    // Simpan flag agar popup tidak muncul lagi
+    sessionStorage.setItem(UPDATE_ACCEPTED_KEY, "1");
+
+    // Perintahkan SW aktifkan versi baru
+    if (navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({
+        type: "SKIP_WAITING",
+      });
     }
   };
 
-  // Auto-hide setelah 30 detik kalau user tidak klik
+  /* ================= AUTO HIDE ================= */
   setTimeout(() => {
     if (document.body.contains(div)) {
       div.style.opacity = "0";
