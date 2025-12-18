@@ -1375,12 +1375,7 @@ const ngajiData = [
   { id: 7, label: "Kamar - Setoran" }
 ];
 
-ngajiData.forEach(n => {
-  const opt = document.createElement("option");
-  opt.value = n.id;       // ← INI YANG MASUK DB
-  opt.textContent = n.label;
-  Ngaji.appendChild(opt);
-});
+
 
 // DOM refs
 const Kelas = document.getElementById('Kelas');
@@ -2275,6 +2270,12 @@ function calculateUsia(tglLahirValue) {
   return `${months} bln`;
 }
 
+ngajiData.forEach(n => {
+  const opt = document.createElement("option");
+  opt.value = n.id;       // ← INI YANG MASUK DB
+  opt.textContent = n.label;
+  Ngaji.appendChild(opt);
+});
 
 // WhatsApp functions
 window.onWA = async function(id) {
