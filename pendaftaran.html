@@ -1065,7 +1065,8 @@
   <!-- =================== -->
   <!--     BAGIAN SISWA    -->
   <!-- =================== -->
-  <h6 class="fw-bold mb-3 mt-2">— Siswa —</h6>
+
+<h6 class="fw-bold text-primary text-center mb-3 mt-2">— Siswa —</h6>
 
   <div class="mb-3">
     <label class="form-label small fw-semibold">Nama Lengkap *</label>
@@ -1130,10 +1131,23 @@
     </div>
   </div>
 
+<h6 class="fw-bold text-primary text-center mb-3 mt-4">— Ngaji —</h6>
+
+<!-- ================== NGAJI ================== -->
+<div class="mb-3">
+  <label for="Ngaji" class="form-label">Ngaji</label>
+  <select id="Ngaji" class="form-select">
+    <option value="">-- Pilih Ngaji --</option>
+  </select>
+</div>
+</div>
+</div>
+
   <!-- =================== -->
   <!--     BAGIAN NDIALEM  -->
   <!-- =================== -->
-  <h6 class="fw-bold mb-3 mt-4">— Ndalem —</h6>
+  
+<h6 class="fw-bold text-primary text-center mb-3 mt-4">— Ndalem —</h6>
 
   <div class="mb-3">
     <label class="form-label small fw-semibold">Unit Ndalem *</label>
@@ -1350,9 +1364,28 @@ const unitNdalemList = [
   'Selepan','Sopir','Toko Nafisah','Warung Nafis','Rizquna Bakso'
 ];
 
+
+const ngajiData = [
+  { id: 1, label: "MMQ - Jet Tempur" },
+  { id: 2, label: "MMQ - Ibtidaiyah" },
+  { id: 3, label: "MMQ - Tsanawiyah" },
+  { id: 4, label: "MMQ - Aliyah" },
+  { id: 5, label: "MMQ - Takhtiman" },
+  { id: 6, label: "Maunah Sari - Setoran" },
+  { id: 7, label: "Kamar - Setoran" }
+];
+
+ngajiData.forEach(n => {
+  const opt = document.createElement("option");
+  opt.value = n.id;       // ← INI YANG MASUK DB
+  opt.textContent = n.label;
+  Ngaji.appendChild(opt);
+});
+
 // DOM refs
 const Kelas = document.getElementById('Kelas');
 const Unit_Ndalem = document.getElementById('Unit_Ndalem');
+const Ngaji = document.getElementById('Ngaji');
 const filterKelas = document.getElementById('filterKelas');
 const filterUnit = document.getElementById('filterUnit');
 const cardGrid = document.getElementById('cardGrid');
@@ -1632,6 +1665,7 @@ window.onEdit = async function(id) {
   document.getElementById('Nama_Lengkap').value = data.Nama_Lengkap || '';
   document.getElementById('Stambuk').value = data.Stambuk || '';
   Unit_Ndalem.value = data.Unit_Ndalem || '';
+  Ngaji.value = data.Ngaji || '';
   document.getElementById('Asal_Daerah').value = data.Asal_Daerah || '';
   document.getElementById('Himpunan').value = data.Himpunan || '';
   document.getElementById('Kamar').value = data.Kamar || '';
@@ -1710,6 +1744,7 @@ if (file) {
     Foto: finalFoto,
     Stambuk: document.getElementById('Stambuk').value || null,
     Unit_Ndalem: Unit_Ndalem.value || null,
+    Ngaji: Ngaji.value ? parseInt(Ngaji.value) : null,
     Asal_Daerah: document.getElementById('Asal_Daerah').value || null,
     Himpunan: document.getElementById('Himpunan').value || null,
     Kamar: document.getElementById('Kamar').value || null,
