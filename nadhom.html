@@ -1,0 +1,5271 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" type="image/png" href="icons/logo.png">
+  <!-- FONT ARAB MODERN DENGAN KASHIDA -->
+  <link href="https://fonts.googleapis.com/css2?family=Amiri&family=Scheherazade+New&display=swap" rel="stylesheet">
+
+<!-- PDF-LIB v1.17.1 (supports registerFontkit) -->
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+
+<!-- FONTKIT untuk dukungan font Arab -->
+<script src="https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@1.0.0/dist/fontkit.umd.min.js"></script>
+
+
+  <title>Setoran Harian - KHUDAMA' KHARISMA</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- ====== JS PDF LIBRARIES ====== -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+
+  <meta name="theme-color" content="#1a73e8">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+ <script src="/libs/pdf-lib.min.js"></script>
+<script src="/libs/fontkit.umd.min.js"></script>
+<script src="/libs/arabic-reshaper.js"></script>
+<script src="/libs/bidi.min.js"></script>
+
+
+  <style>
+  
+	/* ==========================
+   STYLING UMUM
+========================== */
+* {
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  margin: 0;
+  background-color: #f5f7fb;
+  color: #333;
+}
+
+.container {
+  max-width: 100% !important;
+  padding: 12px 18px !important;
+}
+
+/* ==========================
+   HEADER
+========================== */
+header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+header h1 {
+  margin-bottom: 5px;
+  font-size: 1.8rem;
+  color: #1a73e8;
+}
+
+header p {
+  color: #666;
+  margin: 0;
+}
+
+.connection-status {
+  margin-top: 8px;
+  font-size: 0.9rem;
+}
+
+/* ==========================
+   FORM INPUT - IMPROVED FOR MOBILE
+========================== */
+.input-section {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  margin-bottom: 20px;
+}
+
+.input-section h3 {
+  margin-bottom: 15px;
+  color: #1a73e8;
+  font-size: 1.2rem;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #444;
+  font-size: 0.95rem;
+}
+
+/* Improved input styling for mobile */
+input[type="text"],
+input[type="number"],
+input[type="date"],
+select,
+textarea {
+  width: 100%;
+  padding: 14px 12px;
+  border: 1px solid #cdd9ed;
+  border-radius: 8px;
+  font-size: 16px; /* Prevent zoom on iOS */
+  background: #fff;
+  transition: all 0.3s ease;
+  height: 48px; /* Consistent height */
+}
+
+textarea {
+  resize: vertical;
+  min-height: 100px;
+  height: auto;
+}
+
+/* Select dropdown improvements */
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px;
+  padding-right: 40px;
+}
+
+/* ==========================
+   BUTTONS - IMPROVED FOR MOBILE
+========================== */
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  padding: 12px 16px;
+  min-height: 44px; /* Minimum touch target */
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background-color: #1a73e8;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background-color: #1765c0;
+}
+
+.btn-secondary {
+  background-color: #f1f3f5;
+  color: #333;
+  margin-left: 5px;
+}
+
+.btn-secondary:hover {
+  background-color: #e2e6ea;
+}
+
+.btn-edit {
+  background-color: #4caf50;
+  color: #fff;
+  font-size: 0.85rem;
+  border-radius: 6px;
+  padding: 10px 12px;
+  min-height: 40px;
+}
+
+.btn-edit:hover {
+  background-color: #3c8c41;
+}
+
+.btn-delete {
+  background-color: #f44336;
+  color: #fff;
+  font-size: 0.85rem;
+  border-radius: 6px;
+  padding: 10px 12px;
+  min-height: 40px;
+}
+
+.btn-delete:hover {
+  background-color: #d32f2f;
+}
+
+/* ==========================
+   TABEL DATA
+========================== */
+.table-container {
+  background: #fff;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+thead {
+  background-color: #1a73e8;
+  color: #fff;
+}
+
+th, td {
+  padding: 10px 8px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+th:first-child, td:first-child {
+  text-align: center;
+  width: 50px;
+}
+
+td {
+  vertical-align: middle;
+}
+
+/* ==========================
+   SECTION HEADER
+========================== */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+/* ==========================
+   LOADING SCREEN
+========================== */
+.loading-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e0e0e0;
+  border-top: 4px solid #1a73e8;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ==========================
+   POPUP EDIT
+========================== */
+.popup-container {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0,0,0,0.25);
+  z-index: 1000;
+}
+
+.popup-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  padding: 20px;
+  width: 360px;
+  max-width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  animation: fadeIn 0.25s ease;
+}
+
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.popup-header h3 {
+  margin: 0;
+  color: #1a73e8;
+}
+
+.popup-close {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #888;
+  min-height: auto;
+  padding: 5px;
+}
+
+.popup-close:hover {
+  color: #e53935;
+}
+
+@keyframes fadeIn {
+  from { transform: translateY(-8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+
+
+/* ==========================
+   TAMPILAN PER UNIT (GAYA EXCEL)
+========================== */
+.unit-section {
+  margin-top: 28px;
+  border: 2px solid #1a73e8;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Header nama unit */
+.unit-header {
+  background: #1a73e8;
+  color: #fff;
+  padding: 10px 14px;
+  font-weight: 600;
+  font-size: 1.05rem;
+  border-bottom: 2px solid #1a73e8;
+}
+
+/* Scroll horizontal */
+.unit-section .table-wrapper {
+  overflow-x: auto;
+  width: 100%;
+}
+
+/* ======== TABEL GAYA EXCEL ======== */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 950px;
+  border: 1px solid #1a73e8;
+}
+
+/* Header tabel elegan */
+.data-table thead tr {
+  background: #d9e8ff;
+  color: #0d2b5e;
+}
+
+.data-table th,
+.data-table td {
+  padding: 8px 6px;
+  border: 1px solid #1a73e8;
+  vertical-align: middle;
+}
+
+.data-table td:not(.arabic),
+.data-table th:not(.arabic) {
+  text-align: center;
+}
+
+.data-table td.arabic {
+  text-align: right !important;
+  direction: rtl;
+}
+
+
+/* === Sticky Kolom Nama Santri === */
+.data-table th:nth-child(2),
+.data-table td:nth-child(2) {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  max-width: 180px; /* 🔹 ubah sesuai panjang nama santri */
+  box-shadow: 2px 0 3px rgba(0, 0, 0, 0.08); /* bayangan lembut kanan */
+  border-right: 1.4px solid #1a73e8;
+  background-color: #fff; /* agar tidak transparan di atas kolom lain */
+}
+
+/* Header kolom Nama Santri */
+.data-table th:nth-child(2) {
+  background: #d9e8ff !important;
+  text-align: center !important;
+  color: #0d2b5e;
+  font-weight: 600;
+  z-index: 4; /* lebih tinggi dari sel data */
+}
+
+/* Isi kolom Nama Santri */
+.data-table td:nth-child(2) {
+  text-align: left !important;
+  background-color: #fff;
+}
+
+.data-table td:nth-child(12) {
+  text-align: left !important;
+}
+
+/* === Warna baris terbaru (update hijau lembut) === */
+.data-table tr[style*="background-color:#e8f5e9;"] td {
+  background-color: #e8f5e9 !important;
+}
+
+/* Sticky kolom Nama juga ikut warna hijau */
+.data-table tr[style*="background-color:#e8f5e9;"] td:nth-child(2) {
+  background-color: #e8f5e9 !important;
+}
+
+/* === Hover efek biru pastel untuk semua baris === */
+.data-table tbody tr:hover td {
+  background-color: #edf5ff !important; /* biru pastel lembut */
+}
+
+/* Pastikan sticky kolom ikut efek hover */
+.data-table tbody tr:hover td:nth-child(2) {
+  background-color: #edf5ff !important;
+}
+
+/* Garis pembatas kolom Nama */
+.data-table th:nth-child(2),
+.data-table td:nth-child(2) {
+  border-right: 1.4px solid #1a73e8;
+}
+
+.data-table th:nth-child(1),
+.data-table td:nth-child(1) {
+  border-right: 1.4px solid #1a73e8;
+}
+
+
+/* Scrollbar */
+.table-wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+  background: #a6d1ff;
+  border-radius: 10px;
+}
+
+.section-header select {
+  padding: 6px 8px;
+  border: 1px solid #cdd9ed;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  background: #fff;
+  margin-left: 6px;
+}
+
+.section-header label {
+  font-weight: 600;
+  color: #333;
+  margin-right: 6px;
+}
+
+.sort-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sort-controls select {
+  padding: 6px 8px;
+  border: 1px solid #cdd9ed;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  background: #fff;
+}
+
+.btn-sort {
+  background-color: #1a73e8;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  min-height: auto;
+}
+
+.btn-sort:hover {
+  background-color: #1765c0;
+}
+
+/* ==========================
+   FOCUS WARNA BIRU FORM - IMPROVED
+========================== */
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.15);
+  transform: translateY(-1px);
+  transition: all 0.2s ease;
+}
+
+/* ===================== NOTIFICATION POPUP ===================== */
+.notification-popup {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #4CAF50;
+  color: white;
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transform: translateX(150%);
+  transition: transform 0.3s ease-in-out;
+  max-width: 300px;
+}
+
+.notification-popup.show {
+  transform: translateX(0);
+}
+
+.notification-popup.success {
+  background: #4CAF50;
+}
+
+.notification-popup.error {
+  background: #f44336;
+}
+
+.notification-icon {
+  font-size: 18px;
+}
+
+.notification-message {
+  flex: 1;
+  font-weight: 500;
+}
+
+/* ==========================
+   RESPONSIVE MOBILE OPTIMIZATION
+========================== */
+
+/* Base font size adjustment for mobile */
+@media (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
+  
+  .container {
+    padding: 12px;
+  }
+  
+  /* Header adjustments */
+  header h1 {
+    font-size: 1.5rem;
+  }
+  
+  /* Form improvements */
+  .input-section {
+    padding: 18px;
+    border-radius: 10px;
+  }
+  
+  .input-section h3 {
+    font-size: 1.1rem;
+  }
+  
+  /* Larger inputs for mobile */
+  input[type="text"],
+  input[type="number"],
+  input[type="date"],
+  select {
+    padding: 16px 14px;
+    height: 52px;
+    font-size: 16px;
+    border-radius: 10px;
+  }
+  
+  textarea {
+    padding: 14px;
+    min-height: 120px;
+    font-size: 16px;
+  }
+  
+  /* Better focus for mobile */
+  input[type="text"]:focus,
+  input[type="number"]:focus,
+  input[type="date"]:focus,
+  select:focus,
+  textarea:focus {
+    box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.2);
+    transform: translateY(-2px);
+  }
+  
+  /* Form group spacing for mobile */
+  .form-group {
+    margin-bottom: 24px;
+  }
+  
+  .form-group label {
+    font-size: 1rem;
+    margin-bottom: 10px;
+    color: #333;
+  }
+  
+  /* Select dropdown larger arrow for mobile */
+  select {
+    background-size: 14px;
+    background-position: right 16px center;
+    padding-right: 45px;
+  }
+  
+  /* Button improvements for mobile */
+  button {
+    padding: 14px 18px;
+    min-height: 48px;
+    font-size: 1rem;
+    border-radius: 8px;
+  }
+  
+  .btn-edit, .btn-delete {
+    padding: 12px 14px;
+    min-height: 44px;
+    font-size: 0.9rem;
+  }
+  
+  /* Table improvements */
+  .table-container {
+    padding: 10px;
+  }
+  
+  th, td {
+    padding: 12px 6px;
+    font-size: 0.9rem;
+  }
+  
+  /* Unit section improvements */
+  .unit-section {
+    margin-top: 20px;
+  }
+  
+  .unit-header {
+    padding: 12px 10px;
+    font-size: 1rem;
+  }
+  
+  .data-table th,
+  .data-table td {
+    padding: 10px 5px;
+  }
+  
+  .data-table {
+    min-width: 800px;
+  }
+  
+  /* Section header improvements */
+  .section-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+  
+  .sort-controls {
+    justify-content: space-between;
+  }
+  
+  .sort-controls select {
+    padding: 8px 10px;
+    font-size: 1rem;
+  }
+  
+  /* Popup improvements */
+  .popup-card {
+    width: 95%;
+    padding: 15px;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 480px) {
+  html {
+    font-size: 13px;
+  }
+  
+  .container {
+    padding: 8px;
+  }
+  
+  header h1 {
+    font-size: 1.3rem;
+  }
+  
+  .input-section, .table-container {
+    border-radius: 8px;
+  }
+  
+  /* Stack buttons vertically on very small screens */
+  .button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .button-group button {
+    width: 100%;
+    margin-left: 0 !important;
+  }
+  
+  /* Form adjustments for very small screens */
+  .input-section {
+    padding: 15px;
+  }
+  
+  input[type="text"],
+  input[type="number"],
+  input[type="date"],
+  select {
+    padding: 14px 12px;
+    height: 50px;
+    border-radius: 8px;
+  }
+  
+  textarea {
+    padding: 12px;
+    min-height: 100px;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  /* Improve table readability */
+  .data-table {
+    min-width: 700px;
+  }
+  
+  .data-table th:nth-child(2),
+  .data-table td:nth-child(2) {
+    max-width: 140px;
+  }
+  
+  /* Notification popup adjustment */
+  .notification-popup {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    max-width: none;
+  }
+}
+
+/* Touch-friendly improvements for all mobile devices */
+@media (hover: none) and (pointer: coarse) {
+  /* Increase tap targets */
+  button, 
+  .btn-edit, 
+  .btn-delete,
+  select,
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-height: 44px;
+  }
+  
+  /* Improve feedback for touch */
+  button:active,
+  .btn-edit:active,
+  .btn-delete:active {
+    transform: scale(0.98);
+    transition: transform 0.1s;
+  }
+  
+  /* Prevent text selection on interactive elements */
+  button, select {
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+  
+  /* Active state feedback for inputs */
+  input[type="text"]:active,
+  input[type="number"]:active,
+  input[type="date"]:active,
+  select:active,
+  textarea:active {
+    background-color: #f8f9fa;
+    border-color: #1a73e8;
+  }
+}
+
+/* Arabic text optimization for mobile */
+@media (max-width: 768px) {
+  .arabic,
+  option.arabic,
+  #editDariAyat option,
+  #editSampaiAyat option,
+  #dariAyat option,
+  #sampaiAyat option {
+    font-size: 1.1em;
+    line-height: 1.8;
+  }
+}
+
+/* ==========================
+   PLACEHOLDER STYLING
+========================== */
+::placeholder {
+  color: #999;
+  opacity: 1;
+}
+
+::-webkit-input-placeholder {
+  color: #999;
+}
+
+:-ms-input-placeholder {
+  color: #999;
+}
+
+/* ==========================
+   VALIDATION STATES
+========================== */
+input:invalid,
+select:invalid,
+textarea:invalid {
+  border-color: #ff4444;
+}
+
+input:valid,
+select:valid,
+textarea:valid {
+  border-color: #00C851;
+}
+
+/* ==========================
+   DISABLED STATE
+========================== */
+input:disabled,
+select:disabled,
+textarea:disabled {
+  background-color: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Responsif untuk popup di mobile kecil */
+@media (max-width: 500px) {
+  .popup-card {
+    width: 92%;
+    padding: 15px;
+    max-height: 90vh;
+  }
+}
+
+/* ==========================
+   DROPDOWN RTL (ARAB)
+   Arrow di kiri untuk tampilan alami
+========================== */
+select.arabic {
+  direction: rtl; /* teks dari kanan ke kiri */
+  text-align: right;
+  font-size: 1.15em;
+  color: #111;
+  border-radius: 6px;
+  border: 1px solid #c8d8f1;
+  background-color: #fff;
+  padding: 6px 28px 6px 10px; /* beri ruang kanan untuk teks, kiri untuk arrow */
+  appearance: none; /* hilangkan default arrow */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-position: left 10px center; /* posisikan arrow di kiri */
+  background-repeat: no-repeat;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='%23111' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-size: 16px;
+}
+
+/* Hover dan fokus agar tetap modern */
+select.arabic:hover,
+select.arabic:focus {
+  border-color: #1a73e8;
+  box-shadow: 0 0 4px rgba(26, 115, 232, 0.4);
+  outline: none;
+}
+
+/* Opsi dropdown Arab */
+select.arabic option {
+  direction: rtl;
+  text-align: right;
+  font-size: 1.1em;
+  background-color: #fff;
+}
+
+/* Container untuk lafadz nadhom 2 baris */
+.nadhom-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 70px;
+  justify-content: center;
+}
+
+/* Baris pertama dan kedua nadhom */
+
+
+/* Garis pemisah antara dua baris nadhom */
+.nadhom-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 10%, #1a73e8 50%, transparent 90%);
+  margin: 3px 0;
+  opacity: 0.6;
+}
+
+.arabic-single-line {
+  text-align: right;
+  direction: rtl;
+  font-size: 1.2em;
+  line-height: 1.8;
+  padding: 8px 0;
+  display: flex;
+  align-items: center;
+  min-height: 50px;
+  white-space: normal;      /* boleh turun baris */
+  word-wrap: break-word;    /* pecah kata kalau panjang */
+  overflow-wrap: break-word;
+}
+
+/* Kolom lafadz yang diperbaiki */
+
+td.lafadz-col {
+  min-width: 200px;
+  max-width: 280px;
+  width: 200px;
+  direction: rtl;
+  text-align: right;
+  vertical-align: middle;
+  line-height: 1.5;
+  white-space: nowrap;         /* teks tetap 1 baris, tidak turun */
+  overflow: hidden;
+  text-overflow: ellipsis;     /* jika terlalu panjang, beri tanda ... */
+  padding: 10px 12px;
+}
+
+/* Samakan ukuran lafadz dan kitab agar seimbang */
+td.lafadz-colkitab {  
+  font-size: 1.2em !important;
+  line-height: 1.8 !important;
+  direction: rtl !important;
+  text-align: right !important;
+  vertical-align: middle;
+  padding: 10px 12px;
+}
+
+
+/* Responsif untuk mobile */
+@media (max-width: 768px) {
+  .nadhom-container {
+    min-height: 60px;
+    gap: 3px;
+  }
+  
+  .nadhom-line {
+    font-size: 1em;
+    line-height: 1.5;
+  }
+  
+  td.lafadz-colkitab {
+    font-size: 1em;
+    line-height: 1.5;
+  }
+  
+  .arabic-single-line {
+    font-size: 1em;
+    min-height: 45px;
+  }
+  
+  th.lafadz-col, 
+  td.lafadz-col {
+    min-width: 140px;
+    max-width: 200px;
+    padding: 6px 8px;
+  }
+  
+}
+
+/* ==========================
+   PENYESUAIAN UKURAN ARAB YANG KONSISTEN
+========================== */
+
+/* Kolom kitab - Arab single line */
+td.arabic.lafadz-col,
+.arabic-single-line {
+  font-size: 1.2em !important;
+  line-height: 1.8 !important;
+  text-align: right !important;
+  direction: rtl !important;
+}
+
+/* Kolom lafadz - untuk single line */
+td.lafadz-col .arabic-single-line {
+  font-size: 1.2em !important;
+  line-height: 1.8 !important;
+  text-align: right !important;
+  direction: rtl !important;
+}
+
+/* === NADHOM JUSTIFY TANPA KASHIDA (FINAL TERBUKTI) === */
+.nadhom-line {
+  font-family: "Amiri", "Scheherazade New", serif !important;
+  font-size: 1.2em !important;
+  line-height: 1.8 !important;
+  direction: rtl !important;
+
+  /* GARIS JUSTIFY TETAP */
+  text-align: justify !important;
+  text-align-last: justify !important;
+
+  /* MATIKAN MEKANISME KASHIDA */
+  text-justify: auto !important;
+  letter-spacing: normal !important;
+  word-spacing: normal !important;
+  font-variant-ligatures: normal !important;
+  font-feature-settings: "liga" 0, "calt" 0 !important;
+
+  padding: 4px 0;
+}
+
+
+
+/* === FONT ARAB UTAMA === */
+.arabic,
+td.lafadz-col,
+td.lafadz-colkitab,
+.nadhom-line,
+.arabic-single-line {
+  font-family: "Amiri", "Scheherazade New", serif !important;
+  direction: rtl !important;
+}
+
+
+
+/* === OPTION ARAB (NADHOM DI DROPDOWN) - NORMAL TANPA KASHIDA === */
+select.arabic option {
+  font-family: "Amiri", "Scheherazade New", serif !important;
+  direction: rtl;
+  text-align: right;
+  text-align-last: right;
+  text-justify: auto;
+  letter-spacing: normal;
+  word-spacing: normal;
+  line-height: 1.6;
+}
+
+
+/* Container nadhom */
+.nadhom-container {
+  min-height: 70px;
+  gap: 4px;
+  justify-content: center;
+}
+
+/* Garis pemisah nadhom */
+.nadhom-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 10%, #1a73e8 50%, transparent 90%);
+  margin: 3px 0;
+  opacity: 0.6;
+}
+
+/* ==== Atur ukuran teks dropdown agar tidak terlalu besar di Android ==== */
+select,
+select option {
+  font-size: 14px !important; /* lebih kecil & konsisten */
+  line-height: 1.7 !important;
+}
+
+/* Untuk dropdown Arabic tetap proporsional */
+select.arabic,
+select.arabic option {
+  font-size: 1em !important; /* biar tidak membesar di Android */
+}
+
+@media screen and (max-width: 768px) and (pointer: coarse) {
+  select,
+  select option {
+    font-size: 9px !important;
+  }
+
+  select.arabic,
+  select.arabic option {
+    font-size: 0.85em !important;
+  }
+}
+
+.laporan-container h4 {
+  margin-top: 20px;
+  color: #1a237e;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 5px;
+}
+
+.laporan-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+
+.laporan-table th, .laporan-table td {
+  border: 1px solid #ccc;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.laporan-table th {
+  background-color: #e8eaf6;
+  font-weight: bold;
+}
+.tab-content {
+  display: none;
+}
+.tab-content.active {
+  display: block;
+}
+
+.tab-btn.active {
+  background-color: #1a73e8;
+  color: white;
+}
+
+.checklist {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.check-item {
+  background: #f2f2f2;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.radio-group {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+.radio-group label {
+  cursor: pointer;
+}
+
+/* ========== COLLAPSIBLE CHECKLIST ========== */
+.checklist-wrapper {
+  margin-bottom: 12px;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  border: 1px solid #e6eefc;
+  margin-bottom: 6px;
+}
+
+.checklist-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 4px 6px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checklist-title {
+  font-weight: 600;
+  color: #0d47a1;
+  font-size: 0.98rem;
+}
+
+.checklist-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.triangle {
+  width: 12px;
+  height: 12px;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'><path d='M1 3l4 4 4-4z'/></svg>") no-repeat center / contain;
+  background-color: #1a73e8;
+  transform-origin: 50% 50%;
+  transition: transform 0.2s ease;
+}
+
+.triangle.open {
+  transform: rotate(180deg);
+}
+
+
+
+.checklist-body.collapsed {
+  max-height: 0;
+  opacity: 0;
+  padding: 0;
+}
+
+.checklist-body.expanded {
+  max-height: 400px;
+  opacity: 1;
+}
+
+.check-item {
+  background: #f8fbff;
+  color: #0b3b86;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.checklist-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 5%, #e0e7ff 50%, transparent 95%);
+  margin: 6px 0;
+  opacity: 0.9;
+}
+
+/* tabel biru */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+
+table thead th {
+  background: linear-gradient(180deg, #1a73e8 0%, #1565c0 100%);
+  color: #fff;
+  font-weight: 600;
+  text-align: center;
+  padding: 8px 10px;
+  border: 1px solid #0d47a1;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+/* isi tabel rata kiri kecuali header */
+table tbody td {
+  border: 1px solid #dbe3f0;
+  padding: 6px 10px;
+  text-align: left; /* ✅ ubah ke kiri */
+  vertical-align: middle;
+}
+
+/* kolom angka tetap tengah */
+td:nth-child(3),
+td:nth-child(4),
+td:nth-child(5),
+td:nth-child(6),
+td:nth-child(7) {
+  text-align: center;
+}
+
+/* === KHUSUS TABEL REKAP KELAS === */
+#tblKelas tbody td {
+  text-align: center; /* hanya tabel ini yang rata kiri */
+}
+
+/* Supaya header rekap kelas tetap tengah */
+#tblKelas thead th {
+  text-align: center;
+}
+
+table tbody tr:nth-child(even) {
+  background: #f9fbff;
+}
+
+table tbody tr:hover {
+  background: #e9f2ff;
+}
+
+.status-checkbox {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.status-checkbox label {
+  font-weight: 500;
+  color: #333;
+}
+
+.status-checkbox input[type="radio"] {
+  margin-right: 6px;
+  transform: scale(1.2);
+}
+
+
+
+/* responsive: kecilkan font di ponsel */
+@media (max-width: 480px) {
+  .checklist-title { font-size: 0.95rem; }
+  .check-item { font-size: 0.9rem; padding: 6px 8px; }
+}
+
+
+
+/* ===== Ikon kecil di summary ===== */
+.summary-icon {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  vertical-align: middle;
+  margin-right: 6px;
+  transform: translateY(-1px);
+}
+
+/* ========== Download button animated state ========== */
+.btn-download-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #1a73e8;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: transform .18s ease, background .18s ease;
+  overflow: hidden;
+  position: relative;
+}
+
+/* small icon inside button */
+.btn-download-all .btn-icon {
+  display: inline-block;
+  transform-origin: 50% 50%;
+  transition: transform .25s ease;
+}
+
+/* spinner (hidden by default) */
+.btn-download-all .btn-spinner {
+  display: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.22);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: btn-spin 0.8s linear infinite;
+}
+
+/* When downloading: show spinner, push icon a bit and animate */
+.btn-download-all.downloading {
+  pointer-events: none;
+  filter: brightness(.98);
+  transform: translateY(-1px);
+}
+
+.btn-download-all.downloading .btn-spinner {
+  display: inline-block;
+}
+
+.btn-download-all.downloading .btn-icon {
+  transform: translateX(-6px) rotate(-8deg);
+  transition: transform .35s cubic-bezier(.2,.9,.3,1);
+}
+
+/* subtle pulsing glint */
+@keyframes btn-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* small animation after download finished */
+.btn-download-all.complete {
+  animation: btn-complete 0.6s ease;
+  background: linear-gradient(90deg, #1a73e8, #1565c0);
+}
+@keyframes btn-complete {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
+/* ==========================
+   MOBILE FIX: Checklist laporan terlihat di HP
+========================== */
+@media (max-width: 768px) {
+  .checklist-wrapper {
+    width: 100%;
+    margin-bottom: 12px;
+  }
+
+  .checklist-body {
+    max-height: 250px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #d0d7e2;
+    border-radius: 8px;
+    padding: 8px;
+  }
+
+  .checklist label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    padding: 6px 0;
+  }
+
+  .checklist input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+  }
+
+  .checklist-header {
+    padding: 10px;
+    background: #f0f5ff;
+    border-radius: 8px;
+    margin-bottom: 5px;
+  }
+}
+/* ==========================
+   Samakan lebar tabel laporan dengan tabel utama
+========================== */
+.laporan-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #1a73e8;
+  min-width: auto; /* samakan dengan tabel utama */
+  background: #fff;
+  font-size: 0.95rem;
+}
+
+.laporan-table th,
+.laporan-table td {
+  border: 1px solid #1a73e8;
+  padding: 8px 6px;
+}
+
+.laporan-table th {
+  background: #d9e8ff;
+  color: #0d2b5e;
+}
+
+.laporan-container {
+  overflow-x: auto; /* supaya tabel tidak terpotong di HP */
+}
+
+/* ==========================
+   FONT & STYLING UNTUK CHECKLIST LAPORAN
+========================== */
+
+/* Checklist wrapper */
+.checklist-wrapper {
+  margin-bottom: 8px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  font-family: "Poppins", sans-serif;
+}
+
+/* Checklist header */
+.checklist-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.3s ease;
+}
+
+.checklist-title {
+  font-weight: 700;
+  color: #1e40af;
+  font-size: 1rem !important; /* Ukuran font header */
+  letter-spacing: -0.01em;
+  font-family: "Poppins", sans-serif !important;
+}
+
+/* Checklist body */
+
+
+/* Check item individual */
+.check-item {
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 0.9rem !important; /* Ukuran font item */
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #bae6fd;
+  color: #0369a1;
+  font-weight: 500;
+  font-family: "Poppins", sans-serif !important;
+  line-height: 1.4;
+}
+
+
+
+/* Label checkbox */
+.check-item label {
+  font-size: 0.9rem !important;
+  font-weight: 500;
+  color: #0369a1;
+  cursor: pointer;
+  font-family: "Poppins", sans-serif !important;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Radio group styling */
+.radio-group {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  font-weight: 500;
+  font-family: "Poppins", sans-serif;
+}
+
+.radio-group label {
+  font-size: 0.9rem !important;
+  color: #374151;
+  cursor: pointer;
+  font-family: "Poppins", sans-serif !important;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.radio-group input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #1e40af;
+}
+
+/* Status checkbox khusus */
+.status-checkbox {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  font-family: "Poppins", sans-serif;
+}
+
+.status-checkbox label {
+  font-weight: 500;
+  color: #333;
+  font-size: 0.9rem !important;
+  font-family: "Poppins", sans-serif !important;
+}
+
+.status-checkbox input[type="radio"] {
+  margin-right: 6px;
+  transform: scale(1.1);
+}
+
+/* Mobile optimization untuk checklist */
+@media (max-width: 768px) {
+  .checklist-header {
+    padding: 14px 16px;
+  }
+  
+  .checklist-title {
+    font-size: 0.95rem !important;
+  }
+  
+  .checklist-body {
+    padding: 14px 16px;
+    gap: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  
+  .check-item {
+    font-size: 0.85rem !important;
+    padding: 8px 12px;
+    flex: 1 1 calc(50% - 8px);
+    min-width: 140px;
+  }
+  
+  .check-item label {
+    font-size: 0.85rem !important;
+  }
+  
+  .radio-group {
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  
+  .radio-group label {
+    font-size: 0.85rem !important;
+  }
+  
+  .status-checkbox {
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  
+  .status-checkbox label {
+    font-size: 0.85rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .checklist-title {
+    font-size: 0.9rem !important;
+  }
+  
+  .check-item {
+    font-size: 0.8rem !important;
+    flex: 1 1 100%;
+    padding: 8px 10px;
+  }
+  
+  .check-item label {
+    font-size: 0.8rem !important;
+  }
+  
+  .radio-group label {
+    font-size: 0.8rem !important;
+  }
+  
+  .status-checkbox label {
+    font-size: 0.8rem !important;
+  }
+}
+
+/* Hover effects */
+.checklist-header:hover {
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+}
+
+.check-item:hover {
+  background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(3, 105, 161, 0.2);
+}
+
+/* Focus states untuk aksesibilitas */
+.check-item input[type="checkbox"]:focus,
+.radio-group input[type="radio"]:focus {
+  outline: 2px solid #1e40af;
+  outline-offset: 2px;
+}
+
+/* ==========================
+   CHECKLIST HEADER - COMPACT SIZE
+========================== */
+
+/* Checklist wrapper yang lebih compact */
+.checklist-wrapper {
+  margin-bottom: 16px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  font-family: "Poppins", sans-serif;
+}
+
+/* Checklist header yang lebih kecil */
+.checklist-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px !important; /* Diperkecil */
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+  min-height: 44px; /* Touch friendly tapi compact */
+}
+
+/* Judul checklist yang lebih kecil */
+.checklist-title {
+  font-weight: 600;
+  color: #1e40af;
+  font-size: 0.85rem !important; /* Diperkecil dari 1rem */
+  letter-spacing: -0.01em;
+  font-family: "Poppins", sans-serif !important;
+  margin: 0;
+  line-height: 1.3;
+}
+
+/* Triangle toggle yang lebih kecil */
+.triangle {
+  width: 10px !important;
+  height: 10px !important;
+  background: #1e40af;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.triangle.open {
+  transform: rotate(180deg);
+}
+
+/* Checklist body yang compact */
+.checklist-body {
+  padding: 12px 14px !important; /* Diperkecil */
+  background: #fff;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  transition: all 0.3s ease;
+  font-family: "Poppins", sans-serif;
+}
+
+/* Check item yang lebih compact */
+.check-item {
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  padding: 6px 10px !important; /* Diperkecil */
+  border-radius: 8px;
+  font-size: 0.8rem !important; /* Diperkecil */
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #bae6fd;
+  color: #0369a1;
+  font-weight: 500;
+  font-family: "Poppins", sans-serif !important;
+  line-height: 1.3;
+  min-height: 32px; /* Tetap touch friendly */
+}
+
+
+/* Mobile optimization untuk checklist compact */
+@media (max-width: 768px) {
+  .checklist-wrapper {
+    margin-bottom: 12px;
+    border-radius: 8px;
+  }
+  
+  .checklist-header {
+    padding: 8px 12px !important;
+    min-height: 40px;
+  }
+  
+  .checklist-title {
+    font-size: 0.8rem !important;
+  }
+  
+  .checklist-body {
+    padding: 10px 12px !important;
+    gap: 6px;
+    max-height: 180px;
+  }
+  
+  .check-item {
+    font-size: 0.75rem !important;
+    padding: 5px 8px !important;
+    flex: 1 1 calc(50% - 6px);
+    min-width: 120px;
+    min-height: 30px;
+  }
+  
+  .check-item label {
+    font-size: 0.75rem !important;
+  }
+  
+  .triangle {
+    width: 8px !important;
+    height: 8px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .checklist-header {
+    padding: 6px 10px !important;
+    min-height: 36px;
+  }
+  
+  .checklist-title {
+    font-size: 0.75rem !important;
+  }
+  
+  .checklist-body {
+    padding: 8px 10px !important;
+  }
+  
+  .check-item {
+    font-size: 0.7rem !important;
+    padding: 4px 6px !important;
+    flex: 1 1 100%;
+    min-height: 28px;
+  }
+  
+  .check-item label {
+    font-size: 0.7rem !important;
+  }
+  
+
+}
+
+
+.check-item:hover {
+  background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+  transform: translateY(-1px);
+}
+
+/* =================== CEKLIST RAMPING =================== */
+.checklist-wrapper {
+  padding: 10px 14px !important; /* lebih rapat */
+}
+
+.checklist-header {
+  padding: 6px 0 !important; /* tinggi header lebih pendek */
+  min-height: 32px;
+}
+
+.check-item {
+  padding: 3px 0 !important; /* jarak antar item dipersempit */
+  font-size: 0.9rem;
+}
+
+.radio-group,
+.status-checkbox {
+  gap: 6px !important; /* jarak antar tombol lebih rapat */
+  margin-top: 6px !important;
+}
+
+.radio-group label,
+.status-checkbox label {
+  padding: 3px 8px !important; /* tombol radio/checkbox lebih kecil */
+  font-size: 0.85rem !important;
+}
+
+/* =====================================================
+   TOGGLE CHECKLIST: KELAS / UNIT / KITAB (FINAL - SEGITIGA & CEKLIS BULAT)
+   ===================================================== */
+.checklist-wrapper {
+  margin-bottom: 6px !important;
+  padding: 6px 10px !important;
+  border-radius: 10px;
+}
+
+/* Header toggle */
+.checklist-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f7f9fc;
+  padding: 6px 10px !important;
+  border-radius: 8px;
+  cursor: pointer;
+  min-height: 36px !important;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #222;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+.checklist-header:hover {
+  background: #e8f0fe;
+  color: #0b57d0;
+}
+
+/* === Segitiga toggle warna biru === */
+.checklist-header .triangle {
+  width: 0;
+  height: 0;
+  margin-right: 8px;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 9px solid #0b57d0;
+  transition: transform 0.25s ease, border-top-color 0.25s ease;
+  transform-origin: center;
+}
+
+.checklist-header .triangle.open {
+  transform: rotate(180deg);
+  border-top-color: #1a73e8;
+}
+
+/* Isi checklist */
+.checklist-body {
+  padding: 6px 10px !important;
+  background: #fff;
+  border-left: 2px solid #e4e6eb;
+  border-right: 2px solid #e4e6eb;
+  border-bottom: 2px solid #e4e6eb;
+  border-radius: 0 0 8px 8px;
+  overflow-y: auto;
+  transition: max-height 0.25s ease, opacity 0.25s ease;
+  opacity: 1;
+}
+
+.checklist-body.collapsed {
+  max-height: 0;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.checklist-body.expanded {
+  max-height: 300px;
+  opacity: 1;
+}
+
+/* Item checklist */
+.check-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px !important;
+  font-size: 0.9rem;
+  min-height: 28px !important;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.15s ease;
+}
+
+.check-item:hover {
+  background: #f3f6fb;
+}
+
+
+
+
+/* Responsif untuk HP */
+@media (max-width: 768px) {
+  .checklist-header {
+    padding: 8px 12px !important;
+    min-height: 40px !important;
+  }
+  .checklist-header .triangle {
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 10px solid #0b57d0;
+  }
+  .check-item {
+    min-height: 32px !important;
+    padding: 6px 8px !important;
+  }
+}
+
+/* ======= RINGKASAN GLOBAL ======= */
+.summary-box {
+  background: #e8f0fe;
+  color: #0d2b5e;
+  border: 2px solid #1a73e8;
+  border-radius: 10px;
+  padding: 13px;
+  text-align: center;
+  line-height: 1.6;
+  font-weight: 400;
+  font-size: 0.7rem;
+  margin: 20px auto;
+  display: inline-block;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.summary-box div {
+  margin: 3px 0;
+}
+
+.summary-box b {
+  color: #1a73e8;
+}
+/* Baris pertama: ikon + teks sejajar tengah sempurna */
+#laporanSummary div:first-child {
+  display: flex;
+  align-items: center;     /* vertikal rata tengah */
+  justify-content: center; /* horizontal di tengah */
+  gap: 8px;                /* jarak ikon ↔ teks */
+}
+
+/* Ikon statistik di baris Total Santri */
+#laporanSummary img.summary-icon {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  vertical-align: middle;
+  transform: translateY(-1px);  /* geser dikit biar pas */
+}
+
+/* 📱 Tampilan Android / layar kecil (otomatis menyesuaikan) */
+@media (max-width: 600px) {
+  #laporanSummary {
+    font-size: 0.8rem;        /* 🔹 perkecil tulisan */
+    padding: 10px 12px;       /* 🔹 jarak dalam box lebih rapat */
+    line-height: 1.5;
+  }
+
+  /* Ikon di Android lebih kecil */
+  #laporanSummary img.summary-icon {
+    width: 22px;
+    height: 22px;
+    margin-right: 5px;
+    transform: translateY(-1px);
+  }
+
+  /* Sesuaikan juga baris pertama agar tetap center di HP */
+  #laporanSummary div:first-child {
+    gap: 6px; /* sedikit lebih rapat antara ikon dan teks */
+  }
+}
+
+
+.
+/* ==== FILTER BAR COMPACT + SEJAJAR UNTUK SEMUA PERANGKAT ==== */
+.filter-bar {
+  background: #fff;
+  border-radius: 8px;
+  padding: 10px 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.filter-group label {
+  display: block;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+  font-size: 0.9rem;
+}
+
+.filter-group input[type="text"],
+.filter-group select {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 15px;
+  border: 1px solid #cdd9ed;
+  border-radius: 6px;
+  height: 42px;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+/* ==== MOBILE KHUSUS ANDROID (≤600px) ==== */
+@media (max-width: 600px) {
+  .filter-bar {
+    padding: 8px 10px;
+    gap: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+
+  .filter-group label {
+    font-size: 0.85rem;
+    margin-bottom: 2px;
+  }
+
+  .filter-group input,
+  .filter-group select {
+    font-size: 14px;
+    padding: 8px 10px;
+    height: 38px;
+  }
+}
+
+/* ==== URUTKAN: sejajar horizontal rata kiri (desktop & android) ==== */
+.sort-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.sort-controls label {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  margin-right: 6px;
+}
+
+.sort-inline {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 6px;
+  justify-content: flex-start;
+  flex: 1;
+}
+
+.sort-inline select {
+  flex: 0 1 170px;
+  padding: 8px 10px;
+  border: 1px solid #cdd9ed;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  background: #fff;
+  height: 40px;
+  box-sizing: border-box;
+}
+
+.sort-buttons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-sort {
+  background-color: #1a73e8;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 0.9rem;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s ease, background 0.2s ease;
+}
+
+.btn-sort:hover {
+  background-color: #1765c0;
+}
+
+.btn-sort:active {
+  transform: scale(0.96);
+}
+
+/* ==== MOBILE: paksa tetap kiri & rapat ==== */
+@media (max-width: 600px) {
+  .sort-controls {
+    justify-content: flex-start !important;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+  }
+
+  .sort-inline {
+    justify-content: flex-start !important;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+  }
+
+  .sort-controls label {
+    font-size: 0.9rem;
+    margin-right: 4px;
+  }
+
+  .sort-inline select {
+    flex: 0 1 150px;
+    font-size: 14px;
+    padding: 6px 8px;
+    height: 36px;
+  }
+
+  .btn-sort {
+    font-size: 0.85rem;
+    padding: 6px 8px;
+    width: 34px;
+    height: 34px;
+  }
+}
+
+/* Fix tampilan bulatan di Android */
+.check-item input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;              /* pastikan benar-benar sama */
+  height: 20px;
+  min-width: 20px;          /* cegah penyusutan di HP */
+  min-height: 20px;
+  border-radius: 50%;
+  border: 2px solid #1a73e8;
+  background-color: #fff;
+  position: relative;
+  display: inline-block;
+  box-sizing: border-box;
+  transform: translateZ(0); /* paksa re-render GPU agar bentuk bulat */
+}
+
+.check-item input[type="checkbox"]:checked {
+  background-color: #1a73e8;
+  border-color: #1a73e8;
+}
+
+.check-item input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: #fff;
+  border-radius: 50%;
+  top: 5px;
+  left: 5px;
+}
+
+/* Tambahkan agar stabil di semua layar */
+@supports (-webkit-appearance: none) or (-moz-appearance: none) {
+  .check-item input[type="checkbox"] {
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+.app-footer {
+  background: #ffffff;                     /* putih */
+  padding: 1rem 0.75rem;                   /* jarak dalam */
+  border-radius: 16px;                     /* biar mengikuti style app */
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05); /* shadow halus */
+  display: flex;
+  justify-content: center;                 /* center kanan–kiri */
+  align-items: center;
+  flex-wrap: wrap;                         /* biar responsif */
+  gap: 0.75rem;                            /* jarak antar badge */
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 480px) {
+  .app-footer {
+    padding: 0.75rem;
+    gap: 0.5rem;
+  }
+}
+
+.summary-divider {
+  border: none;
+  border-top: 1px dashed rgba(0,0,0,0.2);
+  margin: 8px 0;
+}
+
+.summary-list div {
+  font-size: 13px;
+  margin-top: 2px;
+}
+
+.ngaji-label {
+  color: #1e88e5;      /* biru */
+  font-weight: 600;
+}
+/* ========== SUMMARY BOX SERAGAM (GLOBAL & SUB) ========== */
+#laporanSummary,
+#ngajiSummary {
+  background-color: #e8f0fe;        /* biru lembut solid */
+  color: #0d2b5e !important;        /* teks solid */
+  border: 2px solid #1a73e8;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin: 12px 0;
+  font-weight: 600;
+  font-size: 0.85rem;
+  display: block;
+  max-width: 100%;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+  overflow: hidden;
+
+  /* pastikan tidak ada text gradient */
+  background-clip: border-box !important;
+  -webkit-background-clip: border-box !important;
+  -webkit-text-fill-color: initial !important;
+
+  white-space: normal;
+  word-break: break-word;
+}
+
+/* ---------- Judul kecil di ringkasan tempat ngaji ---------- */
+#ngajiSummary .summary-title {
+  font-weight: 700;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ---------- Isi ringkasan tempat ngaji ---------- */
+#ngajiSummaryBody {
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+/* ---------- Label tempat ngaji (biru) ---------- */
+.ngaji-label {
+  color: #1a73e8;
+  font-weight: 700;
+}
+
+/* Wrapper ringkasan ngaji */
+#ngajiSummaryBody {
+  color: #000;            /* default angka hitam */
+  font-weight: 600;
+}
+
+/* Label tempat ngaji */
+#ngajiSummaryBody .ngaji-label {
+  color: #1a73e8;
+  font-weight: 700;
+}
+
+/* Angka santri */
+#ngajiSummaryBody .ngaji-value {
+  color: #000;
+  font-weight: 600;
+}
+
+  </style>  
+</head>
+<body>
+  <div class="container">
+    <!-- Back Button -->
+    <div style="margin-bottom: 1rem;">
+      <a href="jindex.html" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; border-radius: 12px; font-weight: 600; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); transition: all 0.3s ease; border: none; cursor: pointer;" onmouseover="this.style.boxShadow='0 6px 20px rgba(99, 102, 241, 0.5)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.boxShadow='0 4px 15px rgba(99, 102, 241, 0.3)'; this.style.transform='translateY(0)';">
+        <span style="font-size: 1.2rem;">←</span>
+        <span>Kembali ke Menu</span>
+      </a>
+    </div>
+
+    <header>
+      <h1>📖 Khudama' Kharisma</h1>
+      <p>Pencatatan Setoran Al-Qur'an - Nadhom - Hadis Harian</p>
+    </header>
+
+    <!-- LOADING -->
+    <div id="loadingScreen" class="loading-screen">
+      <div class="spinner"></div>
+      <p>Memuat data...</p>
+    </div>
+
+    <div id="mainContent" style="display:none;">
+
+      <!-- =================== TAB NAVIGATION =================== -->
+      <div class="tab-buttons">
+        <button class="tab-btn active" data-tab="rekapTab">📊 Harian</button>
+        <button class="tab-btn" data-tab="laporanTab">📈 Laporan</button>
+      </div>
+
+      <!-- =================== TAB 1: REKAP HARIAN =================== -->
+      <div id="rekapTab" class="tab-content active">
+
+        <!-- =================== FORM INPUT =================== -->
+        <div class="input-section">
+          <h3>📝 Input Setoran Santri</h3>
+          <form id="santriForm">
+
+            <div class="form-group">
+              <label for="unit">Unit Ndalem:</label>
+              <select id="unit" required>
+                <option value="">Pilih Unit</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="penyimak">Penyimak:</label>
+              <select id="penyimak" required>
+                <option value="">Pilih Penyimak</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="nama">Nama Santri:</label>
+              <select id="nama" required>
+                <option value="">Pilih Unit dulu</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="kitab">Kitab:</label>
+              <select id="kitab" class="arabic" required>
+                <option value="">Pilih Kitab</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="dariAyat">Dari:</label>
+              <select id="dariAyat" class="arabic" required>
+                <option value="">Pilih Kitab dulu</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="sampaiAyat">Sampai:</label>
+              <select id="sampaiAyat" class="arabic" required>
+                <option value="">Pilih Kitab dulu</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="keterangan">Catatan Penyimak:</label>
+              <textarea id="keterangan" rows="3" placeholder="Catatan khusus, evaluasi, dll..."></textarea>
+            </div>
+			
+			<div class="form-group">
+			  <label>Status Setoran:</label>
+			  <div class="status-checkbox">
+				<label><input type="radio" name="status_lancar" value="Lancar" required> Lancar</label>
+				<label><input type="radio" name="status_lancar" value="Tidak Lancar"> Tidak Lancar</label>
+			  </div>
+			</div>
+
+            <button type="submit" class="btn-primary" id="submitBtn">
+              <span class="btn-text">💾 Simpan Setoran</span>
+              <span class="btn-loading" style="display:none;">Menyimpan...</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- =================== DATA TABEL =================== -->
+        <div class="data-section">
+          <div class="section-header">
+            <h3>📊 Rekap Setoran Harian</h3>            
+          </div>
+		  
+		  <div class="filter-bar">
+		  <div class="filter-group">
+			<label for="searchNama">Cari Nama Santri:</label>
+			<input type="text" id="searchNama" placeholder="Ketik nama santri..." autocomplete="off" inputmode="text">
+		  </div>
+
+		  <div class="filter-group">
+			<label for="filterUnit">Pilih Unit Ndalem:</label>
+			<select id="filterUnit">
+			  <option value="Semua">Semua Unit</option>
+			</select>
+			</div>
+
+		  <!-- Radio Sekolah -->
+		  <div class="filter-group">
+			<label>Sekolah:</label>
+			<div id="shiftFilter" class="radio-group" style="display: flex; gap: 15px; margin-top: 8px;">
+			  <label style="margin: 0;"><input type="radio" name="shift" value="semua" checked> Semua Sekolah</label>
+			  <label style="margin: 0;"><input type="radio" name="shift" value="pagi"> Sekolah Pagi</label>
+			  <label style="margin: 0;"><input type="radio" name="shift" value="malam"> Sekolah Malam</label>
+			</div>
+		  </div>
+
+		  <!-- Checklist Kitab -->
+		  <div class="filter-group">
+			<div class="checklist-wrapper" id="kitabWrapperHarian">
+			  <div class="checklist-header" data-target="kitabBodyHarian" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #e0e0e0;">
+				<div class="checklist-title" style="font-weight: 600; color: #333;">Pilih Kitab</div>
+				<div class="checklist-toggle">
+				  <div class="triangle" id="kitabTriangleHarian" style="width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid #666; transition: transform 0.3s;"></div>
+				</div>
+			  </div>
+			  <div id="kitabBodyHarian" class="checklist-body" style="display: none; padding-top: 8px;">
+				<div id="kitabChecklistHarian" class="checklist" style="display: flex; flex-direction: column; gap: 8px;"></div>
+			  </div>
+			</div>
+		  </div>
+
+		  <div class="filter-group sort-controls">
+		  <label for="sortColumn">Urutkan:</label>
+		  <div class="sort-inline">
+			<select id="sortColumn">
+			  <option value="Nama_Lengkap">Nama</option>
+			  <option value="Kelas">Kelas</option>
+			  <option value="judul_arab">Kitab</option>
+			  <option value="penyimak">Penyimak</option>
+			  <option value="created_at">Tanggal</option>
+			  <option value="total_ayat">Setor</option>
+			  <option value="totalKeseluruhan">Total</option>
+			  <option value="keterangan">Ket</option>
+			</select>
+			<div class="sort-buttons">
+			  <button id="btnAsc" class="btn-sort">&#9650;</button>
+			  <button id="btnDesc" class="btn-sort">&#9660;</button>
+			</div>
+		  </div>
+		</div>
+
+		</div>
+
+          <div class="table-container">
+            <table id="dataTable">
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th data-col="Nama_Lengkap" class="sortable">Nama</th>
+                  <th data-col="Kelas" class="sortable">Kelas</th>
+                  <th data-col="nama_kitab" class="sortable">Kitab</th>
+                  <th data-col="dari_ayat" class="sortable text-center">Dari Bait</th>
+                  <th class="lafadz-col">Lafadz</th>
+                  <th data-col="sampai_ayat" class="sortable text-center">Sampai Bait</th>
+                  <th class="lafadz-col">Lafadz</th>
+                  <th data-col="total_ayat" class="sortable text-center">Setor</th>
+                  <th data-col="totalKeseluruhan" class="sortable text-center">Total</th>
+                  <th data-col="tanggal" class="sortable">Tanggal</th>
+                  <th data-col="penyimak" class="sortable">Penyimak</th>
+				  <th data-col="status_lancar" class="sortable">Status</th>
+                  <th>Ket</th>
+                 
+                </tr>
+              </thead>
+              <tbody id="tableBody">
+                <tr><td colspan="14" style="text-align:center;">Memuat data...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- =================== TAB 2: LAPORAN SOROGAN =================== -->
+      <div id="laporanTab" class="tab-content">      
+		
+		<div class="filter-section">
+		  <h4>Filter:</h4>
+
+		  <!-- Radio Sekolah -->
+		  <div id="shiftFilter" class="radio-group">
+			<label><input type="radio" name="shift" value="semua" checked> Semua Sekolah</label>
+			<label><input type="radio" name="shift" value="pagi"> Sekolah Pagi</label>
+			<label><input type="radio" name="shift" value="malam"> Sekolah Malam</label>
+		  </div>
+
+		  <!-- KELAS -->
+		  <div class="checklist-wrapper" id="kelasWrapper">
+			<div class="checklist-header" data-target="kelasBody">
+			  <div class="checklist-title">Kelas</div>
+			  <div class="checklist-toggle">
+				<div class="triangle" id="kelasTriangle"></div>
+				<div class="small-meta" id="kelasCount"></div>
+			  </div>
+			</div>
+			<div id="kelasBody" class="checklist-body collapsed">
+			  <div id="kelasChecklist" class="checklist"></div>
+			</div>
+		  </div>
+
+		  <div class="checklist-divider"></div>
+
+		  <!-- UNIT NDALEM -->
+		  <div class="checklist-wrapper" id="unitWrapper">
+			<div class="checklist-header" data-target="unitBody">
+			  <div class="checklist-title">Unit Ndalem</div>
+			  <div class="checklist-toggle">
+				<div class="triangle" id="unitTriangle"></div>
+				<div class="small-meta" id="unitCount"></div>
+			  </div>
+			</div>
+			<div id="unitBody" class="checklist-body collapsed">
+			  <div id="unitChecklist" class="checklist"></div>
+			</div>
+		  </div>
+
+		  <div class="checklist-divider"></div>
+
+		  <!-- KITAB -->
+		  <div class="checklist-wrapper" id="kitabWrapper">
+			<div class="checklist-header" data-target="kitabBody">
+			  <div class="checklist-title">Kitab</div>
+			  <div class="checklist-toggle">
+				<div class="triangle" id="kitabTriangle"></div>
+				<div class="small-meta" id="kitabCount"></div>
+			  </div>
+			</div>
+			<div id="kitabBody" class="checklist-body collapsed">
+			  <div id="kitabChecklist" class="checklist"></div>
+			</div>
+		  </div>
+
+		</div>
+
+		<!-- RINGKASAN GLOBAL -->
+<div id="laporanSummary" class="summary-box">
+  <div>
+    <img src="https://i.imgur.com/huVGgA2.png" alt="Ikon Statistik" class="summary-icon">
+    <b>Total Santri:</b> <span id="totalSantri">0</span>
+  </div>
+
+  <div>
+    <b>Setoran:</b> <span id="sudahSetoran">0%</span> |
+    <b>Lancar:</b> <span id="persenLancar">0%</span> |
+    <b>Khatam:</b> <span id="persenKhatam">0%</span>
+  </div>
+
+  <div>
+    <b>Belum Setoran:</b> <span id="belumSetoran">0%</span> |
+    <b>Belum Lancar:</b> <span id="belumLancar">0%</span> |
+    <b>Belum Khatam:</b> <span id="belumKhatam">0%</span>
+  </div>
+
+  <hr class="summary-divider">
+
+  <!-- RINGKASAN TEMPAT NGAJI -->
+  <div class="summary-title">
+    <b>Tempat Ngaji:</b>
+  </div>
+  <div id="ngajiSummaryBody" class="summary-list"></div>
+</div>
+
+
+
+
+		<div class="laporan-download-all">
+		  <button class="btn-download-all" id="btnDownloadAll" type="button">
+		  <span class="btn-icon">⬇️</span>
+		  <span class="btn-label">Download Laporan</span>
+		  <span class="btn-spinner" aria-hidden="true"></span>
+		</button>
+		</div>
+
+
+
+        <div class="laporan-container">
+
+		  
+
+		  <!-- 🔹 LANJUT BAGIAN PROSENTASE KELAS -->
+		  <h4>🔸 Rekap Prosentase Kelas</h4>
+		  <table id="tblKelas" class="laporan-table">
+			<thead>
+			  <tr>
+				<th>No</th>
+				<th>Kelas</th>
+				<th>Total Santri</th>
+				<th>Belum Khatam</th>
+				<th>Belum Lancar</th>
+				<th>% Khatam</th>
+				<th>% Lancar</th>
+			  </tr>
+			</thead>
+			<tbody></tbody>
+		  </table>
+
+
+          <h4>🔸 Rekap Prosentase Unit Ndalem</h4>
+          <table id="tblUnit" class="laporan-table">
+            <thead>
+			  <tr>
+				<th>No</th>
+				<th>Unit</th>
+				<th>Total Santri</th>
+				<th>Belum Khatam</th>
+				<th>Belum Lancar</th>
+				<th>% Khatam</th>
+				<th>% Lancar</th>
+			  </tr>
+			</thead>
+            <tbody></tbody>
+          </table>
+
+          <h4>🔸 Status Khatam & Lancar</h4>
+          <table id="tblStatus" class="laporan-table">
+            <thead>
+              <tr>
+                <th>No</th><th>Nama</th><th>Kelas</th><th>Unit</th><th>Kitab</th>
+                <th>Total Setor</th><th>Batas</th><th>Status Khatam</th><th>Status Lancar</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+
+          <h4>🔸 Santri Belum Setoran</h4>
+          <table id="tblBelum" class="laporan-table">
+            <thead><tr><th>No</th><th>Nama</th><th>Kelas</th><th>Unit</th></tr></thead>
+            <tbody></tbody>
+          </table>
+		  
+		  <!-- 🔹 REKAP AKTIVITAS UNIT (v_unit_aktif_setoran) -->
+		  <h4>🔸 Rekap Aktivitas Unit</h4>
+		  <table id="tblUnitAktif" class="laporan-table">
+			<thead>
+			  <tr>
+				<th>No</th>
+				<th>Unit Ndalem</th>				
+				<th>Hari Aktif</th>
+				<th>Daftar Kitab</th>
+				<th>Tanggal Terakhir</th>				
+				<th>Kontribusi</th>			
+			  </tr>
+			</thead>
+			<tbody></tbody>
+		  </table>
+		  <br>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- POPUP EDIT -->
+  <div id="editPopup" class="popup-container" style="display:none;">
+    <div class="popup-card">
+      <div class="popup-header">
+        <h3>✏️ Edit Setoran Santri</h3>
+        <button class="popup-close" id="closeEditPopup">✖</button>
+      </div>
+
+      <form id="editForm">
+        <input type="hidden" id="editId">
+
+        <div class="form-group">
+          <label for="editNama">Nama:</label>
+          <input type="text" id="editNama" readonly>
+        </div>
+
+        <div class="form-group">
+          <label for="editKelas">Kelas:</label>
+          <input type="text" id="editKelas" readonly>
+        </div>
+
+        <div class="form-group">
+          <label for="editKitab">Kitab Nadhom:</label>
+          <select id="editKitab" class="arabic" required></select>
+        </div>
+
+        <div class="form-group">
+          <label for="editDariAyat">Dari Bait/Ayat:</label>
+          <select id="editDariAyat" class="arabic" required></select>
+        </div>
+
+        <div class="form-group">
+          <label for="editSampaiAyat">Sampai Bait:</label>
+          <select id="editSampaiAyat" class="arabic" required></select>
+        </div>
+
+        <div class="form-group">
+          <label for="editKeterangan">Catatan Penyimak:</label>
+          <textarea id="editKeterangan" rows="3"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="editPenyimak">Penyimak:</label>
+          <select id="editPenyimak" required>
+            <option value="">Pilih Penyimak</option>
+          </select>
+        </div>
+		
+		<div class="form-group">
+		  <label>Status Setoran:</label>
+		  <div class="status-checkbox">
+			<label><input type="radio" name="edit_status_lancar" value="Lancar"> Lancar</label>
+			<label><input type="radio" name="edit_status_lancar" value="Tidak Lancar"> Tidak Lancar</label>
+		  </div>
+		</div>
+
+        <button type="submit" class="btn-primary" id="updateBtn">
+          <span class="btn-text">💾 Simpan Perubahan</span>
+          <span class="btn-loading" style="display:none;">Menyimpan...</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- POPUP NOTIF -->
+  <div id="notificationPopup" class="notification-popup">
+    <span class="notification-icon">✓</span>
+    <span class="notification-message" id="notificationMessage">Berhasil disimpan!</span>
+  </div>
+  
+
+<script>
+
+// ===================== SUPABASE SETUP =====================
+const SUPABASE_URL = "https://oflkibeaesvwzdzyvdfy.supabase.co"; // 🔹 ganti sesuai milikmu
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9mbGtpYmVhZXN2d3pkenl2ZGZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4NDIyOTQsImV4cCI6MjA3MDQxODI5NH0.MMcdx7g54R9kqFdfkDPP57gNPCnxGLKWHhexTAcJ2io"; // 🔹 ganti juga
+const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const loadingScreen = document.getElementById("loadingScreen");
+  const mainContent = document.getElementById("mainContent");
+  const form = document.getElementById("santriForm");
+
+  const unitSelect = document.getElementById("unit");
+  const namaSelect = document.getElementById("nama");
+  const kitabSelect = document.getElementById("kitab");
+  const dariSelect = document.getElementById("dariAyat");
+  const sampaiSelect = document.getElementById("sampaiAyat");
+  const tableBody = document.getElementById("tableBody");
+  
+document.addEventListener("click", (e) => {
+  const th = e.target.closest("th.sortable");
+  if (!th) return;
+  const col = th.getAttribute("data-col");
+  sortTable(col);
+});
+
+
+  let santriData = [];
+  let kitabData = [];
+  let baitData = [];
+  let currentRows = []; // data global yang sedang ditampilkan
+  let currentSort = { column: null, ascending: true };
+  
+  // ===================== KELAS PER KATEGORI =====================
+  const kelasPagi = [
+    'IV Ibtidaiyah', 'V Ibtidaiyah', 'VI Ibtidaiyah',
+    'I Tsanawiyah', 'II Tsanawiyah', "I'dadiyah I", "I'dadiyah II"
+  ];
+  const kelasMalam = [
+    'III Tsanawiyah',
+    'I Aliyah', 'II Aliyah', 'III Aliyah',
+    "I-II Ma'had Aly", "III-IV Ma'had Aly", "V-VI Ma'had Aly", "I'dadiyah III"
+  ];
+
+  function getShiftFromKelas(kelas) {
+    if (kelasPagi.includes(kelas)) return 'pagi';
+    if (kelasMalam.includes(kelas)) return 'malam';
+    return null;
+  }
+  
+  // expose convenient refs (opsional, tapi file Anda menggunakan window.pdfLib)
+  window.pdfLib = window.pdfLib;
+  window.fontkit = window.fontkit;
+
+  // ===================== INIT =====================
+  async function init() {
+    try {
+      loadingScreen.style.display = "flex";
+      mainContent.style.display = "none";
+
+      await loadUnits();
+	  await loadPenyimak(); 
+      await loadKitab();
+      await loadData();
+
+      loadingScreen.style.display = "none";
+      mainContent.style.display = "block";
+    } catch (err) {
+      console.error("Init Error:", err);
+      alert("Gagal memuat data awal");
+    }
+  }
+
+  // ===================== LOAD UNITS =====================
+  async function loadUnits() {
+    const { data, error } = await client
+      .from("santri_kharisma")
+      .select("Unit_Ndalem")
+      .neq("Unit_Ndalem", null);
+
+    if (error) return console.error(error);
+
+    const units = [...new Set(data.map(u => u.Unit_Ndalem))].sort();
+    unitSelect.innerHTML = `<option value="">Pilih Unit</option>`;
+    units.forEach(u => {
+      const opt = document.createElement("option");
+      opt.value = u;
+      opt.textContent = u;
+      unitSelect.appendChild(opt);
+    });
+  }
+
+ // ===================== LOAD NAMA SANTRI (tanpa memuat ulang penyimak) =====================
+unitSelect.addEventListener("change", async () => {
+  const unit = unitSelect.value;
+
+  // NOTE: jangan panggil loadPenyimak di sini karena kita memuat penyimak sekali di init()
+  namaSelect.innerHTML = `<option value="">Memuat...</option>`;
+
+  const { data, error } = await client
+    .from("santri_kharisma")
+    .select("Nama_Lengkap, Kelas, Stambuk")
+    .eq("Unit_Ndalem", unit)
+	.eq("Status", "aktif"); // 🔹 hanya santri aktif
+
+  if (error) {
+    console.error("Gagal load santri:", error);
+    namaSelect.innerHTML = `<option value="">Gagal memuat</option>`;
+    return;
+  }
+
+  santriData = data;
+
+  // ✅ urutkan santri sesuai urutan kelasOrder
+  const sortedData = [...data].sort((a, b) => {
+    const aIdx = kelasOrder.indexOf(a.Kelas);
+    const bIdx = kelasOrder.indexOf(b.Kelas);
+    if (aIdx === -1 && bIdx === -1) return a.Nama_Lengkap.localeCompare(b.Nama_Lengkap);
+    if (aIdx === -1) return 1;
+    if (bIdx === -1) return -1;
+    if (aIdx !== bIdx) return aIdx - bIdx;
+    return a.Nama_Lengkap.localeCompare(b.Nama_Lengkap);
+  });
+
+  namaSelect.innerHTML = `<option value="">Pilih Santri</option>`;
+  sortedData.forEach(s => {
+    const opt = document.createElement("option");
+    opt.value = s.Stambuk;
+    opt.textContent = `${s.Nama_Lengkap} (${s.Kelas || "-"})`;
+    namaSelect.appendChild(opt);
+  });
+});
+
+
+
+
+  // ===================== LOAD KITAB =====================
+async function loadKitab() {
+  const { data, error } = await client
+    .from("nadhom_kitab")
+    .select("id, judul_arab")
+    .order("id");
+
+  if (error) {
+    console.error("Error load kitab:", error);
+    return;
+  }
+
+  kitabData = data;
+  kitabSelect.innerHTML = `<option value="">Pilih Kitab</option>`; // "Pilih Kitab" dalam Arab
+
+  data.forEach(k => {
+    const opt = document.createElement("option");
+    opt.value = k.id;
+    opt.textContent = k.judul_arab; // hanya teks Arab
+    opt.style.fontFamily = "'Scheherazade New', serif";
+    opt.style.direction = "rtl";
+    kitabSelect.appendChild(opt);
+  });
+}
+
+kitabSelect.addEventListener("change", async () => {
+  const kitabId = kitabSelect.value;
+  dariSelect.innerHTML = `<option value="">Memuat...</option>`;
+  sampaiSelect.innerHTML = `<option value="">Memuat...</option>`;
+
+  const { data, error } = await client
+    .from("nadhom_bait")
+    .select("id, nomor_bait, teks_arab")
+    .eq("id_kitab", kitabId)
+    .order("nomor_bait");
+
+  if (error) return console.error(error);
+
+  baitData = data;
+  renderBaitOptions(dariSelect, sampaiSelect, data);
+});
+
+// ===================== SIMPAN DATA =====================
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const submitBtn = document.getElementById("submitBtn");
+  setButtonLoading(submitBtn, true);
+
+  try {
+    const stambuk = namaSelect.value;
+    const kitab = kitabSelect.value;
+    const dari = dariSelect.value || null;
+    const sampai = sampaiSelect.value || null;
+    const keterangan = document.getElementById("keterangan").value.trim();
+    const penyimak = document.getElementById("penyimak").value;
+	const statusLancar = document.querySelector('input[name="status_lancar"]:checked')?.value || null;
+
+
+    // Validasi input dasar
+    if (!stambuk || !kitab || !dari || !sampai) {
+      showNotification("⚠️ Lengkapi semua field sebelum menyimpan.", "error", 4000);
+      setButtonLoading(submitBtn, false);
+      return;
+    }
+
+    // Hitung total ayat (kalau memang berupa urutan, abaikan kalau bukan angka)
+    const total = (!isNaN(sampai) && !isNaN(dari)) ? (sampai - dari + 1) : null;
+
+    // Payload yang dikirim ke Supabase
+    const payload = {
+      stambuk,
+      id_kitab: parseInt(kitab),
+      dari_ayat: dari,
+      sampai_ayat: sampai,
+      total_ayat: total,
+      id_penyimak: penyimak,
+	  status_lancar: statusLancar,
+      keterangan,
+      tanggal: new Date().toISOString().split("T")[0],
+    };
+
+    const { error } = await client.from("setoran_nadhom").insert([payload]);
+    if (error) throw error;
+
+    // ✅ Simpan pilihan yang akan dipertahankan
+    const selectedUnit = unitSelect.value;
+    const selectedPenyimak = document.getElementById("penyimak").value;
+    const selectedKitab = kitabSelect.value;
+
+    // ✅ Reset hanya field tertentu (bukan semua form)
+	namaSelect.innerHTML = `<option value="">Pilih Santri</option>`;
+	dariSelect.innerHTML = `<option value="">Pilih Bait</option>`;
+	sampaiSelect.innerHTML = `<option value="">Pilih Bait</option>`;
+	document.getElementById("keterangan").value = "";
+
+	// ✅ Reset radio status lancar
+	document.querySelectorAll('input[name="status_lancar"]').forEach(r => r.checked = false);
+
+
+    // ✅ Kembalikan pilihan unit, penyimak, dan kitab sebelumnya
+    unitSelect.value = selectedUnit;
+    document.getElementById("penyimak").value = selectedPenyimak;
+    kitabSelect.value = selectedKitab;
+
+    // Trigger ulang event agar nama santri dan bait terisi kembali
+    const event = new Event("change");
+    unitSelect.dispatchEvent(event);
+    kitabSelect.dispatchEvent(event);
+
+    // ✅ Tampilkan notifikasi sukses
+    showNotification("✅ Setoran berhasil disimpan!");
+
+    await loadData();
+
+  } catch (err) {
+    console.error("Save error:", err);
+    showNotification("❌ Gagal menyimpan setoran: " + (err.message || "Tidak diketahui"), "error", 5000);
+  } finally {
+    setButtonLoading(submitBtn, false);
+  }
+});
+
+
+// ===================== LOAD DATA =====================
+async function loadData() {
+  const filterSelect = document.getElementById("filterUnit");
+  const tableContainer = document.querySelector(".table-container");
+
+  // 1️⃣ Ambil data setoran
+  const { data, error } = await client
+  .from("setoran_nadhom")
+    .select(`
+    id, tanggal, total_ayat, keterangan,status_lancar,
+    created_at, updated_at,
+    id_penyimak,
+    santri_kharisma (Nama_Lengkap, Kelas, Unit_Ndalem),
+    nadhom_kitab (nama_kitab, judul_arab),
+    dari_bait:nadhom_bait!fk_dari_bait (id, nomor_bait, teks_arab),
+    sampai_bait:nadhom_bait!fk_sampai_bait (id, nomor_bait, teks_arab)
+  `)
+  .order("tanggal", { ascending: false });
+
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  // 2️⃣ Ambil daftar penyimak dari view
+  const { data: penyimakList, error: errPenyimak } = await client
+    .from("penyimak")
+    .select("id_penyimak, nama_penyimak");
+
+  if (errPenyimak) console.error("Gagal ambil penyimak:", errPenyimak);
+
+  // 3️⃣ Gabungkan nama penyimak ke data setoran
+  const merged = data.map(row => {
+    const pen = penyimakList?.find(p => p.id_penyimak === row.id_penyimak);
+    return {
+      ...row,
+      nama_penyimak: pen ? pen.nama_penyimak : "-",
+    };
+  });
+
+  // 4️⃣ Ambil daftar unit unik
+  const allUnits = [...new Set(merged.map(d => d.santri_kharisma?.Unit_Ndalem || "-"))].sort();
+
+  // Isi dropdown filter unit (hanya pertama kali)
+  if (filterSelect.options.length === 1) {
+    allUnits.forEach(u => {
+      const opt = document.createElement("option");
+      opt.value = u;
+      opt.textContent = u;
+      filterSelect.appendChild(opt);
+    });
+  }
+
+  const selectedUnit = filterSelect.value || "Semua";
+  tableContainer.innerHTML = ""; // kosongkan
+
+  // 5️⃣ Render tabel per unit
+  if (selectedUnit === "Semua") {
+    allUnits.forEach(unit => {
+      const filtered = merged.filter(d => d.santri_kharisma?.Unit_Ndalem === unit);
+      tableContainer.innerHTML += renderTable(unit, filtered);
+    });
+  } else {
+    const filtered = merged.filter(d => d.santri_kharisma?.Unit_Ndalem === selectedUnit);
+    tableContainer.innerHTML = renderTable(selectedUnit, filtered);
+  }
+  
+  // Tambah event pencarian nama
+  const searchInput = document.getElementById("searchNama");
+  if (searchInput) {
+    searchInput.removeEventListener("input", handleSearchNama); // hindari duplikat
+    searchInput.addEventListener("input", handleSearchNama);
+  }
+
+  // Simpan data global untuk sorting
+  currentRows = merged;
+
+  // Initialize kitab checklist untuk Harian tab
+  await initKitabChecklistHarian();
+  setupFilterListenersHarian();
+}
+
+// Event filter
+document.getElementById("filterUnit").addEventListener("change", async () => {
+  await loadData();
+  // Reset shift dan kitab filter ketika unit berubah
+  document.querySelector('input[name="shift"][value="semua"]').checked = true;
+  document.querySelectorAll('#kitabChecklistHarian input').forEach(cb => cb.checked = false);
+});
+
+// ===================== RENDER TABLE - DIPERBAIKI =====================
+function renderTable(unitName, rows) {
+  if (!rows || rows.length === 0) {
+    return `
+      <div class="unit-section">
+        <div class="unit-header">${unitName}</div>
+        <p class="no-data">Tidak ada data untuk unit ini.</p>
+      </div>`;
+  }
+
+  // ===== Hitung total akumulasi =====
+  const groupedTotals = {};
+  const latestDate = {};
+  const countByKey = {};
+
+  rows.forEach(r => {
+    const nama  = r.santri_kharisma?.Nama_Lengkap || "-";
+    const kitab = r.nadhom_kitab?.judul_arab || "-";
+    const key   = `${nama}|${kitab}`;
+    const tanggal = new Date(r.updated_at || r.created_at || r.tanggal);
+    const totalHariIni = Math.abs(parseInt(r.total_ayat) || 0);
+
+    countByKey[key] = (countByKey[key] || 0) + 1;
+    groupedTotals[key] = (groupedTotals[key] || 0) + totalHariIni;
+
+    if (!latestDate[key] || tanggal > latestDate[key]) {
+      latestDate[key] = tanggal;
+    }
+  });
+
+  // ===== Buat tabel =====
+  let html = `
+    <div class="unit-section">
+      <div class="unit-header">${unitName}</div>
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Nama</th>
+              <th>Kelas</th>
+              <th>Kitab</th>
+              <th>Dari</th>
+              <th class="lafadz-col">Lafadz</th>
+              <th>Sampai</th>
+              <th class="lafadz-col">Lafadz</th>
+              <th>Setor</th>
+              <th>Total</th>
+              <th>Tanggal</th>
+              <th>Penyimak</th>
+			  <th>Status</th>
+              <th>Ket</th>
+         
+            </tr>
+          </thead>
+          <tbody>`;
+
+  const shownTotals = {};
+
+  rows.forEach((r, i) => {
+    const nama  = r.santri_kharisma?.Nama_Lengkap || "-";
+    const kitab = r.nadhom_kitab?.judul_arab || "-";
+    const key   = `${nama}|${kitab}`;
+    const tanggal = new Date(r.updated_at || r.created_at || r.tanggal);
+    const totalHariIni = Math.abs(parseInt(r.total_ayat) || 0);
+    const tanggalTerbaru = latestDate[key];
+    const isLatest = tanggal.getTime() === tanggalTerbaru.getTime();
+
+    let totalKeseluruhan;
+    let showStar = false;
+
+    if (isLatest && !shownTotals[key]) {
+      totalKeseluruhan = groupedTotals[key];
+      showStar = countByKey[key] > 1;
+      shownTotals[key] = true;
+    } else {
+      totalKeseluruhan = totalHariIni;
+    }
+
+    // Format tanggal
+    const waktuTampil = r.updated_at || r.created_at;
+    let waktuRapi = "-";
+    if (waktuTampil) {
+      const iso = waktuTampil.slice(0, 16).replace("T", " ");
+      const [tanggalPart, waktu] = iso.split(" ");
+      const [tahun, bulan, hari] = tanggalPart.split("-");
+      waktuRapi = `${hari}/${bulan}/${tahun} ${waktu}`;
+    }
+
+    // Render lafadz dengan format yang sesuai berdasarkan kitab
+    const lafadzDari = renderLafadz(r.dari_bait?.teks_arab, kitab);
+    const lafadzSampai = renderLafadz(r.sampai_bait?.teks_arab, kitab);
+
+    html += `
+      <tr ${isLatest ? 'style="background-color:#e8f5e9;"' : ""}>
+        <td>${i + 1}</td>
+        <td>${nama}</td>
+        <td>${r.santri_kharisma?.Kelas || "-"}</td>
+        <td class="arabic lafadz-colkitab">${kitab}</td>
+        <td>${r.dari_bait?.nomor_bait ?? "-"}</td>
+        <td class="lafadz-col">${lafadzDari}</td>
+        <td>${r.sampai_bait?.nomor_bait ?? "-"}</td>
+        <td class="lafadz-col">${lafadzSampai}</td>
+        <td>${totalHariIni}</td>
+        <td>${totalKeseluruhan}${showStar ? " *" : ""}</td>
+        <td>${waktuRapi}</td>
+        <td>${r.nama_penyimak || "-"}</td>
+		<td>${r.status_lancar || '-'}</td>
+        <td>${r.keterangan || "-"}</td>
+       
+      </tr>`;
+  });
+
+  html += `
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+
+  return html;
+}
+
+// Fungsi pencarian nama santri
+function handleSearchNama(e) {
+  const keyword = e.target.value.toLowerCase().trim();
+  const selectedUnit = document.getElementById("filterUnit").value || "Semua";
+  const tableContainer = document.querySelector(".table-container");
+  
+  // Filter berdasarkan nama
+  const filteredRows = currentRows.filter(row =>
+    (row.santri_kharisma?.Nama_Lengkap || "").toLowerCase().includes(keyword)
+  );
+
+  // Filter juga berdasarkan unit bila tidak “Semua”
+  const finalRows = (selectedUnit === "Semua")
+    ? filteredRows
+    : filteredRows.filter(r => r.santri_kharisma?.Unit_Ndalem === selectedUnit);
+
+  tableContainer.innerHTML = "";
+
+  if (selectedUnit === "Semua") {
+    const allUnits = [...new Set(finalRows.map(d => d.santri_kharisma?.Unit_Ndalem || "-"))].sort();
+    allUnits.forEach(unit => {
+      const unitData = finalRows.filter(d => d.santri_kharisma?.Unit_Ndalem === unit);
+      tableContainer.innerHTML += renderTable(unit, unitData);
+    });
+  } else {
+    tableContainer.innerHTML = renderTable(selectedUnit, finalRows);
+  }
+}
+
+ // ===============================
+//  URUTAN KHUSUS KELAS
+// ===============================
+const kelasOrder = [ 
+  "IV Ibtidaiyah",
+  "V Ibtidaiyah",
+  "VI Ibtidaiyah",
+  "I Tsanawiyah",
+  "II Tsanawiyah",
+  "III Tsanawiyah",
+  "I Aliyah",
+  "II Aliyah",
+  "III Aliyah",
+  "I-II Ma'had Aly",
+  "III-IV Ma'had Aly",
+  "V-VI Ma'had Aly",
+  "I'dadiyah I",
+  "I'dadiyah II",
+  "I'dadiyah III"
+];
+
+
+// ===============================
+//  SORT TABLE (perbaikan: dukung semua kolom & nested)
+//  GANTI seluruh blok sortTable + handler klik header + tombol asc/desc
+// ===============================
+function computeGroupedTotalsForSorting(rows) {
+  const groupedTotals = {};
+  rows.forEach(r => {
+    const nama = r.santri_kharisma?.Nama_Lengkap || "-";
+    const kitab = r.nadhom_kitab?.judul_arab || "-";
+    const key = `${nama}|${kitab}`;
+    const val = Math.abs(parseInt(r.total_ayat) || 0);
+    groupedTotals[key] = (groupedTotals[key] || 0) + val;
+  });
+  return groupedTotals;
+}
+
+function getSortValue(row, column, groupedTotals) {
+  // normalize some alias columns
+  if (!row) return "";
+
+  // helper key for groupedTotals
+  const key = `${row.santri_kharisma?.Nama_Lengkap || "-"}|${row.nadhom_kitab?.judul_arab || "-"}`;
+
+  switch (column) {
+    case "Nama_Lengkap":
+      return (row.santri_kharisma?.Nama_Lengkap || "").toString();
+    case "Kelas":
+      return (row.santri_kharisma?.Kelas || "").toString();
+    case "judul_arab":
+    case "nama_kitab":
+      return (row.nadhom_kitab?.judul_arab || "").toString();
+    case "dari_ayat":
+      // tampilkan nomor_bait jika tersedia, fallback ke dari_ayat (id)
+      return row.dari_bait?.nomor_bait ?? row.dari_ayat ?? "";
+    case "sampai_ayat":
+      return row.sampai_bait?.nomor_bait ?? row.sampai_ayat ?? "";
+    case "total_ayat":
+      return Number(row.total_ayat) || 0;
+    case "totalKeseluruhan":
+    case "total_setoran_keseluruhan":
+      return Number(groupedTotals[key] || row.total_setoran_keseluruhan || 0) || 0;
+    case "tanggal":
+    case "created_at":
+      return new Date(row.updated_at || row.created_at || row.tanggal || 0).getTime() || 0;
+    case "penyimak":
+      return (row.nama_penyimak || row.id_penyimak || "").toString();
+    case "keterangan":
+    case "ket":
+      return (row.keterangan || "").toString();
+    default:
+      // fallback: try nested properties, then direct
+      const nested = (
+        row.santri_kharisma?.[column] ||
+        row.nadhom_kitab?.[column] ||
+        row[column]
+      );
+      return (nested ?? "").toString();
+  }
+}
+
+function sortTable(column, rows = currentRows) {
+  if (!rows || rows.length === 0) return;
+
+  // toggle arah (A-Z ↔ Z-A)
+  if (currentSort.column === column) {
+    currentSort.ascending = !currentSort.ascending;
+  } else {
+    currentSort.column = column;
+    currentSort.ascending = true;
+  }
+
+  // compute grouped totals for columns that need it
+  const groupedTotals = computeGroupedTotalsForSorting(rows);
+
+  // special order for kelas
+  const isKelas = column === "Kelas";
+
+  // sort
+  const sorted = [...rows].sort((a, b) => {
+    let aVal = getSortValue(a, column, groupedTotals);
+    let bVal = getSortValue(b, column, groupedTotals);
+
+    // Kelas custom order handled separately
+    if (isKelas) {
+      const aIdx = kelasOrder.indexOf(aVal);
+      const bIdx = kelasOrder.indexOf(bVal);
+      if (aIdx === -1 && bIdx === -1) return 0;
+      if (aIdx === -1) return currentSort.ascending ? 1 : -1;
+      if (bIdx === -1) return currentSort.ascending ? -1 : 1;
+      return currentSort.ascending ? aIdx - bIdx : bIdx - aIdx;
+    }
+
+    // If both are numbers (or look numeric), compare numerically
+    const aNum = parseFloat(aVal);
+    const bNum = parseFloat(bVal);
+    const bothNumbers = !isNaN(aNum) && !isNaN(bNum);
+
+    if (bothNumbers) {
+      return currentSort.ascending ? aNum - bNum : bNum - aNum;
+    }
+
+    // fallback to string compare (case-insensitive)
+    aVal = (aVal || "").toString().toLowerCase();
+    bVal = (bVal || "").toString().toLowerCase();
+
+    if (aVal < bVal) return currentSort.ascending ? -1 : 1;
+    if (aVal > bVal) return currentSort.ascending ? 1 : -1;
+    return 0;
+  });
+
+  // update tampilan header aktif
+  document.querySelectorAll("th.sortable").forEach((th) => {
+    const col = th.getAttribute("data-col");
+    th.classList.remove("sorted-asc", "sorted-desc", "sorted-active");
+    if (col === column) {
+      th.classList.add(
+        currentSort.ascending ? "sorted-asc" : "sorted-desc",
+        "sorted-active"
+      );
+    }
+  });
+
+  // render ulang hasil sorting (sama seperti loadData render logic)
+  const selectedUnit = document.getElementById("filterUnit").value || "Semua";
+  const tableContainer = document.querySelector(".table-container");
+  tableContainer.innerHTML = "";
+
+  if (selectedUnit === "Semua") {
+    const allUnits = [
+      ...new Set(sorted.map((d) => d.santri_kharisma?.Unit_Ndalem || "-"))
+    ].sort();
+
+    allUnits.forEach((unit) => {
+      const filtered = sorted.filter(
+        (d) => d.santri_kharisma?.Unit_Ndalem === unit
+      );
+      tableContainer.innerHTML += renderTable(unit, filtered);
+    });
+  } else {
+    const filtered = sorted.filter(
+      (d) => d.santri_kharisma?.Unit_Ndalem === selectedUnit
+    );
+    tableContainer.innerHTML = renderTable(selectedUnit, filtered);
+  }
+}
+
+// Header click handler (single handler, replace any other duplicate handlers)
+document.addEventListener("click", (e) => {
+  const th = e.target.closest("th.sortable");
+  if (!th) return;
+  const column = th.getAttribute("data-col");
+  if (!column) return;
+  sortTable(column);
+});
+
+// Buttons asc/desc using dropdown select
+const sortColumnSelect = document.getElementById("sortColumn");
+document.getElementById("btnAsc").addEventListener("click", () => {
+  const col = sortColumnSelect.value || currentSort.column || "Nama_Lengkap";
+  currentSort.column = col;
+  currentSort.ascending = true;
+  sortTable(col);
+});
+document.getElementById("btnDesc").addEventListener("click", () => {
+  const col = sortColumnSelect.value || currentSort.column || "Nama_Lengkap";
+  currentSort.column = col;
+  currentSort.ascending = false;
+  sortTable(col);
+});
+
+
+  // ===================== INITIALIZE KITAB CHECKLIST FOR HARIAN TAB =====================
+  async function initKitabChecklistHarian() {
+    try {
+      const { data: kitabRes, error } = await client
+        .from("nadhom_kitab")
+        .select("nama_kitab, judul_arab");
+
+      if (error) {
+        console.error("Gagal ambil kitab:", error);
+        return;
+      }
+
+      // Buat array dengan nama_kitab yang unik untuk checkbox
+      const kitabUnik = [...new Set((kitabRes || []).map(k => k.nama_kitab))].sort();
+      
+      // Render dengan nama_kitab (akan ditampilkan di checklist)
+      renderChecklistHarian("kitabChecklistHarian", kitabUnik, "kitab");
+      initChecklistCollapsiblesHarian();
+    } catch (err) {
+      console.error("Error:", err);
+    }
+  }
+
+  // Render checklist untuk Harian
+  function renderChecklistHarian(containerId, items, type) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = items.map(i => `
+      <label class="check-item" style="display: flex; gap: 8px; margin: 0;">
+        <input type="checkbox" value="${i}" data-type="${type}"> <span>${i}</span>
+      </label>
+    `).join("");
+  }
+  // Initialize collapsibles for Harian checklist
+  function initChecklistCollapsiblesHarian() {
+    const header = document.querySelector('[data-target="kitabBodyHarian"]');
+    const body = document.getElementById('kitabBodyHarian');
+    const triangle = document.getElementById('kitabTriangleHarian');
+
+    if (!header || !body) return;
+
+    header.addEventListener('click', () => {
+      if (body.style.display === 'none') {
+        body.style.display = 'block';
+        triangle.style.transform = 'rotate(180deg)';
+      } else {
+        body.style.display = 'none';
+        triangle.style.transform = 'rotate(0deg)';
+      }
+    });
+  }
+
+  // Handle filter changes (shift + kitab)
+  function setupFilterListenersHarian() {
+    // Shift filter
+    const shiftRadios = document.querySelectorAll('input[name="shift"]');
+    shiftRadios.forEach(radio => {
+      radio.removeEventListener('change', applyHarianFilters);
+      radio.addEventListener('change', applyHarianFilters);
+    });
+
+    // Kitab filter
+    const kitabCheckboxes = document.querySelectorAll('#kitabChecklistHarian input');
+    kitabCheckboxes.forEach(cb => {
+      cb.removeEventListener('change', applyHarianFilters);
+      cb.addEventListener('change', applyHarianFilters);
+    });
+  }
+
+  // Apply filters untuk Harian tab
+  async function applyHarianFilters() {
+    const selectedShift = document.querySelector('input[name="shift"]:checked')?.value || 'semua';
+    const selectedKitabs = [...document.querySelectorAll('#kitabChecklistHarian input:checked')].map(i => i.value);
+
+    const tableContainer = document.querySelector(".table-container");
+    const { data, error } = await client
+      .from("setoran_nadhom")
+      .select(`
+        id, tanggal, total_ayat, keterangan, status_lancar,
+        created_at, updated_at, id_penyimak,
+        santri_kharisma (Nama_Lengkap, Kelas, Unit_Ndalem),
+        nadhom_kitab (nama_kitab, judul_arab),
+        dari_bait:nadhom_bait!fk_dari_bait (id, nomor_bait, teks_arab),
+        sampai_bait:nadhom_bait!fk_sampai_bait (id, nomor_bait, teks_arab)
+      `)
+      .order("tanggal", { ascending: false });
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    // Get penyimak list
+    const { data: penyimakList } = await client
+      .from("penyimak")
+      .select("id_penyimak, nama_penyimak");
+
+    const merged = data.map(row => {
+      const pen = penyimakList?.find(p => p.id_penyimak === row.id_penyimak);
+      return {
+        ...row,
+        nama_penyimak: pen ? pen.nama_penyimak : "-",
+      };
+    });
+
+    // Apply filters
+    let filtered = merged;
+
+    // Filter by shift (berdasarkan kelas)
+    if (selectedShift !== 'semua') {
+      filtered = filtered.filter(d => {
+        const kelas = d.santri_kharisma?.Kelas;
+        const shift = getShiftFromKelas(kelas);
+        return shift === selectedShift;
+      });
+    }
+
+    // Filter by kitab (menggunakan nama_kitab)
+    if (selectedKitabs.length > 0) {
+      filtered = filtered.filter(d => selectedKitabs.includes(d.nadhom_kitab?.nama_kitab));
+    }
+
+    // Render filtered data
+    const allUnits = [...new Set(filtered.map(d => d.santri_kharisma?.Unit_Ndalem || "-"))].sort();
+    tableContainer.innerHTML = "";
+
+    const selectedUnit = document.getElementById("filterUnit")?.value || "Semua";
+    
+    if (selectedUnit === "Semua") {
+      allUnits.forEach(unit => {
+        const unitFiltered = filtered.filter(d => d.santri_kharisma?.Unit_Ndalem === unit);
+        tableContainer.innerHTML += renderTable(unit, unitFiltered);
+      });
+    } else {
+      const unitFiltered = filtered.filter(d => d.santri_kharisma?.Unit_Ndalem === selectedUnit);
+      tableContainer.innerHTML = renderTable(selectedUnit, unitFiltered);
+    }
+
+    currentRows = filtered;
+  }
+
+  // ===================== BUTTON UTILITY =====================
+  function setButtonLoading(btn, loading) {
+    const text = btn.querySelector(".btn-text");
+    const load = btn.querySelector(".btn-loading");
+    text.style.display = loading ? "none" : "inline";
+    load.style.display = loading ? "inline" : "none";
+    btn.disabled = loading;
+  }
+
+
+// ===================== DELETE DATA =====================
+window.deleteData = async function (id) {
+  if (!confirm("Yakin ingin menghapus setoran ini?")) return;
+  
+  const { error } = await client.from("setoran_nadhom").delete().eq("id", id);
+  if (error) {
+    showNotification("❌ Gagal menghapus setoran", "error", 4000);
+    return;
+  }
+  
+  showNotification("🗑️ Setoran berhasil dihapus");
+  await loadData();
+};
+
+// ===================== EDIT POPUP =====================
+window.openEditPopup = async function (id) {
+  const { data, error } = await client
+    .from("setoran_nadhom")
+    .select(`
+      id, id_kitab, tanggal, total_ayat, keterangan,status_lancar,
+      created_at, updated_at,
+      id_penyimak,
+      santri_kharisma (Nama_Lengkap, Kelas, Unit_Ndalem),
+      nadhom_kitab (nama_kitab, judul_arab),
+      dari_bait:nadhom_bait!fk_dari_bait (id, nomor_bait, teks_arab),
+      sampai_bait:nadhom_bait!fk_sampai_bait (id, nomor_bait, teks_arab)
+    `)
+    .eq("id", id)
+    .single();
+
+  if (error) return console.error("Gagal ambil data edit:", error);
+
+  const modal = document.getElementById("editPopup");
+  modal.style.display = "flex";
+
+  document.getElementById("editId").value = id;
+  document.getElementById("editNama").value = data.santri_kharisma?.Nama_Lengkap || "";
+  document.getElementById("editKelas").value = data.santri_kharisma?.Kelas || "";
+  document.getElementById("editKeterangan").value = data.keterangan || "";
+// ✅ Versi fleksibel & tahan huruf besar kecil
+document.querySelectorAll('input[name="edit_status_lancar"]').forEach(radio => {
+  radio.checked = (
+    (data.status_lancar || '').toLowerCase() === radio.value.toLowerCase()
+  );
+});
+
+
+  
+
+  await loadPenyimakToEdit(data.id_penyimak);
+  await loadKitabToEdit(data.id_kitab, data.dari_bait?.nomor_bait, data.sampai_bait?.nomor_bait);
+};
+
+
+async function loadKitabToEdit(selectedKitab, dariNomor, sampaiNomor) {
+  const kitabSelect = document.getElementById("editKitab");
+  const dariSel = document.getElementById("editDariAyat");
+  const sampaiSel = document.getElementById("editSampaiAyat");
+
+  // isi pilihan kitab
+  kitabSelect.innerHTML = `<option value="">Pilih Kitab</option>`;
+  kitabData.forEach(k => {
+    const opt = document.createElement("option");
+    opt.value = k.id;
+    opt.textContent = k.judul_arab;
+    opt.style.fontFamily = "'Scheherazade New', serif";
+    opt.style.direction = "rtl";
+    if (parseInt(k.id) === parseInt(selectedKitab)) opt.selected = true;
+    kitabSelect.appendChild(opt);
+  });
+
+  // ambil bait sesuai kitab terpilih
+  const { data, error } = await client
+    .from("nadhom_bait")
+    .select("id, nomor_bait, teks_arab")
+    .eq("id_kitab", selectedKitab)
+    .order("nomor_bait");
+
+  if (error) return console.error("Gagal load bait edit:", error);
+
+  renderBaitOptions(dariSel, sampaiSel, data, dariNomor, sampaiNomor);
+}
+
+
+document.getElementById("editKitab").addEventListener("change", async (e) => {
+  const kitabId = e.target.value;
+  if (!kitabId) return;
+
+  // ambil id juga! sebelumnya hanya nomor_bait & teks_arab sehingga option.value jadi undefined
+  const { data, error } = await client
+    .from("nadhom_bait")
+    .select("id, nomor_bait, teks_arab")
+    .eq("id_kitab", kitabId)
+    .order("nomor_bait");
+
+  if (error) {
+    console.error("Gagal load bait setelah ganti kitab:", error);
+    return;
+  }
+
+  const dariSel = document.getElementById("editDariAyat");
+  const sampaiSel = document.getElementById("editSampaiAyat");
+
+  // isi ulang dengan helper (renderBaitOptions akan membuat option.value = b.id)
+  renderBaitOptions(dariSel, sampaiSel, data);
+
+  // pilih bait pertama sebagai default agar form tetap valid (jika ada data)
+  if (data && data.length > 0) {
+    dariSel.value = data[0].id;
+    sampaiSel.value = data[0].id;
+  } else {
+    // kalau tidak ada bait
+    dariSel.value = "";
+    sampaiSel.value = "";
+  }
+
+  // (debug) lihat apa yang diisi
+  console.log("editKitab change -> bait count:", data?.length, "dari:", dariSel.value, "sampai:", sampaiSel.value);
+});
+
+
+// ===================== UPDATE DATA (Final Fix Lengkap & Aman) =====================
+document.getElementById("editForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const submitBtn = document.querySelector("#editForm button[type='submit']");
+  setButtonLoading(submitBtn, true);
+
+  try {
+    const id = document.getElementById("editId").value;
+    const kitabVal = document.getElementById("editKitab").value;
+    const dariVal = document.getElementById("editDariAyat").value;
+    const sampaiVal = document.getElementById("editSampaiAyat").value;
+    const penyimak = document.getElementById("editPenyimak").value;
+    const keterangan = document.getElementById("editKeterangan").value.trim();
+	const statusLancar = document.querySelector('input[name="edit_status_lancar"]:checked')?.value || null;
+
+
+    // ✅ Validasi dasar
+    if (!id || !kitabVal || !dariVal || !sampaiVal) {
+      showNotification("⚠️ Lengkapi semua field sebelum menyimpan.", "error", 4000);
+      setButtonLoading(submitBtn, false);
+      return;
+    }
+
+    // ✅ Konversi ke integer aman
+    const kitabId = parseInt(kitabVal);
+    const dari = parseInt(dariVal);
+    const sampai = parseInt(sampaiVal);
+
+    if (isNaN(kitabId) || isNaN(dari) || isNaN(sampai)) {
+      showNotification("⚠️ Pilihan kitab atau bait tidak valid.", "error", 4000);
+      setButtonLoading(submitBtn, false);
+      return;
+    }
+
+    // ✅ Hitung total ayat berdasarkan nomor bait (bukan id)
+    const dariNomor = parseInt(
+      document
+        .querySelector(`#editDariAyat option[value='${dariVal}']`)
+        ?.textContent.match(/\((\d+)\)/)?.[1] || 0
+    );
+    const sampaiNomor = parseInt(
+      document
+        .querySelector(`#editSampaiAyat option[value='${sampaiVal}']`)
+        ?.textContent.match(/\((\d+)\)/)?.[1] || 0
+    );
+    const total = sampaiNomor && dariNomor ? (sampaiNomor - dariNomor + 1) : Math.abs(sampai - dari) + 1;
+
+    // ✅ Siapkan payload sesuai kolom tabel Supabase
+    const payload = {
+      id_kitab: kitabId,
+      dari_ayat: dari,
+      sampai_ayat: sampai,
+      total_ayat: total,
+      id_penyimak: penyimak || null,
+	  status_lancar: statusLancar,
+      keterangan,
+      updated_at: new Date().toISOString(),
+    };
+
+    console.log("🟢 Payload Update:", payload);
+
+    // ✅ Jalankan update ke Supabase
+    const { error } = await client
+      .from("setoran_nadhom")
+      .update(payload)
+      .eq("id", id);
+
+    if (error) throw error;
+
+    showNotification("✏️ Setoran berhasil diperbarui");
+    document.getElementById("editPopup").style.display = "none";
+    await loadData();
+
+  } catch (err) {
+    console.error("❌ Edit error:", err);
+    showNotification("❌ Gagal memperbarui setoran: " + (err.message || "Tidak diketahui"), "error", 5000);
+  } finally {
+    setButtonLoading(submitBtn, false);
+  }
+});
+
+
+
+  document.getElementById("closeEditPopup").onclick = () => {
+    document.getElementById("editPopup").style.display = "none";
+  };
+
+  // Jalankan init
+  init();
+});
+
+function renderBaitOptions(dariSel, sampaiSel, data, selectedDari = null, selectedSampai = null) {
+  dariSel.innerHTML = `<option value="">Pilih Batas Awal</option>`;
+  sampaiSel.innerHTML = `<option value="">Pilih Batas Akhir</option>`;
+
+  data.forEach(b => {
+    const opt1 = document.createElement("option");
+    const opt2 = document.createElement("option");
+
+    // value harus id (b.id) => ini yang diparsing di submit
+    opt1.value = b.id;
+    opt2.value = b.id;
+
+    opt1.textContent = `${b.teks_arab} (${b.nomor_bait})`;
+    opt2.textContent = `${b.teks_arab} (${b.nomor_bait})`;
+
+    opt1.classList.add("arabic");
+    opt2.classList.add("arabic");
+
+    // Terima selectedDari/Sampai baik berupa nomor_bait atau id
+    if (selectedDari && (String(selectedDari) === String(b.nomor_bait) || String(selectedDari) === String(b.id))) opt1.selected = true;
+    if (selectedSampai && (String(selectedSampai) === String(b.nomor_bait) || String(selectedSampai) === String(b.id))) opt2.selected = true;
+
+    dariSel.appendChild(opt1);
+    sampaiSel.appendChild(opt2);
+  });
+
+  // aktifkan aturan otomatis dari ↔ sampai
+  setupBaitSelection(dariSel, sampaiSel);
+}
+
+
+
+// ===================== BATAS LOGIKA DARI/SAMPAI =====================
+function setupBaitSelection(dariSel, sampaiSel) {
+  if (!dariSel || !sampaiSel) return;
+
+  // Saat "Dari Bait" berubah
+  dariSel.addEventListener("change", () => {
+    const dari = parseInt(dariSel.value);
+    if (isNaN(dari)) return;
+
+    // Otomatis isi "Sampai" dengan nilai yang sama
+    sampaiSel.value = dari;
+
+    // Filter opsi supaya hanya menampilkan bait >= dari
+    for (const opt of sampaiSel.options) {
+      if (opt.value && parseInt(opt.value) < dari) {
+        opt.disabled = true;
+        opt.style.display = "none";
+      } else {
+        opt.disabled = false;
+        opt.style.display = "block";
+      }
+    }
+
+    // Fokus ke dropdown "Sampai"
+    sampaiSel.focus();
+  });
+}
+
+// ===================== NOTIFICATION FUNCTION =====================
+function showNotification(message, type = 'success', duration = 3000) {
+  const popup = document.getElementById('notificationPopup');
+  const messageEl = document.getElementById('notificationMessage');
+  
+  // Set message and type
+  messageEl.textContent = message;
+  popup.className = 'notification-popup';
+  popup.classList.add(type);
+  
+  // Show popup
+  popup.classList.add('show');
+  
+  // Auto hide after duration
+  setTimeout(() => {
+    popup.classList.remove('show');
+  }, duration);
+}
+
+// ===================== LOAD PENYIMAK (SEMUA UNIT) =====================
+async function loadPenyimak() {
+  const penyimakSelect = document.getElementById("penyimak");
+  if (!penyimakSelect) return;
+  
+  penyimakSelect.innerHTML = `<option value="">Memuat...</option>`;
+
+  const { data, error } = await client
+    .from("penyimak")
+    .select("id_penyimak, nama_penyimak, unit_ndalem")
+    .order("nama_penyimak");
+
+  if (error) {
+    console.error("Gagal memuat daftar penyimak:", error);
+    penyimakSelect.innerHTML = `<option value="">Gagal memuat</option>`;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    penyimakSelect.innerHTML = `<option value="">(Belum ada penyimak)</option>`;
+    return;
+  }
+
+  penyimakSelect.innerHTML = `<option value="">Pilih Penyimak</option>`;
+  data.forEach(p => {
+    const opt = document.createElement("option");
+    opt.value = p.id_penyimak;
+    opt.textContent = p.nama_penyimak;   // 🔹 hanya nama
+    penyimakSelect.appendChild(opt);
+  });
+}
+
+// ===================== LOAD PENYIMAK UNTUK EDIT POPUP (SEMUA UNIT) =====================
+async function loadPenyimakToEdit(selectedId = null) {
+  const select = document.getElementById("editPenyimak");
+  if (!select) return;
+
+  select.innerHTML = `<option value="">Memuat...</option>`;
+
+  const { data, error } = await client
+    .from("penyimak")
+    .select("id_penyimak, nama_penyimak, unit_ndalem")
+    .order("nama_penyimak");
+
+  if (error) {
+    console.error("Gagal memuat daftar penyimak (edit):", error);
+    select.innerHTML = `<option value="">Gagal memuat</option>`;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    select.innerHTML = `<option value="">(Belum ada penyimak)</option>`;
+    return;
+  }
+
+  select.innerHTML = `<option value="">Pilih Penyimak</option>`;
+  data.forEach(p => {
+    const opt = document.createElement("option");
+    opt.value = p.id_penyimak;
+    opt.textContent = p.nama_penyimak;   // 🔹 hanya nama
+    if (selectedId && p.id_penyimak === selectedId) opt.selected = true;
+    select.appendChild(opt);
+  });
+}
+
+
+
+// Fungsi render lafadz berdasarkan jenis kitab
+function renderLafadz(teksArab, judulKitab) {
+  if (!teksArab || teksArab === "-") return "-";
+  
+  // Cek apakah kitab ini termasuk nadhom
+  const isNadhom = KITAB_NADHOM.includes(judulKitab);
+  
+  if (isNadhom) {
+    const nadhom = splitNadhomText(teksArab);
+    if (nadhom && nadhom.line2) {
+      // Tampilkan sebagai 2 baris dengan garis pemisah
+      return `
+        <div class="nadhom-container">
+          <div class="nadhom-line">${nadhom.line1}</div>
+          <div class="nadhom-divider"></div>
+          <div class="nadhom-line">${nadhom.line2}</div>
+        </div>
+      `;
+    }
+  }
+  
+  // Untuk non-nadhom atau nadhom yang tidak bisa di-split
+  return `<div class="arabic-single-line">${teksArab}</div>`;
+
+}
+
+// ==================== TAB NAVIGATION ====================
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".tab-btn");
+  if (!btn) return;
+
+  // hapus class aktif dari semua tombol
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+
+  // sembunyikan semua tab, tampilkan tab yang dipilih
+  const tabId = btn.getAttribute("data-tab");
+  document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
+  document.getElementById(tabId).classList.add("active");
+});
+
+
+// ==================== LAPORAN SOROGAN ====================
+
+// urutan kelas tetap
+const kelasOrder = [
+  'VI Ibtidaiyah', 'V Ibtidaiyah', 'VI Ibtidaiyah',
+  'I Tsanawiyah', 'II Tsanawiyah', 'III Tsanawiyah',
+  'I Aliyah', 'II Aliyah', 'III Aliyah',
+  "I-II Ma'had Aly", "III-IV Ma'had Aly", "V-VI Ma'had Aly", "I'dadiyah I", "I'dadiyah II", "I'dadiyah III"
+];
+
+async function loadChecklistFilters() {
+  const [santriRes, kitabRes] = await Promise.all([
+    client
+      .from("santri_kharisma")
+      .select("Kelas, Unit_Ndalem, Status")
+      .eq("Status", "aktif")
+      .not("Kelas", "is", null)
+      .not("Unit_Ndalem", "is", null),
+
+    client
+      .from("nadhom_kelas_kitab")
+      .select("jenis_setoran, nadhom_kitab(nama_kitab)")
+  ]);
+
+  if (santriRes.error) console.error("Gagal ambil kelas/unit:", santriRes.error);
+  if (kitabRes.error) console.error("Gagal ambil kitab:", kitabRes.error);
+
+  const data = santriRes.data || [];
+
+  const kelasUnik = [...new Set(data.map(d => d.Kelas))]
+    .sort((a, b) => kelasOrder.indexOf(a) - kelasOrder.indexOf(b));
+
+  const unitUnik = [...new Set(data.map(d => d.Unit_Ndalem))].sort();
+
+  // extract nama kitab dari relasi
+  const kitabUnik = [...new Set((kitabRes.data || [])
+    .filter(k => k.jenis_setoran === "Wajib")
+    .map(k => k.nadhom_kitab.nama_kitab)
+  )].sort();
+
+  renderChecklist("kelasChecklist", kelasUnik, "kelas");
+  renderChecklist("unitChecklist", unitUnik, "unit");
+  renderChecklist("kitabChecklist", kitabUnik, "kitab");
+
+  updateChecklistCounts();
+  initChecklistCollapsibles();
+}
+
+
+function renderChecklist(containerId, items, type) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = items.map(i => `
+    <label class="check-item">
+      <input type="checkbox" value="${i}" data-type="${type}"> ${i}
+    </label>
+  `).join("");
+}
+
+// ===================== CHECKLIST COLLAPSIBLE =====================
+
+// Jalankan ulang event listener setelah checklist dirender
+function initChecklistCollapsibles() {
+  document.querySelectorAll('.checklist-header').forEach(header => {
+    // Hapus event lama supaya tidak dobel
+    header.replaceWith(header.cloneNode(true));
+  });
+
+  // Ambil ulang semua header setelah clone
+  document.querySelectorAll('.checklist-header').forEach(header => {
+    header.addEventListener('click', () => {
+      const targetId = header.getAttribute('data-target');
+      const body = document.getElementById(targetId);
+      const tri = header.querySelector('.triangle');
+      if (!body) return;
+
+      const collapsed = body.classList.contains('collapsed');
+      if (collapsed) {
+        body.classList.remove('collapsed');
+        body.classList.add('expanded');
+        tri.classList.add('open');
+      } else {
+        body.classList.remove('expanded');
+        body.classList.add('collapsed');
+        tri.classList.remove('open');
+      }
+    });
+  });
+
+  // Set default tertutup
+  document.querySelectorAll('.checklist-body').forEach(body => {
+    if (!body.classList.contains('expanded')) {
+      body.classList.add('collapsed');
+    }
+  });
+  document.querySelectorAll('.triangle').forEach(tri => tri.classList.remove('open'));
+}
+
+// Hitung jumlah checklist
+function updateChecklistCounts() {
+  const cnt = id => document.querySelectorAll(`#${id} .check-item`).length;
+  const setText = (id, n) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = n ? `${n}` : '';
+  };
+  setText('kelasCount', cnt('kelasChecklist'));
+  setText('unitCount', cnt('unitChecklist'));
+  setText('kitabCount', cnt('kitabChecklist'));
+}
+
+// Pastikan inisialisasi dilakukan setelah halaman siap
+document.addEventListener('DOMContentLoaded', () => {
+  // inisialisasi pertama
+  initChecklistCollapsibles();
+});
+
+
+// ===================== FILTER SEKOLAH PAGI / MALAM =====================
+
+// daftar kelas per kategori
+const kelasPagi = [
+  'IV Ibtidaiyah', 'V Ibtidaiyah', 'VI Ibtidaiyah',
+  'I Tsanawiyah', 'II Tsanawiyah', "I'dadiyah I", "I'dadiyah II"
+];
+const kelasMalam = [
+  'III Tsanawiyah',
+  'I Aliyah', 'II Aliyah', 'III Aliyah',
+  "I-II Ma'had Aly", "III-IV Ma'had Aly", "V-VI Ma'had Aly", "I'dadiyah III"
+];
+
+// fungsi memperbarui checklist kelas sesuai shift
+function updateKelasByShift(shift) {
+  let targetKelas = [];
+  if (shift === 'pagi') targetKelas = kelasPagi;
+  else if (shift === 'malam') targetKelas = kelasMalam;
+  else targetKelas = [...kelasPagi, ...kelasMalam]; // kalau nanti ada opsi "semua sekolah"
+
+  // render daftar kelas
+  renderChecklist('kelasChecklist', targetKelas, 'kelas');
+
+  // ✅ otomatis centang semua kelas setelah tampil
+  setTimeout(() => {
+    document.querySelectorAll('#kelasChecklist input[type="checkbox"]').forEach(cb => cb.checked = true);
+    loadLaporan(); // langsung refresh laporan setelah semua kelas tercentang
+  }, 50);
+}
+
+// ===================== EVENT LISTENER RADIO SHIFT =====================
+document.addEventListener('change', e => {
+  if (e.target.name === 'shift') {
+    updateKelasByShift(e.target.value);
+    loadLaporan(); // ✅ langsung refresh laporan setelah ganti shift
+  }
+});
+
+// ===================== INISIALISASI AWAL =====================
+// saat halaman pertama kali dimuat, tampilkan semua sekolah & centang semua kelas
+document.addEventListener("DOMContentLoaded", () => {
+  const defaultShift = 'semua'; // ✅ default awal: semua sekolah
+  const defaultRadio = document.querySelector(`input[name="shift"][value="${defaultShift}"]`);
+  if (defaultRadio) defaultRadio.checked = true;
+  updateKelasByShift(defaultShift); // tampilkan semua kelas pagi + malam
+});
+
+// ==================== GLOBAL HELPERS ====================
+
+// Ubah nilai apa pun jadi string aman
+const safeStr = (v) => (v ?? "").toString().trim();
+
+// Locale compare aman (Indonesia, numeric aware)
+const safeCompare = (a, b) =>
+  safeStr(a).localeCompare(safeStr(b), "id", { numeric: true });
+
+// Helper sorting by key
+const sortBy = (key, direction = "asc") => (a, b) => {
+  const res = safeCompare(a[key], b[key]);
+  return direction === "desc" ? -res : res;
+};
+
+// Sorting prioritas + fallback nama
+const sortByScoreThenName = (scoreFn, nameKey = "Nama_Lengkap") => (a, b) => {
+  const diff = scoreFn(b) - scoreFn(a);
+  return diff !== 0 ? diff : safeCompare(a[nameKey], b[nameKey]);
+};
+
+function buildNgajiSummaryFromSantri(data) {
+  const map = {};
+  let total = 0;
+
+  data.forEach(s => {
+    const tempat = s.ngaji?.tempat_ngaji || 'Tidak Diketahui';
+    if (!map[tempat]) map[tempat] = 0;
+    map[tempat]++;
+    total++;
+  });
+
+  return { map, total };
+}
+
+function renderNgajiSummary(summary) {
+  const el = document.getElementById('ngajiSummaryBody');
+  if (!el) return;
+
+  if (!summary || summary.total === 0) {
+    el.textContent = '-';
+    return;
+  }
+
+  el.innerHTML = Object.entries(summary.map)
+    .map(([tempat, jumlah]) =>
+      `<span class="ngaji-label">${tempat}</span>: <b>${jumlah}</b>`
+    )
+    .join(' | ');
+}
+
+
+
+async function loadLaporan() {
+  try {
+    const kelasDipilih = [...document.querySelectorAll('#kelasChecklist input:checked')].map(i => i.value);
+    const unitDipilih  = [...document.querySelectorAll('#unitChecklist input:checked')].map(i => i.value);
+    const kitabDipilih = [...document.querySelectorAll('#kitabChecklist input:checked')].map(i => i.value);
+
+        // ==================== REKAP AKTIVITAS UNIT (v_unit_aktif_setoran) ====================
+    try {
+      const { data: unitAktifData = [], error: unitAktifErr } = await client
+        .from("v_unit_aktif_setoran")
+        .select("*")
+        .order("Unit_Ndalem", { ascending: true });
+
+      if (unitAktifErr) {
+        console.error("Gagal ambil v_unit_aktif_setoran:", unitAktifErr);
+      }
+
+      // Jika tabel tersedia di halaman
+      const tbl = document.querySelector("#tblUnitAktif tbody");
+      if (tbl) {
+        tbl.innerHTML = "";
+
+        if (!unitAktifData || unitAktifData.length === 0) {
+          tbl.innerHTML = `<tr><td colspan="8" style="text-align:center;">(tidak ada data)</td></tr>`;
+        } else {
+          unitAktifData.forEach((row, i) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td>${i + 1}</td>
+              <td>${row.Unit_Ndalem ?? '-'}</td>              
+              <td>${row.total_hari_aktif ?? 0}</td>
+			  <td style="text-align:left;">${row.daftar_kitab ?? 0}</td>
+              <td>${row.tanggal_terakhir_setoran ?? '-'}</td>            
+              <td>${row.persen_kontribusi ?? 0}%</td>             
+            `;
+            tbl.appendChild(tr);
+          });
+        }
+      }
+    } catch (err) {
+      console.error("Gagal memuat Rekap Aktivitas Unit:", err);
+    }
+
+	
+	// Ambil data dari dua view:
+    // - statusData: view per santri (unik, untuk prosentase)
+    // - detailData: view per kitab (untuk tabel detail)
+    const { data: statusData = [], error: statusErr } = await client.from("v_status_khatam_lancar_santri").select("*");
+    const { data: detailData = [], error: detailErr } = await client.from("v_status_khatam_lancar").select("*");
+    const { data: belumData = [], error: belumErr } = await client.from("v_belum_setoran").select("*");
+
+    if (statusErr || detailErr || belumErr) {
+      console.error("Error ambil data view:", statusErr, detailErr, belumErr);
+      return;
+    }
+	
+	// ==================== DATA SANTRI + TEMPAT NGAJI ====================
+	const { data: santriNgaji = [], error: ngajiErr } = await client
+	  .from('santri_kharisma')
+	  .select(`
+		Kelas,
+		Unit_Ndalem,
+		Status,
+		ngaji:Ngaji (
+		  tempat_ngaji
+		)
+	  `);
+
+	if (ngajiErr) {
+	  console.error("Gagal ambil data santri ngaji:", ngajiErr);
+	}
+
+
+    // ==================== FILTER DATA ====================
+    const filterLogic = (item) => {
+      const matchKelas = kelasDipilih.length ? kelasDipilih.includes(item.Kelas) : true;
+      const matchUnit  = unitDipilih.length  ? unitDipilih.includes(item.Unit_Ndalem) : true;
+      return matchKelas && matchUnit;
+    };
+
+    const filterLogicDetail = (item) => {
+      const matchKelas = kelasDipilih.length ? kelasDipilih.includes(item.Kelas) : true;
+      const matchUnit  = unitDipilih.length  ? unitDipilih.includes(item.Unit_Ndalem) : true;
+      const matchKitab = kitabDipilih.length ? kitabDipilih.includes(item.nama_kitab) : true;
+      return matchKelas && matchUnit && matchKitab;
+    };
+
+    const filteredStatus = (statusData || []).filter(filterLogic);
+    const filteredDetail = (detailData || []).filter(filterLogicDetail);
+    const filteredBelum  = (belumData  || []).filter(filterLogic);
+	
+	// ==================== FILTER SANTRI AKTIF ====================
+	const santriAktif = (santriNgaji || []).filter(s =>
+	  !s.Status || s.Status !== 'tidak aktif'
+	);
+
+	// ==================== FILTER SESUAI LAPORAN ====================
+	const santriNgajiFiltered = santriAktif.filter(s => {
+	  const matchKelas = kelasDipilih.length ? kelasDipilih.includes(s.Kelas) : true;
+	  const matchUnit  = unitDipilih.length  ? unitDipilih.includes(s.Unit_Ndalem) : true;
+	  return matchKelas && matchUnit;
+	});
+
+	// ==================== SUMMARY TEMPAT NGAJI (BENAR) ====================
+	renderNgajiSummary(
+	  buildNgajiSummaryFromSantri(santriNgajiFiltered)
+	);
+
+
+    // ==================== TOTAL GLOBAL ====================
+    const totalSantri   = filteredStatus.length;
+    const sudahKhatam   = filteredStatus.filter(s => s.status_khatam === 'Khatam').length;
+    const sudahLancar   = filteredStatus.filter(s => s.status_lancar === 'Lancar').length;
+
+    const persenKhatamGlobal = totalSantri ? ((sudahKhatam / totalSantri) * 100).toFixed(1) : 0;
+    const persenLancarGlobal = totalSantri ? ((sudahLancar / totalSantri) * 100).toFixed(1) : 0;
+
+    const summary = document.getElementById("laporanSummary");
+	if (summary) {
+	  // Jika struktur span belum dibuat (versi lama), buat sekali
+	  if (!document.getElementById('totalSantri')) {
+		summary.innerHTML = `
+		  <div>📊 <b>Total Santri Aktif:</b> <span id="totalSantri">0</span></div>
+		  <div>| <b>Khatam:</b> <span id="persenKhatam">0%</span> | <b>Lancar:</b> <span id="persenLancar">0%</span></div>
+		  <div>| <b>Belum Khatam:</b> <span id="belumKhatam">0%</span> | <b>Belum Lancar:</b> <span id="belumLancar">0%</span></div>
+		  <div>| <b>Sudah Setoran:</b> <span id="sudahSetoran">0%</span> | <b>Belum Setoran:</b> <span id="belumSetoran">0%</span></div>
+		`;
+	  }
+
+	  // Hitung nilai tambahan
+	  const belumKhatamCount = totalSantri - sudahKhatam;
+	  const belumLancarCount = totalSantri - sudahLancar;
+
+	  // 'filteredBelum' di scope loadLaporan() berisi daftar yang belum setoran
+	  const belumSetoranCount = (filteredBelum || []).length;
+	  const sudahSetoranCount = totalSantri - belumSetoranCount;
+
+	  const pct = (n) => totalSantri ? ((n / totalSantri) * 100).toFixed(1) + '%' : '0%';
+
+	  // Isi masing-masing span (aman: cek keberadaan span)
+	  document.getElementById('totalSantri') && (document.getElementById('totalSantri').textContent = totalSantri);
+	  document.getElementById('persenKhatam') && (document.getElementById('persenKhatam').textContent = (persenKhatamGlobal !== undefined ? persenKhatamGlobal : 0) + '%');
+	  document.getElementById('persenLancar') && (document.getElementById('persenLancar').textContent = (persenLancarGlobal !== undefined ? persenLancarGlobal : 0) + '%');
+	  document.getElementById('belumKhatam') && (document.getElementById('belumKhatam').textContent = pct(belumKhatamCount));
+	  document.getElementById('belumLancar') && (document.getElementById('belumLancar').textContent = pct(belumLancarCount));
+	  document.getElementById('sudahSetoran') && (document.getElementById('sudahSetoran').textContent = pct(sudahSetoranCount));
+	  document.getElementById('belumSetoran') && (document.getElementById('belumSetoran').textContent = pct(belumSetoranCount));
+	}
+
+
+    // ==================== REKAP PER KELAS ====================
+    const mapKelas = {};
+    filteredStatus.forEach(s => {
+      if (!mapKelas[s.Kelas]) {
+        mapKelas[s.Kelas] = { Kelas: s.Kelas, total: 0, belumKhatam: 0, belumLancar: 0 };
+      }
+      mapKelas[s.Kelas].total++;
+      if (s.status_khatam !== 'Khatam') mapKelas[s.Kelas].belumKhatam++;
+      if (s.status_lancar !== 'Lancar') mapKelas[s.Kelas].belumLancar++;
+    });
+
+    const kelas = Object.values(mapKelas)
+      .map((k, i) => {
+        const pKhatam = ((1 - k.belumKhatam / k.total) * 100).toFixed(1);
+        const pLancar = ((1 - k.belumLancar / k.total) * 100).toFixed(1);
+        return {
+          No: i + 1,
+          Kelas: k.Kelas,
+          total_santri: k.total,
+          belum_khatam: k.belumKhatam,
+          belum_lancar: k.belumLancar,
+          persen_khatam: `${pKhatam}%`,
+          persen_lancar: `${pLancar}%`
+        };
+      })
+      .sort((a, b) => kelasOrder.indexOf(a.Kelas) - kelasOrder.indexOf(b.Kelas));
+
+    // ==================== REKAP PER UNIT ====================
+    const mapUnit = {};
+    filteredStatus.forEach(s => {
+      if (!mapUnit[s.Unit_Ndalem]) {
+        mapUnit[s.Unit_Ndalem] = { Unit_Ndalem: s.Unit_Ndalem, total: 0, belumKhatam: 0, belumLancar: 0 };
+      }
+      mapUnit[s.Unit_Ndalem].total++;
+      if (s.status_khatam !== 'Khatam') mapUnit[s.Unit_Ndalem].belumKhatam++;
+      if (s.status_lancar !== 'Lancar') mapUnit[s.Unit_Ndalem].belumLancar++;
+    });
+
+    const unit = Object.values(mapUnit)
+      .map((u, i) => {
+        const pKhatam = ((1 - u.belumKhatam / u.total) * 100).toFixed(1);
+        const pLancar = ((1 - u.belumLancar / u.total) * 100).toFixed(1);
+        return {
+          No: i + 1,
+          Unit_Ndalem: u.Unit_Ndalem,
+          total_santri: u.total,
+          belum_khatam: u.belumKhatam,
+          belum_lancar: u.belumLancar,
+          persen_khatam: `${pKhatam}%`,
+          persen_lancar: `${pLancar}%`
+        };
+      })
+      .sort(sortBy("Unit_Ndalem"));
+
+
+    // ==================== URUTKAN DETAIL: Khatam & Lancar dulu ====================
+    const scoreStatus = s =>
+	  (s.status_khatam === 'Khatam' ? 1 : 0) +
+	  (s.status_lancar === 'Lancar' ? 1 : 0);
+
+	filteredDetail.sort(sortByScoreThenName(scoreStatus));
+
+
+    // ==================== RENDER TABEL ====================
+    renderTable("tblKelas", kelas, ["No", "Kelas", "total_santri", "belum_khatam", "belum_lancar", "persen_khatam", "persen_lancar"]);
+    renderTable("tblUnit",  unit,  ["No", "Unit_Ndalem", "total_santri", "belum_khatam", "belum_lancar", "persen_khatam", "persen_lancar"]);
+    renderTable("tblStatus", filteredDetail, ["No", "Nama_Lengkap", "Kelas", "Unit_Ndalem", "nama_kitab", "total_ayat_setor", "batas_khatam", "status_khatam", "status_lancar"]);
+    renderTable("tblBelum",  filteredBelum,  ["No", "Nama_Lengkap", "Kelas", "Unit_Ndalem"]);
+
+  } catch (err) {
+    console.error("Gagal load laporan:", err);
+  }
+}
+
+
+
+function renderTable(id, data, cols) {
+  const tbody = document.querySelector(`#${id} tbody`);
+  if (!tbody) return;
+
+  tbody.innerHTML = data && data.length
+    ? data.map((r, idx) => {
+        r.No = idx + 1;
+        return `<tr>${cols.map(c => `<td>${r[c] ?? ''}</td>`).join('')}</tr>`;
+      }).join('')
+    : `<tr><td colspan="${cols.length}" style="text-align:center;">(tidak ada data)</td></tr>`;
+}
+
+
+// saat tab laporan diklik
+document.querySelector('[data-tab="laporanTab"]').addEventListener("click", async () => {
+  await loadChecklistFilters();
+  await loadLaporan();
+});
+
+// update laporan setiap checklist berubah
+document.addEventListener("change", e => {
+  if (e.target.matches('#kelasChecklist input, #unitChecklist input, #kitabChecklist input')) {
+    loadLaporan();
+  }
+});
+
+// ========================== FINAL VERSION: DOWNLOAD PDF RAPi & BIRU ==========================
+async function downloadPDFAll() {
+  const btn = document.getElementById('btnDownloadAll') || document.querySelector('.btn-download-all');
+  if (btn) {
+    btn.classList.add('downloading');
+    btn.setAttribute('aria-disabled', 'true');
+  }
+
+  try {
+    const { jsPDF } = window.jspdf;
+    const marginX = 36;
+    const doc = new jsPDF({ unit: "pt", format: "a4", compress: true });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    const tables = [
+      { id: "tblKelas", title: "Rekap Prosentase Kelas" },
+      { id: "tblUnit", title: "Rekap Prosentase Unit Ndalem" },
+      { id: "tblStatus", title: "Status Khatam & Lancar (Santri)" },
+      { id: "tblBelum", title: "Santri Belum Setoran" },
+	  { id: "tblUnitAktif", title: "Rekap Aktivitas Unit" }
+    ];
+
+    let cursorY = 25;
+
+    // ===== HEADER DOKUMEN =====
+    try {
+      const logoUrl = "https://i.imgur.com/Irgu32G.png";
+      const resp = await fetch(logoUrl);
+      if (resp.ok) {
+        const blob = await resp.blob();
+        const base64 = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.readAsDataURL(blob);
+        });
+        doc.addImage(base64, "PNG", marginX, 12, 34, 34);
+      }
+    } catch (e) {
+      console.warn("Logo gagal dimuat:", e);
+    }
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.setTextColor(0, 0, 0);
+    doc.text("KHUDAMA' KHARISMA", pageWidth / 2, 30, { align: "center" });
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text("Pondok Pesantren Lirboyo Kota Kediri Jawa Timur", pageWidth / 2, 44, { align: "center" });
+
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(9);
+    doc.text("Sekretariat: Kantor KHARISMA Gedung Nafis Lt. 02 Lirboyo Kota Kediri", pageWidth / 2, 56, { align: "center" });
+
+    doc.setLineWidth(0.7);
+    doc.line(marginX, 64, pageWidth - marginX, 64);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.text("LAPORAN SETORAN NADHOM", pageWidth / 2, 82, { align: "center" });
+
+    // beri jarak cukup antar header dan isi
+    cursorY = 130;
+	
+	// ===== CETAK FILTER: Sekolah / Unit / Kitab (otomatis tampil hanya jika dipilih) =====
+	// ===== CETAK FILTER: Sekolah / Unit / Kitab (kelas mengikuti sekolah) =====
+	let filterPrinted = false;
+
+	// === SEKOLAH + KELAS ===
+	const sekolahRadio = document.querySelector('#shiftFilter input[type="radio"]:checked');
+	const kelasCeklis = document.querySelectorAll('#kelasChecklist input[type="checkbox"]:checked');
+
+	if (sekolahRadio) {
+	  const sekolahUtama = sekolahRadio.closest("label")?.innerText.trim() || sekolahRadio.value;
+	  const kelasList = Array.from(kelasCeklis)
+		.map(el => el.closest("label")?.innerText.trim())
+		.filter(Boolean);
+
+	  let sekolahText = sekolahUtama;
+	  if (kelasList.length > 0) {
+		sekolahText += ` (${kelasList.join(", ")})`;
+	  }
+
+	  // Tulis ke PDF
+	  doc.setFont("helvetica", "bold");
+	  doc.setFontSize(10);
+	  doc.setTextColor(26, 115, 232);
+	  doc.text("Sekolah:", marginX, cursorY);
+
+	  doc.setFont("helvetica", "normal");
+	  doc.setFontSize(9.5);
+	  doc.setTextColor(0, 0, 0);
+	  const lines = doc.splitTextToSize(sekolahText, pageWidth - marginX * 2 - 70);
+	  doc.text(lines, marginX + 50, cursorY);
+	  cursorY += lines.length * 10 + 4;
+
+	  filterPrinted = true;
+	}
+
+	// === UNIT ===
+	const unitChecked = document.querySelectorAll('#unitChecklist input[type="checkbox"]:checked');
+	if (unitChecked.length > 0) {
+	  const unitList = Array.from(unitChecked)
+		.map(el => el.closest("label")?.innerText.trim())
+		.filter(Boolean);
+
+	  doc.setFont("helvetica", "bold");
+	  doc.setFontSize(10);
+	  doc.setTextColor(26, 115, 232);
+	  doc.text("Unit:", marginX, cursorY);
+
+	  doc.setFont("helvetica", "normal");
+	  doc.setFontSize(9.5);
+	  doc.setTextColor(0, 0, 0);
+	  const unitLines = doc.splitTextToSize(unitList.join(", "), pageWidth - marginX * 2 - 70);
+	  doc.text(unitLines, marginX + 50, cursorY);
+	  cursorY += unitLines.length * 10 + 4;
+
+	  filterPrinted = true;
+	}
+
+	// === KITAB ===
+	const kitabChecked = document.querySelectorAll('#kitabChecklist input[type="checkbox"]:checked');
+	if (kitabChecked.length > 0) {
+	  const kitabList = Array.from(kitabChecked)
+		.map(el => el.closest("label")?.innerText.trim())
+		.filter(Boolean);
+
+	  doc.setFont("helvetica", "bold");
+	  doc.setFontSize(10);
+	  doc.setTextColor(26, 115, 232);
+	  doc.text("Kitab:", marginX, cursorY);
+
+	  doc.setFont("helvetica", "normal");
+	  doc.setFontSize(9.5);
+	  doc.setTextColor(0, 0, 0);
+	  const kitabLines = doc.splitTextToSize(kitabList.join(", "), pageWidth - marginX * 2 - 70);
+	  doc.text(kitabLines, marginX + 50, cursorY);
+	  cursorY += kitabLines.length * 10 + 4;
+
+	  filterPrinted = true;
+	}
+
+	if (filterPrinted) cursorY += 6;
+
+	// ===== CETAK SUMMARY (3 BARIS CENTER, DENGAN POSISI TOTAL SANTRI DITURUNKAN) =====
+const summaryEl = document.getElementById("laporanSummary");
+if (summaryEl) {
+  const labelEl = summaryEl.querySelector("b");
+  const angkaEl = summaryEl.querySelector("#totalSantri");
+  const otherLineEls = Array.from(summaryEl.querySelectorAll("div")).slice(1);
+
+  const labelText = labelEl ? (labelEl.innerText.trim() + " ") : "Total Santri: ";
+  const angkaText = angkaEl ? (angkaEl.innerText.trim()) : "";
+  const otherLines = otherLineEls.map(d => d.innerText.trim()).filter(Boolean);
+
+  const boxWidth = pageWidth - marginX * 2;
+  const boxHeight = 90;
+  const boxY = cursorY + 4;
+
+  // === Background gradasi biru lembut ===
+  const gradientSteps = 25;
+  for (let i = 0; i < gradientSteps; i++) {
+    const ratio = i / gradientSteps;
+    const r = 225 + (245 - 225) * ratio;
+    const g = 235 + (250 - 235) * ratio;
+    const b = 255;
+    doc.setFillColor(r, g, b);
+    doc.rect(marginX, boxY + (i * (boxHeight / gradientSteps)), boxWidth, boxHeight / gradientSteps, "F");
+  }
+
+  // === Warna teks ===
+  const isFullKhatam = (summaryEl.innerText || "").includes("100%");
+  const accentColor = isFullKhatam ? [56, 142, 60] : [25, 118, 210];
+  doc.setTextColor(...accentColor);
+
+  // === Muat ikon statistik ===
+  let iconBase64 = null;
+  const iconWidth = 18, iconHeight = 18;
+  try {
+    const iconUrl = "https://i.imgur.com/huVGgA2.png";
+    const resp = await fetch(iconUrl);
+    if (resp.ok) {
+      const blob = await resp.blob();
+      iconBase64 = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.readAsDataURL(blob);
+      });
+    }
+  } catch (e) {
+    console.warn("Ikon summary gagal dimuat:", e);
+  }
+
+  // === Hitung posisi ===
+  const centerY = boxY + boxHeight / 2;
+  const lineSpacing = 14;
+  const totalLines = 1 + otherLines.length;
+  const startY = centerY - ((totalLines - 1) * lineSpacing) / 2 + 3;
+
+  // === Font setup (semua bold) ===
+  let fontSizeMain = 10;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(fontSizeMain);
+
+  // === Hitung lebar teks ===
+  let labelWidth = doc.getTextWidth(labelText);
+  let angkaWidth = doc.getTextWidth(angkaText);
+  let totalWidth = iconWidth + 6 + labelWidth + angkaWidth;
+  const maxAllowed = boxWidth - 20;
+
+  // Pastikan tidak melewati batas box
+  while (fontSizeMain > 7 && totalWidth > maxAllowed) {
+    fontSizeMain -= 0.5;
+    doc.setFontSize(fontSizeMain);
+    labelWidth = doc.getTextWidth(labelText);
+    angkaWidth = doc.getTextWidth(angkaText);
+    totalWidth = iconWidth + 6 + labelWidth + angkaWidth;
+  }
+
+  const startX = Math.max(marginX + 4, (pageWidth - totalWidth) / 2);
+
+  // === Gambar ikon (turunkan sedikit) ===
+  const iconYOffset = 7; // 🔽 nilai ini bisa kamu ubah: 5–8 ideal
+  if (iconBase64) {
+    doc.addImage(iconBase64, "PNG", startX, startY - iconHeight + iconYOffset, iconWidth, iconHeight);
+  }
+
+  // === Gambar label & angka sejajar ===
+  const textBaseY = startY + (fontSizeMain / 2) + 2;
+  let xPos = startX + iconWidth + 6;
+  doc.text(labelText, xPos, textBaseY, { baseline: "alphabetic" });
+  xPos += labelWidth;
+  doc.text(angkaText, xPos, textBaseY, { baseline: "alphabetic" });
+
+  // === Baris kedua & ketiga (semua bold, center) ===
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(10);
+  otherLines.forEach((line, i) => {
+    const y = startY + (i + 1) * lineSpacing + 6;
+    doc.text(line, pageWidth / 2, y, { align: "center" });
+  });
+
+  cursorY = boxY + boxHeight + 20;
+}
+
+
+
+    // ===== Fungsi bantu cetak judul tabel =====
+    function printTableTitleLeft(title, yPos) {
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(10.5);
+      doc.setTextColor(0, 0, 0);
+      doc.text(title.toUpperCase(), marginX, yPos);
+    }
+
+    // ===== LOOP TABEL =====
+    for (let t = 0; t < tables.length; t++) {
+      const { id, title } = tables[t];
+      const tableEl = document.getElementById(id);
+      if (!tableEl) continue;
+
+      const headers = Array.from(tableEl.querySelectorAll("thead th")).map(th => th.innerText.trim());
+      const rows = Array.from(tableEl.querySelectorAll("tbody tr")).map(tr =>
+        Array.from(tr.querySelectorAll("td")).map(td => td.innerText.trim())
+      );
+      if (!rows.length) continue;
+
+      // pindah halaman jika posisi mendekati bawah
+      if (cursorY + 40 > pageHeight - 60) {
+        doc.addPage();
+        cursorY = 40;
+      }
+
+      // cetak judul tabel rata kiri
+      printTableTitleLeft(title, cursorY + 12);
+      let startY = cursorY + 22;
+
+      const isRekapKelas = title.toLowerCase().includes("rekap prosentase kelas");
+
+      doc.autoTable({
+		  startY,
+		  head: [headers],
+		  body: rows,
+		  theme: "grid",
+		  styles: {
+			fontSize: 9,
+			cellPadding: 4,
+			halign: "center",
+			valign: "middle"
+		  },
+		  headStyles: { fillColor: [26, 115, 232], textColor: 255, fontStyle: "bold" },
+		  margin: { left: marginX, right: marginX },
+		  showHead: "everyPage",
+		  pageBreak: 'auto',
+		  rowPageBreak: 'avoid', // ✅ baris tidak akan pecah ke halaman berikutnya
+		  didParseCell: function (data) {
+			if (!isRekapKelas && data.section === "body" && data.column.index === 1) {
+			  data.cell.styles.halign = "left";
+			}
+		  }
+		});
+
+
+      const finalY = doc.lastAutoTable ? doc.lastAutoTable.finalY : startY + 10;
+      cursorY = finalY + 20;
+
+      if (cursorY > pageHeight - 80) {
+        doc.addPage();
+        cursorY = 40;
+      }
+    }
+
+	// ===== CEGAH LEMBAR KOSONG TERAKHIR =====
+	let totalPages = doc.internal.getNumberOfPages();
+	if (totalPages > 1 && cursorY < 100) {
+	  doc.deletePage(totalPages);
+	  totalPages--; // update jumlah halaman
+	}
+
+	// ===== FOOTER (HANYA DI HALAMAN TERAKHIR) =====
+	const footerText = `Admin – Simponi Kharisma – ${new Date().toLocaleString("id-ID")}`;
+	doc.setPage(totalPages);
+	doc.setFont("helvetica", "italic");
+	doc.setFontSize(9);
+	doc.setTextColor(120);
+	doc.text(footerText, pageWidth - marginX, pageHeight - 30, { align: "right" });
+
+	// ===== SIMPAN PDF =====
+	doc.save(`Laporan_Sorogan_${new Date().toISOString().slice(0, 10)}.pdf`);
+
+
+
+    if (btn) {
+      btn.classList.remove('downloading');
+      btn.classList.add('complete');
+      setTimeout(() => btn.classList.remove('complete'), 700);
+      btn.removeAttribute('aria-disabled');
+    }
+
+  } catch (err) {
+    console.error("Error downloadPDFAll:", err);
+    if (btn) {
+      btn.classList.remove('downloading');
+      btn.removeAttribute('aria-disabled');
+    }
+    alert("Gagal membuat PDF: " + (err.message || err));
+  }
+}
+
+// --- pasang event listener untuk tombol Download Semua Laporan ---
+const btnDownloadAll = document.getElementById('btnDownloadAll');
+if (btnDownloadAll) {
+  btnDownloadAll.addEventListener('click', (e) => {
+    // opsional: mencegah double-click
+    if (btnDownloadAll.classList.contains('downloading')) return;
+    downloadPDFAll();
+  });
+}
+
+
+
+async function loadAmiriFont() {
+  // HARUS ADA FILE INI DI PROYEK ANDA → /fonts/Amiri-Regular.ttf
+  const url = "/fonts/Amiri-Regular.ttf";
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error("Gagal memuat font Amiri");
+  return await resp.arrayBuffer();
+}
+
+
+
+
+// ====================== HELPERS & CONFIG ======================
+
+// 1) Daftar kitab nadhom
+const KITAB_NADHOM = [
+  "الفية (الأول)",
+  "الفية (الثاني)",
+  "العمرطي",
+  "جوهر المكنون",
+  "القواعد الصرفية (١)",
+  "القواعد الصرفية (٢)",
+  "عقيدة العوام",
+  "تنوير الحجى"
+];
+
+// 2) Split nadhom (sama logika dg web Anda)
+function splitNadhomText(teksArab) {
+  if (!teksArab || teksArab === "-") return null;
+  const patterns = [
+    /✽/, / \.\.\. /, /\.\.\./, / - /, /-/, /\./, /…/, /\s\s+/
+  ];
+  let separator = null;
+  let separatorFound = null;
+  for (const pattern of patterns) {
+    const match = teksArab.match(pattern);
+    if (match) { separator = pattern; separatorFound = match[0]; break; }
+  }
+  if (separator && separatorFound) {
+    const parts = teksArab.split(separator);
+    if (parts.length === 2) {
+      return { line1: parts[0].trim(), line2: parts[1].trim(), separator: separatorFound };
+    } else if (parts.length > 2) {
+      return { line1: parts[0].trim(), line2: parts.slice(1).join(" ").trim(), separator: separatorFound };
+    }
+  }
+  const words = teksArab.split(" ");
+  if (words.length > 3) {
+    const mid = Math.floor(words.length / 2);
+    return { line1: words.slice(0, mid).join(" "), line2: words.slice(mid).join(" "), separator: " " };
+  }
+  return null;
+}
+function isNadhomKitab(judulKitab) {
+  return KITAB_NADHOM.includes(judulKitab);
+}
+
+let __arabicLibPromise = null;
+
+function loadScriptOnce(src) {
+  return new Promise((resolve, reject) => {
+    if ([...document.scripts].some(s => s.src.includes(src) || s.getAttribute("src") === src)) {
+      return resolve();
+    }
+    const s = document.createElement("script");
+    s.src = src;
+    s.async = true;
+    s.onload = resolve;
+    s.onerror = () => reject(new Error("Gagal load " + src));
+    document.head.appendChild(s);
+  });
+}
+
+function ensureArabicLibs() {
+  // Simple: only load reshaper. Bidi is handled by simple reverse.
+  if (window.ArabicReshaper) return Promise.resolve();
+
+  return new Promise(async (resolve, reject) => {
+    try {
+      // Coba load local relative
+      await loadScriptOnce("libs/arabic-reshaper.js");
+      resolve();
+    } catch (e) {
+      console.warn("Gagal load arabic-reshaper local, trying CDN:", e);
+      try {
+         // Fallback CDN
+         await loadScriptOnce("https://cdn.jsdelivr.net/npm/arabic-reshaper@2.0.1/index.min.js");
+         resolve();
+      } catch (e2) {
+         console.warn("CDN failed too:", e2);
+         resolve(); // Tetap lanjut
+      }
+    }
+  });
+}
+
+function reverseString(str) {
+  return str.split("").reverse().join("");
+}
+
+
+function containsArabic(text = "") {
+  return /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/.test(text);
+}
+
+// 4) Small adapter: try multiple API shapes (sync)
+function fixArabicRawUsingAvailableAPI(txt) {
+  if (!txt) return "";
+  try {
+    if (window.ArabicReshaper && typeof window.ArabicReshaper.convertArabic === 'function') {
+      return window.ArabicReshaper.convertArabic(txt);
+    }
+    if (window.ArabicReshaper && typeof window.ArabicReshaper.reshape === 'function') {
+      return window.ArabicReshaper.reshape(txt);
+    }
+    if (window.ArabicReshaper && typeof window.ArabicReshaper === 'function') {
+      return window.ArabicReshaper(txt);
+    }
+  } catch (e) {
+    console.warn('reshaper API error', e);
+  }
+  return txt;
+}
+function applyBidiIfAvailable(shaped) {
+  if (!shaped) return shaped;
+  try {
+    if (window.Bidi && typeof window.Bidi === 'function') {
+      const b = new window.Bidi();
+      if (typeof b.setLine === 'function' && typeof b.getText === 'function') {
+        b.setLine(shaped);
+        return b.getText();
+      }
+      if (typeof b.reorderVisually === 'function') {
+        return b.reorderVisually(shaped);
+      }
+    }
+    if (window.Bidi && typeof window.Bidi.reorderVisually === 'function') {
+      return window.Bidi.reorderVisually(shaped);
+    }
+  } catch (e) {
+    console.warn('bidi API error', e);
+  }
+  return shaped;
+}
+
+function fixArabicSync(text) {
+  if (!text) return "";
+
+  let shaped = text;
+
+  try {
+    // 1. Reshape (Connect letters)
+    if (window.ArabicReshaper && typeof window.ArabicReshaper.convertArabic === 'function') {
+      shaped = window.ArabicReshaper.convertArabic(shaped);
+    }
+  } catch (e) {
+    console.warn("Reshape error:", e);
+  }
+
+  // 2. Reverse (Simple Bidi)
+  return reverseString(shaped);
+}
+
+async function fixArabicForPDFAsync(text) {
+  if (!text) return "";
+
+  try {
+    await ensureArabicLibs();
+    return fixArabicSync(text);
+  } catch (e) {
+    console.warn("fixArabicForPDFAsync fallback:", e);
+    return text;
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  // --- IMMEDIATE LOAD ARABIC RESHAPER ---
+  // Kita inject script global agar tersedia saat downloadPDFHarian dipanggil
+  if (!window.ArabicReshaper) {
+     const s = document.createElement("script");
+     s.src = "https://cdn.jsdelivr.net/npm/arabic-reshaper@2.0.1/index.min.js";
+     s.onload = () => console.log("Arabic Reshaper CDN loaded");
+     s.onerror = (e) => console.warn("Arabic Reshaper CDN failed", e);
+     document.head.appendChild(s);
+  }
+
+  try {
+    if (!window.PDFLib || !window.fontkit) return;
+    const PDFDocument = window.PDFLib.PDFDocument;
+    if (PDFDocument?.registerFontkit) {
+      PDFDocument.registerFontkit(window.fontkit);
+      console.log("Fontkit registered");
+    }
+  } catch (e) {
+    console.error("Fontkit register error:", e);
+  }
+});
+
+async function drawPDFHeader(doc) {
+  const marginX = 36;
+  const pageWidth = doc.internal.pageSize.getWidth();
+
+  // === LOGO ===
+  try {
+    const logoUrl = "https://i.imgur.com/Irgu32G.png";
+    const resp = await fetch(logoUrl);
+    if (resp.ok) {
+      const blob = await resp.blob();
+      const base64 = await new Promise(res => {
+        const r = new FileReader();
+        r.onloadend = () => res(r.result);
+        r.readAsDataURL(blob);
+      });
+      doc.addImage(base64, "PNG", marginX, 12, 34, 34);
+    }
+  } catch (e) {
+    console.warn("Logo gagal dimuat", e);
+  }
+
+  // === HEADER TEKS ===
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(14);
+  doc.setTextColor(0);
+  doc.text("KHUDAMA' KHARISMA", pageWidth / 2, 30, { align: "center" });
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.text(
+    "Pondok Pesantren Lirboyo Kota Kediri Jawa Timur",
+    pageWidth / 2,
+    44,
+    { align: "center" }
+  );
+
+  doc.setFont("helvetica", "italic");
+  doc.setFontSize(9);
+  doc.text(
+    "Sekretariat: Kantor KHARISMA Gedung Nafis Lt. 02 Lirboyo Kota Kediri",
+    pageWidth / 2,
+    56,
+    { align: "center" }
+  );
+
+  doc.setLineWidth(0.7);
+  doc.line(marginX, 64, pageWidth - marginX, 64);
+
+  // === JUDUL LAPORAN ===
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.text("LAPORAN SETORAN HARIAN", pageWidth / 2, 82, { align: "center" });
+}
+
+async function downloadPDFHarian() {
+  const btn = document.getElementById("btnDownloadHarian");
+  if (btn) {
+    btn.classList.add("downloading");
+    btn.setAttribute("aria-disabled", "true");
+  }
+
+  try {
+    // === PASTIKAN html2canvas ===
+    if (!window.html2canvas) {
+      await new Promise(r => {
+        const s = document.createElement("script");
+        s.src = "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js";
+        s.onload = r;
+        document.head.appendChild(s);
+      });
+    }
+
+    // === PASTIKAN jsPDF ===
+    if (!window.jspdf) {
+      await new Promise(r => {
+        const s = document.createElement("script");
+        s.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+        s.onload = r;
+        document.head.appendChild(s);
+      });
+    }
+
+    const { jsPDF } = window.jspdf;
+
+    // === TARGET TABEL HARIAN ===
+    const originalElement = document.querySelector(".table-container");
+    if (!originalElement) throw new Error("Data tabel tidak ditemukan");
+
+    // === CLONE UNTUK CAPTURE ===
+    const clone = originalElement.cloneNode(true);
+    clone.style.width = "1580px";
+    clone.style.padding = "20px";
+    clone.style.background = "white";
+    clone.style.position = "absolute";
+    clone.style.top = "-9999px";
+    clone.style.left = "0";
+
+    // === HAPUS BUTTON / AKSI ===
+    clone.querySelectorAll("button, .btn-download-all, .action-buttons")
+      .forEach(el => el.remove());
+
+    document.body.appendChild(clone);
+
+    // === CAPTURE ===
+    const canvas = await html2canvas(clone, {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      windowWidth: 1600,
+      width: 1580
+    });
+
+    document.body.removeChild(clone);
+
+    const imgData = canvas.toDataURL("image/jpeg", 0.9);
+
+    // === PDF A3 LANDSCAPE ===
+    const pdf = new jsPDF({
+      orientation: "landscape",
+      unit: "px",
+      format: "a3",
+      compress: true
+    });
+
+    // === HEADER (SAMA PERSIS DENGAN downloadPDFAll) ===
+    await drawPDFHeader(pdf);
+
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+
+    const imgWidth = canvas.width;
+    const imgHeight = canvas.height;
+    const ratio = pdfWidth / imgWidth;
+    const imgRenderHeight = imgHeight * ratio;
+
+    let heightLeft = imgRenderHeight;
+    let position = 110; // 🔽 aman, tidak tabrak header
+
+    // === PAGE 1 ===
+    pdf.addImage(imgData, "JPEG", 0, position, pdfWidth, imgRenderHeight);
+    heightLeft -= pdfHeight;
+
+    // === PAGE SELANJUTNYA ===
+    while (heightLeft > 0) {
+      pdf.addPage();
+      await drawPDFHeader(pdf); // header ulang tiap halaman
+      position = heightLeft - imgRenderHeight + 110;
+      pdf.addImage(imgData, "JPEG", 0, position, pdfWidth, imgRenderHeight);
+      heightLeft -= pdfHeight;
+    }
+
+    // === FOOTER (SAMA DENGAN downloadPDFAll) ===
+    const totalPages = pdf.internal.getNumberOfPages();
+    pdf.setPage(totalPages);
+    pdf.setFont("helvetica", "italic");
+    pdf.setFontSize(9);
+    pdf.setTextColor(120);
+    pdf.text(
+      `Admin – Simponi Kharisma – ${new Date().toLocaleString("id-ID")}`,
+      pdfWidth - 36,
+      pdfHeight - 30,
+      { align: "right" }
+    );
+
+    // === SIMPAN ===
+    pdf.save(`Rekap_Setoran_Harian_${new Date().toISOString().slice(0,10)}.pdf`);
+
+    if (btn) {
+      btn.classList.remove("downloading");
+      btn.classList.add("complete");
+      setTimeout(() => btn.classList.remove("complete"), 600);
+      btn.removeAttribute("aria-disabled");
+    }
+
+  } catch (err) {
+    console.error("downloadPDFHarian error:", err);
+    alert("Gagal membuat PDF: " + err.message);
+    if (btn) {
+      btn.classList.remove("downloading");
+      btn.removeAttribute("aria-disabled");
+    }
+  }
+}
+
+(function ensureHarianButtonExists() {
+  const header = document.querySelector('.data-section .section-header');
+  if (!header) return;
+
+  if (!document.getElementById('btnDownloadHarian')) {
+    const btn = document.createElement('button');
+    btn.id = 'btnDownloadHarian';
+    btn.type = 'button';
+    btn.className = 'btn-download-all';
+    btn.innerHTML = `
+      <span class="btn-icon">⬇️</span>
+      <span class="btn-label">Download Harian</span>
+      <span class="btn-spinner" aria-hidden="true"></span>
+    `;
+    header.appendChild(btn);
+  }
+
+  const btnEl = document.getElementById('btnDownloadHarian');
+  if (btnEl) {
+    btnEl.addEventListener('click', () => {
+      if (btnEl.classList.contains('downloading')) return;
+      downloadPDFHarian();
+    });
+  }
+})();
+
+</script>
+</script>
+<div class="app-footer">
+  <img src="https://img.shields.io/badge/version-v2.1.5-orange" alt="Version">
+  <img src="https://img.shields.io/badge/license-Proprietary-red" alt="License">
+  <img src="https://img.shields.io/badge/status-Internal%20Use-blue" alt="Status">
+  <img src="https://img.shields.io/badge/%C2%A9%202025%20Ndalem%20Kharisma-Semua%20hak%20dilindungi%20undang%E2%80%90undang-red" 
+       alt="Copyright">
+</div>
+</body>
+</html>
