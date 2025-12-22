@@ -2533,65 +2533,153 @@ button:active {
     gap: 0.5rem;
   }
 }
-
-/* ===== Checkbox Group – Responsive & Device Safe ===== */
-.checkbox-group {
+/* ===============================
+   CONTAINER LUAR (KELAS & UNIT)
+================================ */
+#filterKelas,
+#filterUnit {
   display: flex;
   flex-wrap: wrap;
   gap: 10px 16px;
+
+  padding: 12px;
+  margin-top: 6px;
+
+  background: #f4faff;
+  border: 1.5px solid #cfe8ff;
+  border-radius: 14px;
+
   max-height: 160px;
   overflow-y: auto;
-  padding: 8px 4px;
-
-  /* mobile scroll smooth */
-  -webkit-overflow-scrolling: touch;
 }
 
-/* label jadi area klik besar & konsisten */
-.checkbox-group label {
+/* Scrollbar halus (opsional) */
+#filterKelas::-webkit-scrollbar,
+#filterUnit::-webkit-scrollbar {
+  width: 6px;
+}
+#filterKelas::-webkit-scrollbar-thumb,
+#filterUnit::-webkit-scrollbar-thumb {
+  background: #c7def5;
+  border-radius: 6px;
+}
+
+/* ===============================
+   WRAPPER
+================================ */
+.bulat-checkbox-wrapper {
   display: inline-flex;
+}
+
+/* ===============================
+   HIDE CHECKBOX ASLI
+================================ */
+.bulat-checkbox {
+  display: none;
+}
+
+/* ===============================
+   LABEL (ICON | TEXT)
+================================ */
+.bulat-checkbox-label {
+  display: grid;
+  grid-template-columns: auto 1fr;
   align-items: center;
-  gap: 6px;
+  column-gap: 8px;
 
-  font-size: 13px;
-  line-height: 1.4;
   cursor: pointer;
-
-  white-space: nowrap;
+  padding: 4px 0;
   user-select: none;
 }
 
-/* checkbox konsisten lintas device */
-.checkbox-group input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
+/* ===============================
+   BULATAN CHECK
+================================ */
+.bulat-checkbox-icon {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #9aa0a6;
+  border-radius: 50%;
+  background: transparent;
+
+  display: grid;
+  place-items: center;
+  transition: all 0.25s ease;
 }
 
-/* ===== Mobile ===== */
-@media (max-width: 600px) {
-  .checkbox-group {
-    gap: 8px 12px;
-    max-height: 200px;
-  }
+/* ===============================
+   CHECKMARK SVG
+================================ */
+.bulat-checkmark {
+  width: 12px;
+  height: 12px;
+  stroke: #fff;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  transition: stroke-dashoffset 0.3s ease;
+}
 
-  .checkbox-group label {
-    font-size: 14px; /* lebih terbaca di HP */
-  }
+/* ===============================
+   TEXT
+================================ */
+.bulat-checkbox-text {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #333;
 
-  .checkbox-group input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
+  line-height: 1.2;
+  margin: 0;
+  padding: 0;
+}
+
+/* ===============================
+   CHECKED STATE
+================================ */
+.bulat-checkbox:checked + .bulat-checkbox-label .bulat-checkbox-icon {
+  background: #2196f3;
+  border-color: #2196f3;
+}
+
+.bulat-checkbox:checked + .bulat-checkbox-label .bulat-checkmark {
+  stroke-dashoffset: 0;
+}
+
+.bulat-checkbox:checked + .bulat-checkbox-label .bulat-checkbox-text {
+  color: #1976d2;
+}
+
+/* ===============================
+   HOVER (DESKTOP)
+================================ */
+@media (hover: hover) {
+  .bulat-checkbox-label:hover .bulat-checkbox-icon {
+    border-color: #2196f3;
   }
 }
 
-/* ===== Desktop besar ===== */
-@media (min-width: 1200px) {
-  .checkbox-group {
+/* ===============================
+   MOBILE
+================================ */
+@media (max-width: 768px) {
+  #filterKelas,
+  #filterUnit {
+    padding: 10px;
+    gap: 8px 14px;
     max-height: 140px;
   }
-}
 
+  .bulat-checkbox-icon {
+    width: 17px;
+    height: 17px;
+  }
+
+  .bulat-checkbox-text {
+    font-size: 0.8rem;
+  }
+}
 
 
   </style>
@@ -3939,45 +4027,71 @@ function renderCheckboxFilters(data) {
   const kelasDiv = document.getElementById("filterKelas");
   const unitDiv  = document.getElementById("filterUnit");
 
-  // simpan state centang
   const checkedKelas = Array.from(
-    kelasDiv.querySelectorAll('input:checked')
+    kelasDiv.querySelectorAll('input[type="checkbox"]:checked')
   ).map(cb => cb.value);
 
   const checkedUnit = Array.from(
-    unitDiv.querySelectorAll('input:checked')
+    unitDiv.querySelectorAll('input[type="checkbox"]:checked')
   ).map(cb => cb.value);
 
   kelasDiv.innerHTML = "";
   unitDiv.innerHTML  = "";
 
-  // ==== KELAS (URUT KHUSUS) ====
-  const kelasList = sortByKelasOrder(
-    [...kelasSet],
-    kelasOrder
-  );
+  let index = 0;
 
+  /* ===== KELAS ===== */
+  const kelasList = sortByKelasOrder([...kelasSet], kelasOrder);
   kelasList.forEach(k => {
-    const checked = checkedKelas.includes(k) ? 'checked' : '';
-    kelasDiv.innerHTML += `
-      <label>
-        <input type="checkbox" value="${k}" ${checked} onchange="filterSantri()">
-        ${k}
-      </label>
-    `;
+    const id = `bulat-chk-${index++}`;
+    const checked = checkedKelas.includes(k) ? "checked" : "";
+
+    kelasDiv.insertAdjacentHTML("beforeend", `
+      <div class="bulat-checkbox-wrapper">
+        <input type="checkbox"
+          id="${id}"
+          class="bulat-checkbox"
+          value="${k}"
+          ${checked}
+          onchange="filterSantri()">
+        <label for="${id}" class="bulat-checkbox-label">
+          <div class="bulat-checkbox-icon">
+            <svg viewBox="0 0 24 24" class="bulat-checkmark">
+              <path d="M4.1,12.7 9,17.6 20.3,6.3" fill="none"></path>
+            </svg>
+          </div>
+          <span class="bulat-checkbox-text">${k}</span>
+        </label>
+      </div>
+    `);
   });
 
-  // ==== UNIT (ALFABET) ====
-  [...unitSet].sort((a, b) => a.localeCompare(b, 'id')).forEach(u => {
-    const checked = checkedUnit.includes(u) ? 'checked' : '';
-    unitDiv.innerHTML += `
-      <label>
-        <input type="checkbox" value="${u}" ${checked} onchange="filterSantri()">
-        ${u}
-      </label>
-    `;
+  /* ===== UNIT ===== */
+  [...unitSet].sort((a, b) => a.localeCompare(b, "id")).forEach(u => {
+    const id = `bulat-chk-${index++}`;
+    const checked = checkedUnit.includes(u) ? "checked" : "";
+
+    unitDiv.insertAdjacentHTML("beforeend", `
+      <div class="bulat-checkbox-wrapper">
+        <input type="checkbox"
+          id="${id}"
+          class="bulat-checkbox"
+          value="${u}"
+          ${checked}
+          onchange="filterSantri()">
+        <label for="${id}" class="bulat-checkbox-label">
+          <div class="bulat-checkbox-icon">
+            <svg viewBox="0 0 24 24" class="bulat-checkmark">
+              <path d="M4.1,12.7 9,17.6 20.3,6.3" fill="none"></path>
+            </svg>
+          </div>
+          <span class="bulat-checkbox-text">${u}</span>
+        </label>
+      </div>
+    `);
   });
 }
+
 
 
 
@@ -4079,21 +4193,20 @@ function formatTanggalIndo(tanggalStr) {
 function createSantriCard(santri) {
   const card = document.createElement('div');
   card.className = `santri-card ${santri.Status === 'tidak aktif' ? 'tidak-aktif' : ''}`;
+  
+  // Klik biasa untuk select santri (tetap jalan)
   card.onclick = () => selectSantri(santri, card);
 
   const imgUrl = santri.Foto || 'img/placeholder.png';
   const tglKeluarFormatted = formatTanggalIndo(santri.Tgl_Keluar);
 
   card.innerHTML = `
-    <!-- Logo Lembaga -->
-    <img src="img/lembaga.png" class="logolembaga" alt="Logo Lembaga">
-
+    <img src="https://i.imgur.com/ZzF73E3.png" class="logolembaga" alt="Logo Lembaga">
     <div class="santri-info">
-      <img class="photo" 
-           src="${imgUrl}" 
+      <img class="photo"
+           src="${imgUrl}"
            alt="${santri.Nama_Lengkap || 'Santri'}"
            onerror="this.src='img/placeholder.png'">
-
       <div class="info">
         <h3><span>Nama</span>: <span>${santri.Nama_Lengkap || '-'}</span></h3>
         <p><span>Kelas</span>: <span>${santri.Kelas || '-'}</span></p>
@@ -4104,7 +4217,6 @@ function createSantriCard(santri) {
         <p><span>Unit Ndalem</span>: <span>${santri.Unit_Ndalem || '-'}</span></p>
       </div>
     </div>
-
     ${
       santri.Status === 'tidak aktif'
         ? `
@@ -4116,6 +4228,28 @@ function createSantriCard(santri) {
         : ''
     }
   `;
+
+  // ==== FITUR DOUBLE TAP UNTUK SCREENSHOT (KHUSUS HP) ====
+  let lastTap = 0;
+  card.addEventListener('touchend', function(e) {
+    const currentTime = new Date().getTime();
+    const tapLength = currentTime - lastTap;
+
+    if (tapLength < 500 && tapLength > 0) {
+      // Double tap terdeteksi!
+      e.preventDefault(); // cegah aksi klik biasa
+      e.stopPropagation(); // agar tidak trigger selectSantri
+
+      screenshotCard(card, santri.Nama_Lengkap || 'santri');
+    }
+    lastTap = currentTime;
+  });
+
+  // Opsional: double click di desktop (mouse)
+  card.addEventListener('dblclick', function(e) {
+    e.preventDefault();
+    screenshotCard(card, santri.Nama_Lengkap || 'santri');
+  });
 
   return card;
 }
@@ -4183,7 +4317,65 @@ function filterSantri() {
   sortTableBy('Masa Khidmah');
 }
 
+async function screenshotCard(cardElement, namaSantri) {
+  try {
+    // Indikator loading
+    const originalCursor = cardElement.style.cursor;
+    cardElement.style.cursor = 'wait';
 
+    const canvas = await html2canvas(cardElement, {
+      scale: 2,                  // Kualitas tinggi untuk HP retina
+      useCORS: true,             // Agar gambar eksternal (logo Imgur) ikut kecapture
+      backgroundColor: '#ffffff',
+      logging: false             // Matikan log debug
+    });
+
+    // Kembalikan cursor
+    cardElement.style.cursor = originalCursor;
+
+    // Convert canvas ke Blob (untuk share & download)
+    canvas.toBlob(async function(blob) {
+      const file = new File([blob], `Kartu_${namaSantri.replace(/[^a-zA-Z0-9]/g, '_')}.png`, {
+        type: 'image/png'
+      });
+
+      // Cek apakah browser support Web Share API
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        // Support share file (kebanyakan HP Android + beberapa iOS)
+        try {
+          await navigator.share({
+            title: `Kartu Santri - ${namaSantri}`,
+            text: `Kartu identitas santri ${namaSantri}`,
+            files: [file]
+          });
+          // Jika berhasil share, tidak perlu download otomatis
+          return;
+        } catch (shareErr) {
+          console.warn("Share dibatalkan atau gagal, fallback ke download:", shareErr);
+          // Lanjut ke download jika user cancel atau error
+        }
+      }
+
+      // FALLBACK: Jika tidak support share file (misal desktop atau browser lama)
+      // Atau user cancel share → otomatis download
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = file.name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      // Notifikasi sukses
+      alert(`✅ Kartu ${namaSantri} berhasil di-download!`);
+    }, 'image/png');
+
+  } catch (err) {
+    console.error("Gagal screenshot:", err);
+    alert("❌ Gagal mengambil screenshot kartu.");
+  }
+}
 
 	// ===== Helper: hitung jumlah bulan sejak `start` sampai sekarang =====
 function monthsSince(startDate) {
@@ -12199,7 +12391,7 @@ function showPopupUpdate(msg) {
 
 </script>
 <div class="app-footer">
-  <img src="https://img.shields.io/badge/version-v2.1.5-orange" alt="Version">
+  <img src="https://img.shields.io/badge/version-v2.1.6-orange" alt="Version">
   <img src="https://img.shields.io/badge/license-Proprietary-red" alt="License">
   <img src="https://img.shields.io/badge/status-Internal%20Use-blue" alt="Status">
   <img src="https://img.shields.io/badge/%C2%A9%202025%20Ndalem%20Kharisma-Semua%20hak%20dilindungi%20undang%E2%80%90undang-red" 
