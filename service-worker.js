@@ -1,4 +1,4 @@
-const CACHE_NAME = "kharisma-cache-v15";
+const CACHE_NAME = "kharisma-cache-v16";
 const OFFLINE_URL = "/offline.html";
 
 const FILES_TO_CACHE = [
