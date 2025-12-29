@@ -1301,7 +1301,7 @@
   <div class="mb-3">
   <label class="form-label small fw-semibold">Kategori</label>
   <select id="Kategori" class="form-select form-control-modern">
-    <option value="Tanpa SKTM">Tanpa SKTM</option>
+    <option value="Non-SKTM">Non-SKTM</option>
     <option value="SKTM">SKTM</option>
   </select>
 </div>
@@ -1798,7 +1798,7 @@ window.onEdit = async function(id) {
   document.getElementById('Stambuk').value = data.Stambuk || '';
   Unit_Ndalem.value = data.Unit_Ndalem || '';
   Ngaji.value = data.Ngaji || '';
-  Kategori.value = data.Kategori || 'Tanpa SKTM';
+  Kategori.value = data.Kategori || 'Non-SKTM';
   document.getElementById('Asal_Daerah').value = data.Asal_Daerah || '';
   document.getElementById('Himpunan').value = data.Himpunan || '';
   document.getElementById('Kamar').value = data.Kamar || '';
@@ -1872,7 +1872,7 @@ if (file) {
 
   const payload = {
     Kelas: Kelas.value || null,
-	Kategori: Kategori.value || 'Tanpa SKTM',
+	Kategori: Kategori.value || 'Non-SKTM',
     Bagian: document.getElementById('Bagian').value || null,
     Nama_Lengkap: document.getElementById('Nama_Lengkap').value || null,
     Foto: finalFoto,
