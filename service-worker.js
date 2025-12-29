@@ -2,7 +2,7 @@
    🧠 SERVICE WORKER - KHARISMA (FINAL)
    ===================================================== */
 
-const CACHE_NAME = "kharisma-cache-v17";
+const CACHE_NAME = "kharisma-cache-v18";
 const OFFLINE_URL = "/offline.html";
 
 const FILES_TO_CACHE = [
