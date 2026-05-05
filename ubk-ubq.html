@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>UBK & UBQ - Khudama' Kharisma</title>
+  
+  <link rel="icon" type="image/png" href="icons/logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri&family=Scheherazade+New&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      -webkit-text-size-adjust: 100%; 
+      font-family: 'Poppins', sans-serif; 
+      background-color: #f5f7fb; 
+      color: #333;
+      min-height: 100vh;
+    }
+    .module-container { 
+      max-width: 100% !important; 
+      padding: 12px 18px !important; 
+      display: block;
+      width: 100%;
+    }
+    
+    .back-button {
+      display: inline-flex; 
+      align-items: center; 
+      gap: 8px; 
+      background: #fff; 
+      padding: 10px 18px;
+      border-radius: 40px; 
+      margin-bottom: 20px; 
+      cursor: pointer; 
+      font-weight: 600;
+      color: #1a73e8; 
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08); 
+      border: 1px solid #e2e8f0;
+      transition: all 0.2s ease;
+    }
+    .back-button:hover { background: #f1f5f9; transform: translateX(-4px); }
+   
+    .main-tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      border-bottom: 2px solid #e2e8f0;
+      flex-wrap: wrap;
+    }
+    .main-tab {
+      padding: 12px 28px;
+      font-size: 1rem;
+      font-weight: 600;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: #64748b;
+      transition: all 0.2s;
+      border-radius: 12px 12px 0 0;
+    }
+    .main-tab.active {
+      color: #1a73e8;
+      background: #eff6ff;
+      border-bottom: 3px solid #1a73e8;
+    }
+    
+    .main-panel { display: none; }
+    .main-panel.active { display: block; }
+    
+    .sub-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      background: #fff;
+      padding: 6px;
+      border-radius: 60px;
+      border: 1px solid #e2e8f0;
+      width: fit-content;
+      flex-wrap: wrap;
+    }
+    .sub-tab {
+      padding: 8px 24px;
+      border-radius: 40px;
+      font-weight: 500;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: #475569;
+      transition: all 0.2s;
+    }
+    .sub-tab.active {
+      background: #1a73e8;
+      color: white;
+      box-shadow: 0 2px 6px rgba(26,115,232,0.2);
+    }
+    
+    .sub-panel { display: none; }
+    .sub-panel.active { display: block; }
+    
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+      background: white;
+      padding: 16px 20px;
+      border-radius: 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      border: 1px solid #e6eefc;
+    }
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 180px;
+    }
+    .filter-group label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .filter-group input, .filter-group select {
+      padding: 12px 14px;
+      border: 1px solid #cdd9ed;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      background: white;
+      transition: all 0.2s;
+    }
+    
+    .admin-tools {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .admin-tools button {
+      background: #1a73e8;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .admin-tools button:hover { background: #1765c0; transform: translateY(-2px); }
+    
+    .nilai-table-container {
+      background: white;
+      border-radius: 16px;
+      overflow-x: auto;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      border: 1px solid #e2e8f0;
+    }
+    .nilai-main-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+      min-width: 500px;
+    }
+    .nilai-main-table th {
+      background: #f8fafc;
+      padding: 14px 10px;
+      text-align: left;
+      font-weight: 600;
+      color: #1e293b;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    .nilai-main-table td {
+      padding: 12px 10px;
+      border-bottom: 1px solid #e2e8f0;
+      vertical-align: middle;
+    }
+    .nilai-main-table tr:hover {
+      background: #f8fafc;
+    }
+    
+    /* Grade Styles baru sesuai permintaan */
+    .grade-JydI { background: #10b981; color: white; padding: 4px 10px; border-radius: 20px; display: inline-block; font-weight: bold; font-size: 0.75rem; }
+    .grade-JydII { background: #3b82f6; color: white; padding: 4px 10px; border-radius: 20px; display: inline-block; font-weight: bold; font-size: 0.75rem; }
+    .grade-MwtI { background: #eab308; color: white; padding: 4px 10px; border-radius: 20px; display: inline-block; font-weight: bold; font-size: 0.75rem; }
+    .grade-MwtII { background: #f97316; color: white; padding: 4px 10px; border-radius: 20px; display: inline-block; font-weight: bold; font-size: 0.75rem; }
+    .grade-Rodi { background: #ef4444; color: white; padding: 4px 10px; border-radius: 20px; display: inline-block; font-weight: bold; font-size: 0.75rem; }
+    
+    .nilai-angka { font-weight: 700; font-size: 1rem; }
+    .nilai-badge { background: #e0e7ff; display: inline-block; padding: 3px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; margin: 2px; }
+    
+    .aksi-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
+    .btn-edit {  border: none; cursor: pointer; padding: 4px 8px; border-radius: 20px; font-size: 0.7rem; }
+    .btn-edit { background: #3b82f6; color: white; }
+	  .btn-delete {  border: none; cursor: pointer; padding: 4px 8px; border-radius: 20px; font-size: 0.7rem; }
+    .btn-delete { background: #ef4444; color: white; }
+    
+    /* Tally Counter (UBK) */
+    .tally-counter {
+      background: #fef3c7;
+      border-radius: 16px;
+      padding: 20px;
+      margin-top: 16px;
+      border: 2px solid #f59e0b;
+      font-family: 'Courier New', monospace;
+    }
+    .tally-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 2px dashed #f59e0b;
+    }
+    .tally-header h4 { font-size: 0.9rem; font-weight: 700; color: #92400e; }
+    .tally-total-badge {
+      background: #f59e0b;
+      color: white;
+      padding: 4px 14px;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+    .tally-group {
+      margin-bottom: 20px;
+      background: white;
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .tally-group label {
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: #78350f;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .tally-display {
+      font-size: 1.8rem;
+      font-weight: bold;
+      letter-spacing: 4px;
+      background: #fffbeb;
+      padding: 12px 16px;
+      border-radius: 12px;
+      text-align: center;
+      font-family: monospace;
+      cursor: pointer;
+      border: 2px solid #fcd34d;
+    }
+    .tally-number {
+      font-size: 1.2rem;
+      background: #f59e0b;
+      color: white;
+      padding: 2px 10px;
+      border-radius: 20px;
+      margin-right: 12px;
+      display: inline-block;
+    }
+    .tally-marks { font-family: monospace; font-size: 1.4rem; letter-spacing: 6px; display: inline-block; }
+    .tally-controls { display: flex; gap: 12px; margin-top: 12px; justify-content: center; }
+    .tally-btn { padding: 8px 24px; border: none; border-radius: 40px; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
+    .tally-btn-add { background: #10b981; color: white; }
+    .tally-btn-sub { background: #ef4444; color: white; }
+    .tally-btn-reset { background: #6b7280; color: white; }
+    
+    /* Nilai Tambahan UBK */
+    .nilai-tambahan-box {
+      background: #e0e7ff;
+      border-radius: 16px;
+      padding: 16px;
+      margin-top: 16px;
+      border: 1px solid #c7d2fe;
+    }
+    .nilai-tambahan-box h4 { font-size: 0.85rem; font-weight: 700; color: #1e40af; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .tambahan-row { display: flex; gap: 16px; flex-wrap: wrap; }
+    .tambahan-field { flex: 1; min-width: 150px; }
+    .tambahan-field label { font-size: 0.7rem; font-weight: 600; color: #1e40af; display: block; margin-bottom: 4px; }
+    .tambahan-field select, .tambahan-field input { width: 100%; padding: 10px 12px; border: 1px solid #c7d2fe; border-radius: 12px; font-size: 0.85rem; background: white; }
+    
+    /* UBQ Scoring Area Tiga Komponen dengan Grade baru */
+    .ubq-scoring-area {
+      background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+      border-radius: 16px;
+      padding: 20px;
+      margin-top: 16px;
+      border: 2px solid #10b981;
+    }
+    .ubq-score-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 2px dashed #10b981;
+    }
+    .ubq-score-header h4 { font-size: 0.9rem; font-weight: 700; color: #065f46; }
+    .ubq-total-badge {
+      background: #10b981;
+      color: white;
+      padding: 4px 14px;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+    .ubq-score-group {
+      margin-bottom: 20px;
+      background: white;
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .ubq-score-group label {
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: #065f46;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .ubq-grade-selector {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .ubq-grade-selector select {
+      padding: 10px 15px;
+      border-radius: 12px;
+      border: 2px solid #a7f3d0;
+      font-weight: bold;
+      background: white;
+      font-size: 1rem;
+      min-width: 140px;
+    }
+    
+    .grade-preview-box {
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      color: white;
+      padding: 14px 18px;
+      border-radius: 14px;
+      margin-top: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .grade-letter {
+      font-size: 1.5rem;
+      font-weight: 800;
+      padding: 6px 20px;
+      border-radius: 50px;
+      letter-spacing: 1px;
+    }
+    .grade-letter.JydI { background: #10b981; }
+    .grade-letter.JydII { background: #3b82f6; }
+    .grade-letter.MwtI { background: #eab308; }
+    .grade-letter.MwtII { background: #f97316; }
+    .grade-letter.Rodi { background: #ef4444; }
+    
+    .ubq-grade-preview {
+      background: linear-gradient(135deg, #064e3b, #065f46);
+      color: white;
+      padding: 14px 18px;
+      border-radius: 14px;
+      margin-top: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .ubq-grade-letter {
+      font-size: 1.5rem;
+      font-weight: 800;
+      padding: 6px 20px;
+      border-radius: 50px;
+    }
+    .ubq-grade-letter.JydI { background: #10b981; }
+    .ubq-grade-letter.JydII { background: #3b82f6; }
+    .ubq-grade-letter.MwtI { background: #eab308; }
+    .ubq-grade-letter.MwtII { background: #f97316; }
+    .ubq-grade-letter.Rodi { background: #ef4444; }
+    
+    .kriteria-info {
+      background: #e0e7ff;
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      color: #1e40af;
+      margin-top: 10px;
+      text-align: center;
+    }
+    
+    .asiliah-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+    .asiliah-table th, .asiliah-table td {
+      border: 1px solid #e2e8f0;
+      padding: 12px 16px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .asiliah-table th { background: #f1f5f9; font-weight: 600; color: #0f172a; }
+    
+    /* MODAL STYLES */
+    .crud-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      backdrop-filter: blur(4px);
+    }
+    .crud-modal-content {
+      background: white;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 700px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 24px;
+      position: relative;
+      animation: modalSlideIn 0.2s ease;
+    }
+    @keyframes modalSlideIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .crud-close {
+      position: absolute;
+      right: 20px;
+      top: 16px;
+      font-size: 28px;
+      cursor: pointer;
+      color: #94a3b8;
+    }
+    .crud-close:hover { color: #ef4444; }
+    .crud-form { display: flex; flex-direction: column; gap: 16px; margin-top: 20px; }
+    .crud-form label { font-weight: 600; font-size: 0.85rem; color: #334155; }
+    .crud-form input, .crud-form select, .crud-form textarea {
+      padding: 12px 14px;
+      border: 1px solid #cdd9ed;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      width: 100%;
+    }
+    .crud-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 8px; }
+    .crud-btn-save { background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 40px; cursor: pointer; font-weight: 600; }
+    .crud-btn-cancel { background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 40px; cursor: pointer; font-weight: 600; }
+    
+    .toast-message {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e293b;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 40px;
+      font-size: 0.9rem;
+      z-index: 1100;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+    .toast-message.show { opacity: 1; }
+    .toast-message.error { background: #ef4444; }
+    
+    .pagination {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 24px;
+      padding: 12px 0;
+    }
+    .pagination-info { font-size: 0.85rem; color: #475569; }
+    .pagination-controls { display: flex; gap: 8px; flex-wrap: wrap; }
+    .pagination-controls button {
+      padding: 6px 12px;
+      border: 1px solid #cbd5e1;
+      background: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .pagination-controls button:hover:not(:disabled) { background: #f1f5f9; }
+    .pagination-controls button.active { background: #1a73e8; color: white; border-color: #1a73e8; }
+    .pagination-controls button:disabled { opacity: 0.5; cursor: not-allowed; }
+    
+    .kitab-library-container {
+      background: linear-gradient(145deg, #e8eef5 0%, #dce3ec 100%);
+      border-radius: 20px;
+      padding: 20px;
+      min-height: 70vh;
+    }
+    .library-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .library-title { font-size: 1.3rem; font-weight: 700; color: #1e293b; }
+    .library-actions button {
+      background: #1a73e8;
+      color: white;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 40px;
+      cursor: pointer;
+    }
+    .kitab-shelf {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+      max-height: 550px;
+      overflow-y: auto;
+      padding: 10px;
+    }
+    .kitab-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    .kitab-card:hover { transform: translateY(-5px); }
+    .kitab-cover {
+      background: linear-gradient(135deg, #2d3a4a, #1a2533);
+      padding: 30px 15px;
+      text-align: center;
+    }
+    .kitab-cover i { font-size: 48px; color: #e2e8f0; }
+    .kitab-cover .kitab-nama { color: white; font-size: 0.9rem; margin-top: 10px; font-family: 'Amiri', serif; }
+    .kitab-delete {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(239,68,68,0.9);
+      color: white;
+      border: none;
+      border-radius: 20px;
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+    }
+    .kitab-card:hover .kitab-delete { opacity: 1; }
+    
+    .reader-container { position: relative; overflow: hidden; }
+    .reader-nav {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      margin-top: 20px;
+      padding: 12px 20px;
+      background: #1e293b;
+      border-radius: 60px;
+      flex-wrap: wrap;
+    }
+    .reader-nav button {
+      background: #1a73e8;
+      color: white;
+      border: none;
+      padding: 10px 28px;
+      border-radius: 40px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .reader-nav button:disabled { background: #64748b; cursor: not-allowed; }
+    .reader-tools {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 15px;
+      flex-wrap: wrap;
+    }
+    .reader-tools select, .reader-tools input {
+      padding: 8px 16px;
+      border-radius: 40px;
+      border: none;
+      background: white;
+      font-size: 0.85rem;
+    }
+    .back-to-library {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #1e293b;
+      color: white;
+      padding: 8px 20px;
+      border-radius: 40px;
+      margin-bottom: 20px;
+      cursor: pointer;
+    }
+    .app-footer {
+      background: #ffffff;
+      padding: 1rem 0.75rem;
+      border-radius: 16px;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+    #mainPage { width: 100%; }
+    .row-utama { cursor: pointer; }
+    
+    @media (max-width: 768px) {
+      .module-container { padding: 12px; }
+      .main-tab { padding: 8px 16px; font-size: 0.9rem; }
+      .nilai-main-table { font-size: 0.7rem; min-width: 500px; }
+      .nilai-main-table th, .nilai-main-table td { padding: 8px 6px; }
+      .tally-display { font-size: 1.2rem; letter-spacing: 3px; }
+      .tally-marks { font-size: 1rem; letter-spacing: 3px; }
+      .grade-letter, .ubq-grade-letter { font-size: 1rem; padding: 4px 10px; }
+    }
+	
+	/* Perbaikan font As'ilah di HP */
+@media (max-width: 768px) {
+  .asiliah-table,
+  .asiliah-table th,
+  .asiliah-table td {
+    font-size: 0.7rem !important;
+  }
+  
+  .asiliah-table th,
+  .asiliah-table td {
+    padding: 8px 6px !important;
+  }
+  
+  .asiliah-table td span {
+    font-size: 0.65rem !important;
+    padding: 2px 8px !important;
+  }
+}
+  </style>
+</head>
+<body>
+<div id="ubkubq-module" class="module-container">
+  <div class="back-button" onclick="goBackToMain()">
+    <i class="material-icons">arrow_back</i>
+    <span>Kembali ke Menu Utama</span>
+  </div>
+
+  <h2>📖 Ujian Baca Kitab & Al-Qur'an</h2>
+
+  <div class="main-tabs">
+    <button class="main-tab active" data-panel="ubk-panel">📘 UBK</button>
+    <button class="main-tab" data-panel="ubq-panel">🕋 UBQ</button>
+    <button class="main-tab" data-panel="kitab-panel">📚 Perpustakaan Kitab</button>
+  </div>
+
+  <!-- UBK PANEL -->
+  <div id="ubk-panel" class="main-panel active">
+  <div class="sub-tabs">
+    <button class="sub-tab active" data-subpanel="ubk-nilai">📊 Nilai UBK</button>
+    <button class="sub-tab" data-subpanel="ubk-soal">📝 As'ilah</button>
+  </div>
+
+  <div id="ubk-nilai" class="sub-panel active">
+    <div class="admin-tools"><button onclick="openAddNilai('ubk')"><i class="material-icons">add</i> Tambah Nilai UBK</button></div>
+    <div class="filter-row"><div class="filter-group"><label>Cari Nama</label><input type="text" id="searchUbkNama" placeholder="Cari santri..." oninput="filterNilaiUbk()"></div><div class="filter-group"><label>Kelas</label><select id="filterUbkKelas" onchange="filterNilaiUbk()"><option value="semua">Semua Kelas</option></select></div><div class="filter-group"><label>Unit</label><select id="filterUbkUnit" onchange="filterNilaiUbk()"><option value="semua">Semua Unit</option></select></div></div>
+    <div id="nilaiUbkContainer" class="nilai-table-container"><div style="text-align:center;padding:40px;">⏳ Memuat data...</div></div>
+    <div id="paginationUbkNilai" class="pagination"></div>
+  </div>
+
+  <div id="ubk-soal" class="sub-panel">
+    <div class="admin-tools"><button onclick="openAddSoal('ubk')"><i class="material-icons">add</i> Tambah Soal UBK</button></div>
+    <div class="filter-row"><div class="filter-group"><label>Cari Soal</label><input type="text" id="searchUbkSoal" placeholder="Cari soal/jawaban..." oninput="filterSoalUbk()"></div><div class="filter-group"><label>Kategori</label><select id="filterUbkKategori" onchange="filterSoalUbk()"><option value="semua">Semua Kategori</option></select></div></div>
+    <div id="soalUbkContainer"><div style="text-align:center;padding:40px;">⏳ Memuat data...</div></div>
+    <div id="paginationUbkSoal" class="pagination"></div>
+  </div>
+</div>
+
+  <!-- UBQ PANEL -->
+  <div id="ubq-panel" class="main-panel">
+  <div class="sub-tabs">
+    <button class="sub-tab active" data-subpanel="ubq-nilai">📊 Nilai UBQ</button>
+    <button class="sub-tab" data-subpanel="ubq-soal">📝 As'ilah</button>
+  </div>
+
+  <div id="ubq-nilai" class="sub-panel active">
+    <div class="admin-tools"><button onclick="openAddNilai('ubq')"><i class="material-icons">add</i> Tambah Nilai UBQ</button></div>
+    <div class="filter-row"><div class="filter-group"><label>Cari Nama</label><input type="text" id="searchUbqNama" placeholder="Cari santri..." oninput="filterNilaiUbq()"></div><div class="filter-group"><label>Kelas</label><select id="filterUbqKelas" onchange="filterNilaiUbq()"><option value="semua">Semua Kelas</option></select></div><div class="filter-group"><label>Unit</label><select id="filterUbqUnit" onchange="filterNilaiUbq()"><option value="semua">Semua Unit</option></select></div></div>
+    <div id="nilaiUbqContainer" class="nilai-table-container"><div style="text-align:center;padding:40px;">⏳ Memuat data...</div></div>
+    <div id="paginationUbqNilai" class="pagination"></div>
+  </div>
+
+  <div id="ubq-soal" class="sub-panel">
+    <div class="admin-tools"><button onclick="openAddSoal('ubq')"><i class="material-icons">add</i> Tambah Soal UBQ</button></div>
+    <div class="filter-row"><div class="filter-group"><label>Cari Soal</label><input type="text" id="searchUbqSoal" placeholder="Cari soal/jawaban..." oninput="filterSoalUbq()"></div><div class="filter-group"><label>Kategori</label><select id="filterUbqKategori" onchange="filterSoalUbq()"><option value="semua">Semua Kategori</option></select></div></div>
+    <div id="soalUbqContainer"><div style="text-align:center;padding:40px;">⏳ Memuat data...</div></div>
+    <div id="paginationUbqSoal" class="pagination"></div>
+  </div>
+</div>
+
+  <!-- KITAB PANEL -->
+  <div id="kitab-panel" class="main-panel">
+    <div class="kitab-library-container"><div id="libraryView"><div class="library-header"><div class="library-title">📚 Pustaka Kitab Digital</div><div class="library-actions"><button id="uploadKitabBtn" class="admin-only" onclick="uploadKitabToSupabase()"><i class="material-icons">upload</i> Upload PDF</button><button onclick="refreshKitabList()"><i class="material-icons">refresh</i> Refresh</button></div></div><div class="filter-row"><div class="filter-group"><label>🔍 Cari Kitab</label><input type="text" id="searchKitabInput" placeholder="Cari nama kitab..." oninput="filterKitabList()"></div></div><div id="kitabShelf" class="kitab-shelf"><div style="text-align:center;padding:40px;">⏳ Memuat data...</div></div></div><div id="readerView" style="display:none;"><button class="back-to-library" onclick="showLibraryView()"><i class="material-icons">arrow_back</i> Kembali ke Pustaka</button><div class="flip-reader-container"><div class="reader-container"><canvas id="mainPage"></canvas></div><div class="reader-nav"><button id="prevBtn" onclick="prevPage()" disabled><i class="material-icons">chevron_left</i></button><span id="pageIndicator">0 / 0</span><button id="nextBtn" onclick="nextPage()" disabled><i class="material-icons">chevron_right</i></button></div><div class="reader-tools"><select id="readerZoom" onchange="changeZoom()"><option value="1.5">Zoom 100%</option><option value="2">Zoom 130%</option><option value="2.5">Zoom 160%</option></select></div></div></div></div>
+  </div>
+</div>
+
+<!-- MODAL NILAI -->
+<div id="modalNilai" class="crud-modal"><div class="crud-modal-content"><span class="crud-close" onclick="closeModalNilai()">&times;</span><h3 id="modalNilaiTitle">Tambah Nilai</h3><form id="formNilai" class="crud-form"><input type="hidden" id="nilaiId"><input type="hidden" id="nilaiJenis"><input type="hidden" id="nilaiAngka" value="0"><label>Unit Ndalem *</label><select id="nilaiUnit" required onchange="loadSantriByUnitForModal()"><option value="">-- Pilih Unit --</option></select><label>Santri *</label><select id="nilaiStambuk" required><option value="">-- Pilih Santri --</option></select><label>Penyimak (Penasehat) *</label><select id="nilaiPenyimak" required><option value="">-- Pilih Penyimak --</option></select>
+      
+      <div id="ubkTallyArea" style="display:none;"><div class="tally-counter"><div class="tally-header"><h4><i class="material-icons">how_to_vote</i> 📊 PENGHITUNGAN KESALAHAN</h4><span class="tally-total-badge" id="tallyTotalKesalahan">0</span></div><div class="tally-group"><label><i class="material-icons">menu_book</i> 📖 Kesalahan Kaidah Nahwu Shorof</label><div class="tally-display" onclick="addTally('kaidah')"><span class="tally-number" id="kaidahCount">0</span><span class="tally-marks" id="kaidahMarks"></span></div><div class="tally-controls"><button type="button" class="tally-btn tally-btn-sub" onclick="subtractTally('kaidah')">−1 Coret</button><button type="button" class="tally-btn tally-btn-add" onclick="addTally('kaidah')">+1 Coret</button><button type="button" class="tally-btn tally-btn-reset" onclick="resetTally('kaidah')">Reset</button></div></div><div class="tally-group"><label><i class="material-icons">translate</i> 📝 Kesalahan Makna Lafadz</label><div class="tally-display" onclick="addTally('makna')"><span class="tally-number" id="maknaCount">0</span><span class="tally-marks" id="maknaMarks"></span></div><div class="tally-controls"><button type="button" class="tally-btn tally-btn-sub" onclick="subtractTally('makna')">−1 Coret</button><button type="button" class="tally-btn tally-btn-add" onclick="addTally('makna')">+1 Coret</button><button type="button" class="tally-btn tally-btn-reset" onclick="resetTally('makna')">Reset</button></div></div><div class="nilai-tambahan-box"><h4><i class="material-icons">add_circle</i> 📝 Nilai Tambahan (Opsional)</h4><div class="tambahan-row"><div class="tambahan-field"><label>🎯 Murod / Pemahaman</label><select id="nilaiMurod"><option value="">-- Pilih --</option><option value="Lengkap">✅ Lengkap & Benar</option><option value="Cukup">📘 Cukup (masih ada kurang)</option><option value="Kurang">⚠️ Kurang</option><option value="Tidak Menjawab">❌ Tidak menjawab</option></select></div><div class="tambahan-field"><label>📖 Pertanyaan Nahwu Shorof</label><select id="nilaiNahwuShorof"><option value="">-- Pilih --</option><option value="Lengkap">✅ Lengkap & Benar</option><option value="Cukup">📘 Cukup (masih ada kurang)</option><option value="Kurang">⚠️ Kurang</option><option value="Tidak Menjawab">❌ Tidak menjawab</option></select></div></div></div><div class="grade-preview-box"><span>⭐ GRADE UJIAN BACA KITAB (UBK)</span><span class="grade-letter" id="gradeLetter">-</span><span class="grade-detail-text" id="gradeDetail">0 kesalahan</span></div><div class="kriteria-info"><strong>📏 Kriteria Nilai:</strong> Jyd I (≤5) | Jyd II (≤10) | Mwt I (≤15) | Mwt II (≤18) | Rodi' (>18)</div></div></div>
+      
+      <!-- UBQ SCORING AREA Tiga Komponen -->
+      <div id="ubqScoringArea" style="display:none;"><div class="ubq-scoring-area"><div class="ubq-score-header"><h4><i class="material-icons"></i> 📊 PENILAIAN UJIAN BACA AL-QUR'AN (UBQ)</h4><span class="ubq-total-badge" id="ubqTotalNilai">-</span></div><div class="ubq-score-group"><label><i class="material-icons"></i> 📖 Hafalan</label><div class="ubq-grade-selector"><select id="nilaiHafalan" onchange="updateUbqFinalGrade()"><option value="">-- Pilih Grade --</option><option value="Jyd I">Jyd I</option><option value="Jyd II">Jyd II</option><option value="Mwt I">Mwt I</option><option value="Mwt II">Mwt II</option><option value="Rodi'">Rodi'</option></select></div></div><div class="ubq-score-group"><label><i class="material-icons"></i> 🗣️ Membaca (Tartil & Tajwid)</label><div class="ubq-grade-selector"><select id="nilaiMembaca" onchange="updateUbqFinalGrade()"><option value="">-- Pilih Grade --</option><option value="Jyd I">Jyd I</option><option value="Jyd II">Jyd II</option><option value="Mwt I">Mwt I</option><option value="Mwt II">Mwt II</option><option value="Rodi'">Rodi'</option></select></div></div><div class="ubq-score-group"><label><i class="material-icons"></i> 🔤 Ghorib (Musykilat)</label><div class="ubq-grade-selector"><select id="nilaiGhorib" onchange="updateUbqFinalGrade()"><option value="">-- Pilih Grade --</option><option value="Jyd I">Jyd I</option><option value="Jyd II">Jyd II</option><option value="Mwt I">Mwt I</option><option value="Mwt II">Mwt II</option><option value="Rodi'">Rodi'</option></select></div></div><div class="ubq-grade-preview"><span>⭐ GRADE AKHIR UBQ</span><span class="ubq-grade-letter" id="ubqGradeLetter">-</span><span id="ubqGradeDetail"></span></div><div class="kriteria-info"><strong>📏 Aturan Nilai Akhir:</strong> Diambil nilai yang paling banyak muncul. Jika semua berbeda, ambil nilai tengah (median).</div></div></div>
+      
+      <label>Catatan Tambahan</label><textarea id="nilaiKeterangan" placeholder="Catatan lain..."></textarea><div class="crud-actions"><button type="button" class="crud-btn-cancel" onclick="closeModalNilai()">Batal</button><button type="submit" class="crud-btn-save">Simpan</button></div></form></div></div>
+
+<!-- MODAL SOAL -->
+<div id="modalSoal" class="crud-modal"><div class="crud-modal-content"><span class="crud-close" onclick="closeModalSoal()">&times;</span><h3 id="modalSoalTitle">Tambah Soal</h3><form id="formSoal" class="crud-form"><input type="hidden" id="soalId"><input type="hidden" id="soalJenis"><label>Kategori</label><select id="soalKategori" required><option value="">-- Pilih Kategori --</option><option value="Umum">Umum</option><option value="Tajwid">Tajwid</option><option value="Nahwu">Nahwu</option><option value="Shorof">Shorof</option><option value="Fikih">Fikih</option></select><label>Soal *</label><textarea id="soalPertanyaan" required placeholder="Tulis soal..."></textarea><label>Jawaban *</label><textarea id="soalJawaban" required placeholder="Tulis jawaban..."></textarea><div class="crud-actions"><button type="button" class="crud-btn-cancel" onclick="closeModalSoal()">Batal</button><button type="submit" class="crud-btn-save">Simpan</button></div></form></div></div>
+
+<div id="modalConfirmDelete" class="crud-modal"><div class="crud-modal-content" style="max-width:400px;"><h3>Hapus Kitab</h3><p id="deleteConfirmText">Yakin ingin menghapus kitab ini?</p><div class="crud-actions"><button class="crud-btn-cancel" onclick="closeConfirmModal()">Batal</button><button class="crud-btn-save" id="confirmDeleteBtn" style="background:#ef4444;">Hapus</button></div></div></div>
+
+<div class="app-footer"><img src="https://img.shields.io/badge/version-v3.0-orange" alt="Version"><img src="https://img.shields.io/badge/UBK-Tally%20Marks%20卌-blue" alt="UBK"><img src="https://img.shields.io/badge/UBQ-3%20Components%20%7C%20Majelisi-green" alt="UBQ"><img src="https://img.shields.io/badge/%C2%A9%202025%20Ndalem%20Kharisma-red" alt="Copyright"></div>
+
+<script>
+// ==================== SUPABASE CONFIG ====================
+const SUPABASE_URL = "https://oflkibeaesvwzdzyvdfy.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9mbGtpYmVhZXN2d3pkenl2ZGZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4NDIyOTQsImV4cCI6MjA3MDQxODI5NH0.MMcdx7g54R9kqFdfkDPP57gNPCnxGLKWHhexTAcJ2io";
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ==================== GLOBAL ====================
+let allSantri = [], allPenasehat = [], allUnit = [];
+let nilaiUbk = [], nilaiUbq = [], soalUbk = [], soalUbq = [];
+let currentPageNilai = 1, currentPageNilaiUbq = 1;
+let currentPageSoal = 1;
+const PAGE_SIZE = 10;
+let tallyKaidah = 0, tallyMakna = 0;
+let kitabList = [];
+let currentPDFDoc = null, currentPageNum = 1, totalPages = 0;
+let pendingDeleteId = null;
+
+function isAdmin() { return localStorage.getItem('userRole') === 'admin'; }
+function showToast(msg, isError = false) { const toast = document.createElement('div'); toast.className = 'toast-message' + (isError ? ' error' : ''); toast.textContent = msg; document.body.appendChild(toast); setTimeout(() => toast.classList.add('show'), 10); setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 2500); }
+function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m] || m)); }
+function formatDate(dateStr) { if (!dateStr) return '-'; return new Date(dateStr).toLocaleDateString('id-ID'); }
+
+function getGradeClass(grade) {
+  if (!grade) return '';
+  
+  // Normalisasi: trim, lowercase, hapus semua jenis apostrof/kutip
+  const cleanGrade = grade.trim().toLowerCase().replace(/['’""]/g, '');
+
+  const gradeMap = {
+    'jyd i': 'grade-JydI',
+    'jyd ii': 'grade-JydII',
+    'mwt i': 'grade-MwtI',
+    'mwt ii': 'grade-MwtII',
+    'rodi': 'grade-Rodi'
+  };
+
+  return gradeMap[cleanGrade] || ''; // Fallback jika tidak cocok
+}
+
+// ==================== UBK TALLY ====================
+function getUbkGrade(total) {
+  if (total <= 5) return { grade: 'Jyd I', nilai: 90 };
+  if (total <= 10) return { grade: 'Jyd II', nilai: 80 };
+  if (total <= 15) return { grade: 'Mwt I', nilai: 70 };
+  if (total <= 18) return { grade: 'Mwt II', nilai: 60 };
+  return { grade: "Rodi'", nilai: 50 };
+}
+function getTallyMarks(number) { if (number === 0) return ''; const fullSets = Math.floor(number / 5); const remaining = number % 5; return '卌 '.repeat(fullSets) + '|'.repeat(remaining); }
+function updateTallyDisplay() {
+  const kaidahCount = document.getElementById('kaidahCount'); const kaidahMarks = document.getElementById('kaidahMarks');
+  const maknaCount = document.getElementById('maknaCount'); const maknaMarks = document.getElementById('maknaMarks');
+  const totalEl = document.getElementById('tallyTotalKesalahan'); const gradeLetter = document.getElementById('gradeLetter');
+  const gradeDetail = document.getElementById('gradeDetail'); const nilaiAngka = document.getElementById('nilaiAngka');
+  if (kaidahCount) kaidahCount.innerHTML = tallyKaidah; if (kaidahMarks) kaidahMarks.innerHTML = getTallyMarks(tallyKaidah);
+  if (maknaCount) maknaCount.innerHTML = tallyMakna; if (maknaMarks) maknaMarks.innerHTML = getTallyMarks(tallyMakna);
+  const total = tallyKaidah + tallyMakna; if (totalEl) totalEl.innerHTML = total;
+  const { grade, nilai } = getUbkGrade(total);
+  if (gradeLetter) { gradeLetter.innerHTML = grade; gradeLetter.className = 'grade-letter ' + getGradeClass(grade); }
+  if (gradeDetail) gradeDetail.innerHTML = `Total: ${total} kesalahan (📖 ${tallyKaidah} | 📝 ${tallyMakna}) → ${grade}`;
+  if (nilaiAngka) nilaiAngka.value = nilai;
+}
+function ubkBuildKeterangan() {
+  const total = tallyKaidah + tallyMakna; const { grade, nilai } = getUbkGrade(total);
+  const murod = document.getElementById('nilaiMurod')?.value || ''; const nahwu = document.getElementById('nilaiNahwuShorof')?.value || '';
+  const catatan = document.getElementById('nilaiKeterangan')?.value || '';
+  return `[UBK] Grade:${grade} | Nilai:${nilai} | Kaidah:${tallyKaidah}(${getTallyMarks(tallyKaidah)}) | Makna:${tallyMakna}(${getTallyMarks(tallyMakna)}) | Murod:${murod} | NahwuShorof:${nahwu} | Catatan:${catatan}`;
+}
+function parseKeteranganToForm(keterangan) {
+  if (!keterangan) return;
+  const kaidahMatch = keterangan.match(/Kaidah:(\d+)/); const maknaMatch = keterangan.match(/Makna:(\d+)/);
+  if (kaidahMatch) tallyKaidah = parseInt(kaidahMatch[1]) || 0; if (maknaMatch) tallyMakna = parseInt(maknaMatch[1]) || 0;
+  const murodMatch = keterangan.match(/Murod:([^|]+)/); const nahwuMatch = keterangan.match(/NahwuShorof:([^|]+)/);
+  const catatanMatch = keterangan.match(/Catatan:(.+)$/);
+  if (murodMatch && document.getElementById('nilaiMurod')) document.getElementById('nilaiMurod').value = murodMatch[1].trim();
+  if (nahwuMatch && document.getElementById('nilaiNahwuShorof')) document.getElementById('nilaiNahwuShorof').value = nahwuMatch[1].trim();
+  if (catatanMatch && document.getElementById('nilaiKeterangan')) document.getElementById('nilaiKeterangan').value = catatanMatch[1].trim();
+  updateTallyDisplay();
+}
+function addTally(type) { if (type === 'kaidah') tallyKaidah++; else tallyMakna++; updateTallyDisplay(); }
+function subtractTally(type) { if (type === 'kaidah' && tallyKaidah > 0) tallyKaidah--; else if (type === 'makna' && tallyMakna > 0) tallyMakna--; updateTallyDisplay(); }
+function resetTally(type) { if (type === 'kaidah') tallyKaidah = 0; else tallyMakna = 0; updateTallyDisplay(); }
+function resetAllTally() { tallyKaidah = 0; tallyMakna = 0; if (document.getElementById('nilaiMurod')) document.getElementById('nilaiMurod').value = ''; if (document.getElementById('nilaiNahwuShorof')) document.getElementById('nilaiNahwuShorof').value = ''; updateTallyDisplay(); }
+
+// ==================== UBQ TIGA KOMPONEN dengan aturan mayoritas/median ====================
+const gradeOrder = ['Jyd I', 'Jyd II', 'Mwt I', 'Mwt II', "Rodi'"];
+function getGradeValue(grade) {
+  if (grade === 'Jyd I') return 90;
+  if (grade === 'Jyd II') return 80;
+  if (grade === 'Mwt I') return 70;
+  if (grade === 'Mwt II') return 60;
+  if (grade === "Rodi'") return 50;
+  return 0;
+}
+function computeFinalGrade(grades) {
+  const counts = {}; for (let g of grades) if (g) counts[g] = (counts[g] || 0) + 1;
+  let maxCount = 0, mostFrequent = null;
+  for (let [g, c] of Object.entries(counts)) if (c > maxCount) { maxCount = c; mostFrequent = g; }
+  if (maxCount >= 2) return mostFrequent;
+  let validGrades = grades.filter(g => g && gradeOrder.includes(g));
+  if (validGrades.length === 3) { validGrades.sort((a,b) => gradeOrder.indexOf(a) - gradeOrder.indexOf(b)); return validGrades[1]; }
+  if (validGrades.length === 2) return validGrades[0];
+  return validGrades[0] || '';
+}
+function updateUbqFinalGrade() {
+  const hafalan = document.getElementById('nilaiHafalan')?.value || '';
+  const membaca = document.getElementById('nilaiMembaca')?.value || '';
+  const ghorib = document.getElementById('nilaiGhorib')?.value || '';
+  const grades = [hafalan, membaca, ghorib].filter(g => g);
+  const finalGrade = computeFinalGrade(grades);
+  const finalNilai = getGradeValue(finalGrade);
+  const nilaiAngka = document.getElementById('nilaiAngka');
+  const totalBadge = document.getElementById('ubqTotalNilai');
+  const gradeLetter = document.getElementById('ubqGradeLetter');
+  const gradeDetail = document.getElementById('ubqGradeDetail');
+  if (nilaiAngka) nilaiAngka.value = finalNilai;
+  if (totalBadge) totalBadge.innerHTML = finalGrade || '-';
+  if (gradeLetter) { gradeLetter.innerHTML = finalGrade || '-'; gradeLetter.className = 'ubq-grade-letter ' + (finalGrade ? getGradeClass(finalGrade).replace('grade-', '') : ''); }
+  if (gradeDetail) gradeDetail.innerHTML = finalGrade ? `Hasil Akhir: ${finalGrade} (Hafalan:${hafalan||'-'}, Membaca:${membaca||'-'}, Ghorib:${ghorib||'-'})` : 'Pilih ketiga nilai terlebih dahulu';
+}
+function ubqBuildKeterangan() {
+  const hafalan = document.getElementById('nilaiHafalan')?.value || '';
+  const membaca = document.getElementById('nilaiMembaca')?.value || '';
+  const ghorib = document.getElementById('nilaiGhorib')?.value || '';
+  const catatan = document.getElementById('nilaiKeterangan')?.value || '';
+  const grades = [hafalan, membaca, ghorib].filter(g => g);
+  const finalGrade = computeFinalGrade(grades);
+  const finalNilai = getGradeValue(finalGrade);
+  return `[UBQ] Grade Akhir:${finalGrade} | Nilai:${finalNilai} | Hafalan:${hafalan} | Membaca:${membaca} | Ghorib:${ghorib} | Catatan:${catatan}`;
+}
+function parseUbqKeterangan(keterangan) {
+  if (!keterangan) return;
+  const hafalanMatch = keterangan.match(/Hafalan:([^|]+)/); const membacaMatch = keterangan.match(/Membaca:([^|]+)/); const ghoribMatch = keterangan.match(/Ghorib:([^|]+)/);
+  const catatanMatch = keterangan.match(/Catatan:(.+)$/);
+  if (hafalanMatch && document.getElementById('nilaiHafalan')) document.getElementById('nilaiHafalan').value = hafalanMatch[1].trim();
+  if (membacaMatch && document.getElementById('nilaiMembaca')) document.getElementById('nilaiMembaca').value = membacaMatch[1].trim();
+  if (ghoribMatch && document.getElementById('nilaiGhorib')) document.getElementById('nilaiGhorib').value = ghoribMatch[1].trim();
+  if (catatanMatch && document.getElementById('nilaiKeterangan')) document.getElementById('nilaiKeterangan').value = catatanMatch[1].trim();
+  updateUbqFinalGrade();
+}
+function resetUbqScores() {
+  if (document.getElementById('nilaiHafalan')) document.getElementById('nilaiHafalan').value = '';
+  if (document.getElementById('nilaiMembaca')) document.getElementById('nilaiMembaca').value = '';
+  if (document.getElementById('nilaiGhorib')) document.getElementById('nilaiGhorib').value = '';
+  if (document.getElementById('nilaiKeterangan')) document.getElementById('nilaiKeterangan').value = '';
+  updateUbqFinalGrade();
+}
+
+// ==================== LOAD MASTER DATA ====================
+async function loadMasterData() {
+  try {
+    const [unitRes, santriRes, penasehatRes] = await Promise.all([
+      supabaseClient.from('referensi_unit_ndalem').select('Kode_Unit, Nama_Unit').order('Nama_Unit'),
+      supabaseClient.from('santri_kharisma').select('Stambuk, Nama_Lengkap, Kelas, Unit_Ndalem').eq('Status', 'aktif').order('Nama_Lengkap'),
+      supabaseClient.from('penasehat').select('id, Nama, Kode_Unit, Status').eq('Status', 'aktif').order('Nama')
+    ]);
+    if (!unitRes.error) allUnit = unitRes.data || [];
+    if (!santriRes.error) allSantri = santriRes.data || [];
+    if (!penasehatRes.error) allPenasehat = penasehatRes.data || [];
+  } catch (err) { console.error(err); }
+}
+async function loadNilai(jenis) { const table = jenis === 'ubk' ? 'nilai_ubk' : 'nilai_ubq'; const { data, error } = await supabaseClient.from(table).select('*').order('created_at', { ascending: false }); if (!error) { if (jenis === 'ubk') { nilaiUbk = data || []; renderNilaiUbk(); } else { nilaiUbq = data || []; renderNilaiUbq(); } } else { showToast('Gagal memuat data nilai', true); } }
+async function loadSoal(jenis) { const table = jenis === 'ubk' ? 'soal_ubk' : 'soal_ubq'; const { data, error } = await supabaseClient.from(table).select('*').order('created_at', { ascending: false }); if (!error) { if (jenis === 'ubk') { soalUbk = data || []; renderSoalUbk(); populateKategoriFilters(); } else { soalUbq = data || []; renderSoalUbq(); populateKategoriFilters(); } } }
+function populateKategoriFilters() { const katSet = new Set(); soalUbk.forEach(i => i.kategori && katSet.add(i.kategori)); const filterUbk = document.getElementById('filterUbkKategori'); if (filterUbk) filterUbk.innerHTML = '<option value="semua">Semua Kategori</option>' + Array.from(katSet).sort().map(k => `<option value="${k}">${k}</option>`).join(''); const katSet2 = new Set(); soalUbq.forEach(i => i.kategori && katSet2.add(i.kategori)); const filterUbq = document.getElementById('filterUbqKategori'); if (filterUbq) filterUbq.innerHTML = '<option value="semua">Semua Kategori</option>' + Array.from(katSet2).sort().map(k => `<option value="${k}">${k}</option>`).join(''); }
+
+function renderNilaiUbk(page = 1) {
+  const search = document.getElementById('searchUbkNama')?.value.toLowerCase() || ''; const kelasFilter = document.getElementById('filterUbkKelas')?.value || 'semua'; const unitFilter = document.getElementById('filterUbkUnit')?.value || 'semua';
+  let filtered = nilaiUbk.filter(item => { const santri = allSantri.find(s => s.Stambuk === item.stambuk); if (!santri) return false; return santri.Nama_Lengkap.toLowerCase().includes(search) && (kelasFilter === 'semua' || santri.Kelas === kelasFilter) && (unitFilter === 'semua' || santri.Unit_Ndalem === unitFilter); });
+  filtered.sort((a, b) => (b.nilai || 0) - (a.nilai || 0)); const totalPages = Math.ceil(filtered.length / PAGE_SIZE); if (page < 1) page = 1; if (page > totalPages && totalPages > 0) page = totalPages; const start = (page - 1) * PAGE_SIZE; const pageData = filtered.slice(start, start + PAGE_SIZE); currentPageNilai = page;
+  let rows = '';
+  pageData.forEach((item, idx) => { const santri = allSantri.find(s => s.Stambuk === item.stambuk); if (!santri) return; const penyimak = allPenasehat.find(p => p.id == item.penyimak_id); let grade = ''; let tallyPreview = ''; let tambahanPreview = ''; if (item.keterangan) { const gradeMatch = item.keterangan.match(/Grade:([^|]+)/); if (gradeMatch) grade = gradeMatch[1]; const kaidahMatch = item.keterangan.match(/Kaidah:\d+\(([^)]+)\)/); const maknaMatch = item.keterangan.match(/Makna:\d+\(([^)]+)\)/); if (kaidahMatch || maknaMatch) tallyPreview = `<div class="nilai-badge">Kaidah: ${kaidahMatch ? kaidahMatch[1] : '0'} | Makna: ${maknaMatch ? maknaMatch[1] : '0'}</div>`; const murodMatch = item.keterangan.match(/Murod:([^|]+)/); const nahwuMatch = item.keterangan.match(/NahwuShorof:([^|]+)/); if (murodMatch || nahwuMatch) tambahanPreview = `<div class="nilai-badge">Murod: ${murodMatch ? murodMatch[1] : '-'} | Nahwu/Shorof: ${nahwuMatch ? nahwuMatch[1] : '-'}</div>`; }
+    rows += `<tr class="row-utama" onclick="toggleDetail('ubk-${item.id}')"><td>${start + idx + 1}</td><td><strong>${escapeHtml(santri.Nama_Lengkap)}</strong><br><small>${escapeHtml(santri.Kelas)}</small></td><td class="nilai-angka">${item.nilai}</td><td><span class="${getGradeClass(grade)}">${grade || '-'}</span></td></tr>
+    <tr id="detail-ubk-${item.id}" class="row-detail" style="display:none;"><td colspan="4"><div class="detail-box"><div><strong>Unit:</strong> ${escapeHtml(santri.Unit_Ndalem || '-')}</div><div><strong>Coretan Kesalahan:</strong> ${tallyPreview || '-'}</div><div><strong>Nilai Tambahan:</strong> ${tambahanPreview || '-'}</div><div><strong>Penyimak:</strong> ${escapeHtml(penyimak?.Nama || '-')}</div><div><strong>Tanggal:</strong> ${formatDate(item.created_at)}</div><div class="aksi-buttons"><button class="btn-edit" onclick="event.stopPropagation(); editNilai('ubk','${item.id}')">✏️ Edit</button><button class="btn-delete" onclick="event.stopPropagation(); deleteNilai('ubk','${item.id}')">🗑️ Hapus</button></div></div></td></tr>`; });
+  let html = filtered.length === 0 ? '<div style="text-align:center;padding:40px;">📭 Belum ada data nilai UBK</div>' : `<table class="nilai-main-table"><thead><tr><th>No</th><th>Nama</th><th>Nilai</th><th>Grade</th></tr></thead><tbody>${rows}</tbody></table>`;
+  document.getElementById('nilaiUbkContainer').innerHTML = html; renderPagination('ubk', filtered.length, page, totalPages);
+}
+function renderNilaiUbq(page = 1) {
+  const search = document.getElementById('searchUbqNama')?.value.toLowerCase() || ''; 
+  const kelasFilter = document.getElementById('filterUbqKelas')?.value || 'semua'; 
+  const unitFilter = document.getElementById('filterUbqUnit')?.value || 'semua';
+  
+  let filtered = nilaiUbq.filter(item => { 
+    const santri = allSantri.find(s => s.Stambuk === item.stambuk); 
+    if (!santri) return false; 
+    return santri.Nama_Lengkap.toLowerCase().includes(search) && 
+           (kelasFilter === 'semua' || santri.Kelas === kelasFilter) && 
+           (unitFilter === 'semua' || santri.Unit_Ndalem === unitFilter); 
+  });
+  
+  filtered.sort((a, b) => (b.nilai || 0) - (a.nilai || 0)); 
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE); 
+  if (page < 1) page = 1; 
+  if (page > totalPages && totalPages > 0) page = totalPages; 
+  const start = (page - 1) * PAGE_SIZE; 
+  const pageData = filtered.slice(start, start + PAGE_SIZE); 
+  currentPageNilaiUbq = page;
+  
+  let rows = '';
+  pageData.forEach((item, idx) => { 
+    const santri = allSantri.find(s => s.Stambuk === item.stambuk); 
+    if (!santri) return; 
+    const penyimak = allPenasehat.find(p => p.id == item.penyimak_id); 
+    let grade = ''; 
+    let detailScores = '';
+    
+    if (item.keterangan) { 
+      const gradeMatch = item.keterangan.match(/Grade Akhir:([^|]+)/); 
+      if (gradeMatch) grade = gradeMatch[1];
+      
+      // Ambil detail nilai hafalan, membaca, ghorib
+      const hafalanMatch = item.keterangan.match(/Hafalan:([^|]+)/);
+      const membacaMatch = item.keterangan.match(/Membaca:([^|]+)/);
+      const ghoribMatch = item.keterangan.match(/Ghorib:([^|]+)/);
+      if (hafalanMatch || membacaMatch || ghoribMatch) {
+        detailScores = `<div class="nilai-badge">Hafalan: ${hafalanMatch ? hafalanMatch[1] : '-'}</div>
+                        <div class="nilai-badge">Membaca: ${membacaMatch ? membacaMatch[1] : '-'}</div>
+                        <div class="nilai-badge">Ghorib: ${ghoribMatch ? ghoribMatch[1] : '-'}</div>`;
+      }
+    }
+    
+    rows += `<tr class="row-utama" onclick="toggleDetail('ubq-${item.id}')">
+      <td style="width: 50px;">${start + idx + 1}</td>
+      <td><strong>${escapeHtml(santri.Nama_Lengkap)}</strong><br><small>${escapeHtml(santri.Kelas)}</small></td>
+      <td class="nilai-angka" style="width: 80px;">${item.nilai}</td>
+      <td style="width: 100px;"><span class="${getGradeClass(grade)}">${grade || '-'}</span></td>
+    </tr>
+    <tr id="detail-ubq-${item.id}" class="row-detail" style="display:none;">
+      <td colspan="4"><div class="detail-box">
+        <div><strong>Unit:</strong> ${escapeHtml(santri.Unit_Ndalem || '-')}</div>
+        <div><strong>Detail Nilai:</strong> ${detailScores || '-'}</div>
+        <div><strong>Penyimak:</strong> ${escapeHtml(penyimak?.Nama || '-')}</div>
+        <div><strong>Tanggal:</strong> ${formatDate(item.created_at)}</div>
+        <div class="aksi-buttons" style="margin-top:8px;">
+          <button class="btn-edit" onclick="event.stopPropagation(); editNilai('ubq','${item.id}')">✏️ Edit</button>
+          <button class="btn-delete" onclick="event.stopPropagation(); deleteNilai('ubq','${item.id}')">🗑️ Hapus</button>
+        </div>
+      </div></td>
+    </tr>`;
+  });
+  
+  let html = filtered.length === 0 ? 
+    '<div style="text-align:center;padding:40px;">📭 Belum ada data nilai UBQ</div>' : 
+    `<table class="nilai-main-table"><thead>
+      <tr><th style="width:50px;">No</th><th>Nama</th><th style="width:80px;">Nilai</th><th style="width:100px;">Grade</th></tr>
+      </thead><tbody>${rows}</tbody></table>`;
+  
+  document.getElementById('nilaiUbqContainer').innerHTML = html; 
+  renderPagination('ubq', filtered.length, page, totalPages);
+}
+function renderPagination(jenis, totalData, currentPage, totalPages) { const pagEl = document.getElementById(jenis === 'ubk' ? 'paginationUbkNilai' : 'paginationUbqNilai'); if (!pagEl || totalData === 0) { if(pagEl) pagEl.innerHTML = ''; return; } const start = (currentPage - 1) * PAGE_SIZE; let html = `<div class="pagination-info">Menampilkan ${start+1}-${Math.min(totalData, start+PAGE_SIZE)} dari ${totalData} data</div><div class="pagination-controls"><button onclick="${jenis === 'ubk' ? 'renderNilaiUbk(1)' : 'renderNilaiUbq(1)'}" ${currentPage === 1 ? 'disabled' : ''}><i class="material-icons">first_page</i></button><button onclick="${jenis === 'ubk' ? 'renderNilaiUbk(' + (currentPage-1) + ')' : 'renderNilaiUbq(' + (currentPage-1) + ')'}" ${currentPage === 1 ? 'disabled' : ''}><i class="material-icons">chevron_left</i></button>`; let startPage = Math.max(1, currentPage - 2); let endPage = Math.min(totalPages, currentPage + 2); for (let i = startPage; i <= endPage; i++) html += `<button onclick="${jenis === 'ubk' ? 'renderNilaiUbk(' + i + ')' : 'renderNilaiUbq(' + i + ')'}" class="${i === currentPage ? 'active' : ''}">${i}</button>`; html += `<button onclick="${jenis === 'ubk' ? 'renderNilaiUbk(' + (currentPage+1) + ')' : 'renderNilaiUbq(' + (currentPage+1) + ')'}" ${currentPage === totalPages ? 'disabled' : ''}><i class="material-icons">chevron_right</i></button><button onclick="${jenis === 'ubk' ? 'renderNilaiUbk(' + totalPages + ')' : 'renderNilaiUbq(' + totalPages + ')'}" ${currentPage === totalPages ? 'disabled' : ''}><i class="material-icons">last_page</i></button></div>`; pagEl.innerHTML = html; }
+function toggleDetail(id) { const el = document.getElementById('detail-' + id); if (el) el.style.display = (el.style.display === 'none' || el.style.display === '') ? 'table-row' : 'none'; }
+function renderSoalUbk(page = 1) { const search = document.getElementById('searchUbkSoal')?.value.toLowerCase() || ''; const katFilter = document.getElementById('filterUbkKategori')?.value || 'semua'; let filtered = soalUbk.filter(item => (item.soal.toLowerCase().includes(search) || item.jawaban.toLowerCase().includes(search)) && (katFilter === 'semua' || item.kategori === katFilter)); const totalPages = Math.ceil(filtered.length / PAGE_SIZE); if (page < 1) page = 1; if (page > totalPages && totalPages > 0) page = totalPages; const start = (page - 1) * PAGE_SIZE; const pageData = filtered.slice(start, start + PAGE_SIZE); currentPageSoal = page; let html = `<table class="asiliah-table"><thead><tr><th>No</th><th>Kategori</th><th>Soal</th><th>Jawaban</th><th>Aksi</th></tr></thead><tbody>`; for (const [idx, item] of pageData.entries()) { html += `<tr><td>${start+idx+1}</td><td><span style="background:#e0e7ff;padding:4px 12px;border-radius:20px;">${escapeHtml(item.kategori || 'Umum')}</span></td><td>${escapeHtml(item.soal)}</td><td>${escapeHtml(item.jawaban)}</td><td><button onclick="editSoal('ubk', '${item.id}')" class="btn-edit">✏️</button> <button onclick="deleteSoal('ubk', '${item.id}')" class="btn-delete">🗑️</button></td></tr>`; } html += `</tbody></table>`; if (filtered.length === 0) html = '<div style="text-align:center;padding:40px;">📭 Belum ada soal UBK</div>'; document.getElementById('soalUbkContainer').innerHTML = html; renderSoalPagination('ubk', filtered.length, page, totalPages); }
+function renderSoalUbq(page = 1) { const search = document.getElementById('searchUbqSoal')?.value.toLowerCase() || ''; const katFilter = document.getElementById('filterUbqKategori')?.value || 'semua'; let filtered = soalUbq.filter(item => (item.soal.toLowerCase().includes(search) || item.jawaban.toLowerCase().includes(search)) && (katFilter === 'semua' || item.kategori === katFilter)); const totalPages = Math.ceil(filtered.length / PAGE_SIZE); if (page < 1) page = 1; if (page > totalPages && totalPages > 0) page = totalPages; const start = (page - 1) * PAGE_SIZE; const pageData = filtered.slice(start, start + PAGE_SIZE); let html = `<table class="asiliah-table"><thead><tr><th>No</th><th>Kategori</th><th>Soal</th><th>Jawaban</th><th>Aksi</th></tr></thead><tbody>`; for (const [idx, item] of pageData.entries()) { html += `<tr><td>${start+idx+1}</td><td><span style="background:#e0e7ff;padding:4px 12px;border-radius:20px;">${escapeHtml(item.kategori || 'Umum')}</span></td><td>${escapeHtml(item.soal)}</td><td>${escapeHtml(item.jawaban)}</td><td><button onclick="editSoal('ubq', '${item.id}')" class="btn-edit">✏️</button> <button onclick="deleteSoal('ubq', '${item.id}')" class="btn-delete">🗑️</button></td></tr>`; } html += `</tbody></table>`; if (filtered.length === 0) html = '<div style="text-align:center;padding:40px;">📭 Belum ada soal UBQ</div>'; document.getElementById('soalUbqContainer').innerHTML = html; renderSoalPagination('ubq', filtered.length, page, totalPages); }
+function renderSoalPagination(jenis, totalData, currentPage, totalPages) { const pagEl = document.getElementById(jenis === 'ubk' ? 'paginationUbkSoal' : 'paginationUbqSoal'); if (!pagEl || totalData === 0) { if(pagEl) pagEl.innerHTML = ''; return; } const start = (currentPage - 1) * PAGE_SIZE; pagEl.innerHTML = `<div class="pagination-info">${start+1}-${Math.min(totalData, start+PAGE_SIZE)} dari ${totalData}</div><div class="pagination-controls"><button onclick="${jenis === 'ubk' ? 'renderSoalUbk(1)' : 'renderSoalUbq(1)'}" ${currentPage === 1 ? 'disabled' : ''}><i class="material-icons">first_page</i></button><button onclick="${jenis === 'ubk' ? 'renderSoalUbk(' + (currentPage-1) + ')' : 'renderSoalUbq(' + (currentPage-1) + ')'}" ${currentPage === 1 ? 'disabled' : ''}><i class="material-icons">chevron_left</i></button><span>Halaman ${currentPage} dari ${totalPages}</span><button onclick="${jenis === 'ubk' ? 'renderSoalUbk(' + (currentPage+1) + ')' : 'renderSoalUbq(' + (currentPage+1) + ')'}" ${currentPage === totalPages ? 'disabled' : ''}><i class="material-icons">chevron_right</i></button><button onclick="${jenis === 'ubk' ? 'renderSoalUbk(' + totalPages + ')' : 'renderSoalUbq(' + totalPages + ')'}" ${currentPage === totalPages ? 'disabled' : ''}><i class="material-icons">last_page</i></button></div>`; }
+window.filterNilaiUbk = () => renderNilaiUbk(1); window.filterNilaiUbq = () => renderNilaiUbq(1); window.filterSoalUbk = () => renderSoalUbk(1); window.filterSoalUbq = () => renderSoalUbq(1);
+window.loadSantriByUnitForModal = function() { const unitKode = document.getElementById('nilaiUnit').value; const santriSelect = document.getElementById('nilaiStambuk'); santriSelect.innerHTML = '<option value="">-- Pilih Santri --</option>'; if (!unitKode) return; const unitNama = allUnit.find(u => u.Kode_Unit === unitKode)?.Nama_Unit; const filtered = allSantri.filter(s => s.Unit_Ndalem === unitNama); filtered.forEach(s => santriSelect.innerHTML += `<option value="${s.Stambuk}">${escapeHtml(s.Nama_Lengkap)} (${s.Kelas})</option>`); };
+window.openAddNilai = function(jenis) { document.getElementById('modalNilaiTitle').innerText = `Tambah Nilai ${jenis.toUpperCase()}`; document.getElementById('nilaiId').value = ''; document.getElementById('nilaiJenis').value = jenis; const nilaiAngka = document.getElementById('nilaiAngka'); if (nilaiAngka) nilaiAngka.value = 0; const unitSelect = document.getElementById('nilaiUnit'); if (unitSelect) { unitSelect.innerHTML = '<option value="">-- Pilih Unit --</option>'; for (const u of allUnit) unitSelect.innerHTML += `<option value="${u.Kode_Unit}">${escapeHtml(u.Nama_Unit)}</option>`; } const penyimakSelect = document.getElementById('nilaiPenyimak'); if (penyimakSelect) { penyimakSelect.innerHTML = '<option value="">-- Pilih Penyimak --</option>'; for (const p of allPenasehat) penyimakSelect.innerHTML += `<option value="${p.id}">${escapeHtml(p.Nama)}</option>`; } document.getElementById('nilaiStambuk').innerHTML = '<option value="">-- Pilih Santri --</option>'; const ubkTally = document.getElementById('ubkTallyArea'); const ubqArea = document.getElementById('ubqScoringArea'); if (jenis === 'ubk') { if (ubkTally) { ubkTally.style.display = 'block'; resetAllTally(); } if (ubqArea) ubqArea.style.display = 'none'; } else { if (ubkTally) ubkTally.style.display = 'none'; if (ubqArea) { ubqArea.style.display = 'block'; resetUbqScores(); } } document.getElementById('nilaiKeterangan').value = ''; document.getElementById('modalNilai').style.display = 'flex'; };
+window.editNilai = function(jenis, id) { const data = jenis === 'ubk' ? nilaiUbk : nilaiUbq; const item = data.find(d => d.id == id); if (!item) return; const santri = allSantri.find(s => s.Stambuk === item.stambuk); const unitKode = allUnit.find(u => u.Nama_Unit === santri?.Unit_Ndalem)?.Kode_Unit || ''; document.getElementById('modalNilaiTitle').innerText = `Edit Nilai ${jenis.toUpperCase()}`; document.getElementById('nilaiId').value = item.id; document.getElementById('nilaiJenis').value = jenis; const nilaiAngka = document.getElementById('nilaiAngka'); if (nilaiAngka) nilaiAngka.value = item.nilai; const unitSelect = document.getElementById('nilaiUnit'); if (unitSelect) { unitSelect.innerHTML = '<option value="">-- Pilih Unit --</option>'; for (const u of allUnit) unitSelect.innerHTML += `<option value="${u.Kode_Unit}" ${u.Kode_Unit === unitKode ? 'selected' : ''}>${escapeHtml(u.Nama_Unit)}</option>`; } const penyimakSelect = document.getElementById('nilaiPenyimak'); if (penyimakSelect) { penyimakSelect.innerHTML = '<option value="">-- Pilih Penyimak --</option>'; for (const p of allPenasehat) penyimakSelect.innerHTML += `<option value="${p.id}" ${p.id == item.penyimak_id ? 'selected' : ''}>${escapeHtml(p.Nama)}</option>`; } if (unitKode) { const unitNama = allUnit.find(u => u.Kode_Unit === unitKode)?.Nama_Unit; const santriSelect = document.getElementById('nilaiStambuk'); santriSelect.innerHTML = '<option value="">-- Pilih Santri --</option>'; const filtered = allSantri.filter(s => s.Unit_Ndalem === unitNama); filtered.forEach(s => santriSelect.innerHTML += `<option value="${s.Stambuk}" ${s.Stambuk === item.stambuk ? 'selected' : ''}>${escapeHtml(s.Nama_Lengkap)} (${s.Kelas})</option>`); } const ubkTally = document.getElementById('ubkTallyArea'); const ubqArea = document.getElementById('ubqScoringArea'); if (jenis === 'ubk') { if (ubkTally) ubkTally.style.display = 'block'; if (ubqArea) ubqArea.style.display = 'none'; parseKeteranganToForm(item.keterangan); } else { if (ubkTally) ubkTally.style.display = 'none'; if (ubqArea) { ubqArea.style.display = 'block'; parseUbqKeterangan(item.keterangan); } } document.getElementById('modalNilai').style.display = 'flex'; };
+window.deleteNilai = async function(jenis, id) { if (!confirm('Yakin hapus nilai ini?')) return; const table = jenis === 'ubk' ? 'nilai_ubk' : 'nilai_ubq'; const { error } = await supabaseClient.from(table).delete().eq('id', id); if (error) showToast('Gagal hapus', true); else { showToast('Data dihapus'); await loadNilai(jenis); } };
+document.getElementById('formNilai').onsubmit = async (e) => { e.preventDefault(); const id = document.getElementById('nilaiId').value; const jenis = document.getElementById('nilaiJenis').value; const stambuk = document.getElementById('nilaiStambuk').value; const penyimakId = document.getElementById('nilaiPenyimak').value; const nilai = parseFloat(document.getElementById('nilaiAngka').value); const table = jenis === 'ubk' ? 'nilai_ubk' : 'nilai_ubq'; if (!stambuk || !penyimakId || isNaN(nilai)) { showToast('Lengkapi data!', true); return; } const keterangan = jenis === 'ubk' ? ubkBuildKeterangan() : ubqBuildKeterangan(); if (id) { const { error } = await supabaseClient.from(table).update({ nilai, keterangan, penyimak_id: parseInt(penyimakId) }).eq('id', id); if (error) showToast('Gagal update: ' + error.message, true); else { showToast('Data diperbarui'); closeModalNilai(); await loadNilai(jenis); } } else { const { error } = await supabaseClient.from(table).insert([{ stambuk, nilai, keterangan, penyimak_id: parseInt(penyimakId) }]); if (error) showToast('Gagal simpan: ' + error.message, true); else { showToast('Data tersimpan'); closeModalNilai(); await loadNilai(jenis); } } };
+document.getElementById('formSoal').onsubmit = async (e) => { e.preventDefault(); const id = document.getElementById('soalId').value; const jenis = document.getElementById('soalJenis').value; const kategori = document.getElementById('soalKategori').value; const soal = document.getElementById('soalPertanyaan').value.trim(); const jawaban = document.getElementById('soalJawaban').value.trim(); const table = jenis === 'ubk' ? 'soal_ubk' : 'soal_ubq'; if (!soal || !jawaban) { showToast('Lengkapi soal & jawaban!', true); return; } if (id) { const { error } = await supabaseClient.from(table).update({ kategori, soal, jawaban }).eq('id', id); if (error) showToast('Gagal update', true); else { showToast('Soal diperbarui'); closeModalSoal(); await loadSoal(jenis); } } else { const { error } = await supabaseClient.from(table).insert([{ kategori, soal, jawaban }]); if (error) showToast('Gagal simpan', true); else { showToast('Soal tersimpan'); closeModalSoal(); await loadSoal(jenis); } } };
+window.openAddSoal = function(jenis) { document.getElementById('modalSoalTitle').innerText = `Tambah Soal ${jenis.toUpperCase()}`; document.getElementById('soalId').value = ''; document.getElementById('soalJenis').value = jenis; document.getElementById('soalKategori').value = ''; document.getElementById('soalPertanyaan').value = ''; document.getElementById('soalJawaban').value = ''; document.getElementById('modalSoal').style.display = 'flex'; };
+window.editSoal = function(jenis, id) { const data = jenis === 'ubk' ? soalUbk : soalUbq; const item = data.find(d => d.id == id); if (!item) return; document.getElementById('modalSoalTitle').innerText = `Edit Soal ${jenis.toUpperCase()}`; document.getElementById('soalId').value = item.id; document.getElementById('soalJenis').value = jenis; document.getElementById('soalKategori').value = item.kategori || ''; document.getElementById('soalPertanyaan').value = item.soal; document.getElementById('soalJawaban').value = item.jawaban; document.getElementById('modalSoal').style.display = 'flex'; };
+window.deleteSoal = async function(jenis, id) { if (!confirm('Yakin hapus soal ini?')) return; const table = jenis === 'ubk' ? 'soal_ubk' : 'soal_ubq'; const { error } = await supabaseClient.from(table).delete().eq('id', id); if (error) showToast('Gagal hapus', true); else { showToast('Soal dihapus'); await loadSoal(jenis); } };
+async function loadKitabList() { try { const { data, error } = await supabaseClient.from('perpustakaan_kitab').select('*').order('created_at', { ascending: false }); if (error) throw error; kitabList = data || []; renderKitabShelf(); } catch (error) { showToast('Gagal memuat kitab', true); } }
+function renderKitabShelf() { const searchTerm = document.getElementById('searchKitabInput')?.value.toLowerCase() || ''; const filtered = kitabList.filter(k => (k.nama && k.nama.toLowerCase().includes(searchTerm))); let html = ''; for (const kitab of filtered) { html += `<div class="kitab-card"><button class="kitab-delete admin-only" onclick="event.stopPropagation(); confirmDeleteKitab(${kitab.id}, '${escapeHtml(kitab.nama)}')"><i class="material-icons">delete</i></button><div onclick="openKitab(${kitab.id})"><div class="kitab-cover"><i class="material-icons">menu_book</i><div class="kitab-nama">${escapeHtml(kitab.nama)}</div></div><div class="kitab-info"><div style="padding:8px;text-align:center;">📄 ${kitab.total_halaman || '?'} halaman</div></div></div></div>`; } if (filtered.length === 0) html = '<div style="text-align:center;padding:60px;">📭 Belum ada kitab. Klik Upload PDF</div>'; document.getElementById('kitabShelf').innerHTML = html; }
+window.uploadKitabToSupabase = function() { if (!isAdmin()) { showToast('❌ Hanya admin!', true); return; } const input = document.createElement('input'); input.type = 'file'; input.accept = 'application/pdf'; input.onchange = async (e) => { const file = e.target.files[0]; if (!file) return; const nama = prompt('Nama kitab:', file.name.replace('.pdf', '')); if (!nama) return; const penulis = prompt('Penulis:', 'Tidak diketahui'); try { const filePath = `kitab_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`; await supabaseClient.storage.from('kitab-pdfs').upload(filePath, file); const { data: urlData } = supabaseClient.storage.from('kitab-pdfs').getPublicUrl(filePath); await supabaseClient.from('perpustakaan_kitab').insert([{ nama, penulis, file_url: urlData.publicUrl }]); showToast(`✅ "${nama}" berhasil diupload`); await loadKitabList(); } catch (error) { showToast('Gagal upload', true); } }; input.click(); };
+window.confirmDeleteKitab = function(id, nama) { if (!isAdmin()) return; pendingDeleteId = id; document.getElementById('deleteConfirmText').innerHTML = `Yakin hapus <strong>${escapeHtml(nama)}</strong>?`; document.getElementById('modalConfirmDelete').style.display = 'flex'; document.getElementById('confirmDeleteBtn').onclick = async () => { await deleteKitabFromSupabase(pendingDeleteId); closeConfirmModal(); }; };
+window.closeConfirmModal = function() { document.getElementById('modalConfirmDelete').style.display = 'none'; };
+async function deleteKitabFromSupabase(id) { try { const kitab = kitabList.find(k => k.id == id); if (!kitab) throw new Error('Kitab tidak ditemukan'); await supabaseClient.from('perpustakaan_kitab').delete().eq('id', id); if (kitab.file_url) { const urlParts = kitab.file_url.split('/'); const filePath = urlParts.slice(urlParts.indexOf('kitab-pdfs') + 1).join('/'); if (filePath) await supabaseClient.storage.from('kitab-pdfs').remove([filePath]); } showToast('Kitab dihapus'); await loadKitabList(); } catch (error) { showToast('Gagal hapus', true); } }
+window.openKitab = async function(kitabId) { const kitab = kitabList.find(k => k.id == kitabId); if (!kitab || !kitab.file_url) { showToast('URL tidak valid', true); return; } document.getElementById('libraryView').style.display = 'none'; document.getElementById('readerView').style.display = 'block'; await loadPDFFromUrl(kitab.file_url); };
+async function loadPDFFromUrl(url) { const loadingTask = pdfjsLib.getDocument(url); currentPDFDoc = await loadingTask.promise; totalPages = currentPDFDoc.numPages; currentPageNum = 1; await renderPage(currentPageNum); showToast(`✅ ${totalPages} halaman`, false); }
+async function renderPage(pageNum) { if (!currentPDFDoc) return; const canvas = document.getElementById('mainPage'); const ctx = canvas.getContext('2d'); const page = await currentPDFDoc.getPage(pageNum); const scale = window.innerWidth < 500 ? 1.2 : 1.6; const viewport = page.getViewport({ scale }); canvas.width = viewport.width; canvas.height = viewport.height; await page.render({ canvasContext: ctx, viewport }).promise; document.getElementById('pageIndicator').innerHTML = `${pageNum} / ${totalPages}`; updateNavButtons(); }
+function updateNavButtons() { const prevBtn = document.getElementById('prevBtn'); const nextBtn = document.getElementById('nextBtn'); if (prevBtn) prevBtn.disabled = currentPageNum <= 1; if (nextBtn) nextBtn.disabled = currentPageNum >= totalPages; }
+window.nextPage = async function() { if (currentPageNum < totalPages) { currentPageNum++; await renderPage(currentPageNum); } };
+window.prevPage = async function() { if (currentPageNum > 1) { currentPageNum--; await renderPage(currentPageNum); } };
+window.changeZoom = function() { if (currentPDFDoc) renderPage(currentPageNum); };
+window.showLibraryView = function() { document.getElementById('libraryView').style.display = 'block'; document.getElementById('readerView').style.display = 'none'; currentPDFDoc = null; };
+window.refreshKitabList = function() { loadKitabList(); };
+window.filterKitabList = function() { renderKitabShelf(); };
+async function populateFilters() { const kelasSet = new Set(), unitSet = new Set(); allSantri.forEach(s => { if (s.Kelas) kelasSet.add(s.Kelas); if (s.Unit_Ndalem) unitSet.add(s.Unit_Ndalem); }); const kelasOpt = Array.from(kelasSet).sort().map(k => `<option value="${k}">${k}</option>`).join(''); const unitOpt = Array.from(unitSet).sort().map(u => `<option value="${u}">${u}</option>`).join(''); document.getElementById('filterUbkKelas').innerHTML = '<option value="semua">Semua Kelas</option>' + kelasOpt; document.getElementById('filterUbkUnit').innerHTML = '<option value="semua">Semua Unit</option>' + unitOpt; document.getElementById('filterUbqKelas').innerHTML = '<option value="semua">Semua Kelas</option>' + kelasOpt; document.getElementById('filterUbqUnit').innerHTML = '<option value="semua">Semua Unit</option>' + unitOpt; }
+function initTabs() { document.querySelectorAll('.main-tab').forEach(tab => { tab.addEventListener('click', () => { document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('.main-panel').forEach(p => p.classList.remove('active')); tab.classList.add('active'); document.getElementById(tab.dataset.panel).classList.add('active'); }); }); document.querySelectorAll('#ubk-panel .sub-tab').forEach(tab => { tab.addEventListener('click', () => { document.querySelectorAll('#ubk-panel .sub-tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('#ubk-panel .sub-panel').forEach(p => p.classList.remove('active')); tab.classList.add('active'); document.getElementById(tab.dataset.subpanel).classList.add('active'); }); }); document.querySelectorAll('#ubq-panel .sub-tab').forEach(tab => { tab.addEventListener('click', () => { document.querySelectorAll('#ubq-panel .sub-tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('#ubq-panel .sub-panel').forEach(p => p.classList.remove('active')); tab.classList.add('active'); document.getElementById(tab.dataset.subpanel).classList.add('active'); }); }); }
+window.goBackToMain = function() { window.location.href = 'jindex.html'; };
+window.closeModalNilai = function() { document.getElementById('modalNilai').style.display = 'none'; };
+window.closeModalSoal = function() { document.getElementById('modalSoal').style.display = 'none'; };
+window.updateUbqFinalGrade = updateUbqFinalGrade;
+async function init() { await loadMasterData(); await populateFilters(); await loadNilai('ubk'); await loadNilai('ubq'); await loadSoal('ubk'); await loadSoal('ubq'); await loadKitabList(); initTabs(); const adminOnly = document.querySelectorAll('.admin-only'); if (!isAdmin()) adminOnly.forEach(el => el.style.display = 'none'); else adminOnly.forEach(el => el.style.display = 'inline-flex'); }
+init();
+</script>
+</body>
+</html>
