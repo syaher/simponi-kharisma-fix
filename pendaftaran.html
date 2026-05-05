@@ -244,11 +244,9 @@
 
 
     /* Card Grid Mobile */
-    .card-grid-modern { 
-      display: grid; 
-      gap: 0.75rem;
-      grid-template-columns: 1fr;
-    }
+  .card-grid-modern { 
+  grid-template-columns: 1fr; 
+}
 
     .santri-card {
       background: white;
@@ -318,15 +316,24 @@
     }
 
     .action-buttons {
-      grid-column: 1 / span 2;
-      grid-row: 3;
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 0.25rem;
-      margin-top: 0.5rem;
-      padding-top: 0.5rem;
-      border-top: 1px solid #e2e8f0;
-    }
+  grid-column: 1 / span 2;
+  grid-row: 3;
+  display: grid;
+  grid-template-columns: repeat(5, auto); /* 🔥 kunci */
+  justify-content: center;                /* 🔥 tengah */
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.action-buttons button {
+  aspect-ratio: 1 / 1;     /* 🔥 kotak */
+  border-radius: 12px;     /* 🔥 agak bulat */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
     .action-btn {
       padding: 0.5rem 0.25rem;
@@ -536,7 +543,8 @@
       }
 
       .action-buttons {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(3, auto);
+		justify-content: center;
         gap: 0.2rem;
       }
 
@@ -1127,6 +1135,38 @@
   opacity: 1;
 }
 
+#listArea {
+  scrollbar-width: thin;
+}
+
+#listArea::-webkit-scrollbar {
+  width: 6px;
+}
+
+#listArea::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
+}
+
+#formWrapper {
+  scrollbar-width: thin;
+}
+
+#formWrapper::-webkit-scrollbar {
+  width: 6px;
+}
+
+#formWrapper::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
+}
+
+@media (min-width: 1200px) {
+  .card-grid-modern { 
+    grid-template-columns: repeat(3, 1fr); 
+  }
+}
+
   </style>
   <link rel="icon" type="image/png" href="https://i.imgur.com/Irgu32G.png">
 </head>
@@ -1140,26 +1180,20 @@
     </a>
   </div>
 
-  <!-- Header Modern -->
-  <header class="header-modern d-flex align-items-center">
-    <img id="logo" src="https://i.imgur.com/Irgu32G.png" alt="logo" class="me-3">
-    <div class="flex-grow-1">
-      <h1 class="h3 mb-1 fw-bold">KHUDAMA' KHARISMA</h1>
-      <div class="small opacity-85">Tambah, edit, cari, dan kelola data santri dengan mudah</div>
-    </div>
-    <div class="d-none d-md-flex align-items-center gap-3">
-      <div class="text-end">
-        <div class="fw-bold" id="currentDate"></div>
-        <div class="small opacity-85" id="currentTime"></div>
-      </div>
-    </div>
-  </header>
+ 
 
-  <div class="row g-4">
+  <div class="row g-4 flex-column flex-lg-column">
     <!-- Form Section -->
-    <div class="col-lg-4">
-      <div class="card-modern">
-        <div class="card-header-modern">
+    <div class="col-12 admin-only" id="formSection" style="display:none;">
+  
+  <!-- Tombol Toggle -->
+  <button id="toggleFormBtn" class="btn btn-modern btn-outline-modern mb-2 w-100">
+    <i class="bi bi-chevron-down"></i> Buka Form
+  </button>
+
+  <div id="formWrapper" style="display:none; max-height:75vh; overflow-y:auto;">
+    <div class="card-modern">
+        <div class="card-header-modern" style="position: sticky; top: 0; z-index: 10;">
           <h5 class="mb-0"><i class="bi bi-person-plus me-2"></i>Formulir Ndalem Baru</h5>
         </div>
         <div class="card-body p-4">
@@ -1298,13 +1332,6 @@
     </div>
   </div>
   
-  <div class="mb-3">
-  <label class="form-label small fw-semibold">Kategori</label>
-  <select id="Kategori" class="form-select form-control-modern">
-    <option value="Non-SKTM">Non-SKTM</option>
-    <option value="SKTM">SKTM</option>
-  </select>
-</div>
 
 
   <div class="row g-2">
@@ -1351,13 +1378,14 @@
   </div>
 
 </form>
+  </div>   
 
         </div>
       </div>
     </div>
 
     <!-- Table & Controls Section -->
-    <div class="col-lg-8">
+    <div class="col-12">
       <!-- Stats Cards -->
       <div class="stats-row">        
         <div class="stats-card">
@@ -1421,7 +1449,7 @@
       </div>
 
       <!-- Data Display Area -->
-      <div id="listArea">
+      <div id="listArea" style="max-height: 75vh; overflow-y: auto;">
         <!-- Card View -->
         <div id="cardGrid" class="card-grid-modern"></div>
 
@@ -1472,7 +1500,7 @@ const unitNdalemList = [
   'Rahmatuka I (Maqom)','Rahmatuka II (Pasar Campurejo)',
   'Rizquna Baby & Fashion','Rizquna Bangunan','Rizqua Galon Barat',
   'Rizqua Galon Timur','Rizquna Juwet','Rizquna Laundry',
-  'Selepan','Sopir','Toko Nafisah','Warung Nafis','Rizquna Bakso'
+  'Selepan','Sopir', 'Tahu Goglek','Toko Nafisah','Warung Nafis','Rizquna Bakso'
 ];
 
 
@@ -1484,7 +1512,12 @@ const ngajiData = [
   { id: 5, label: "MMQ - Takhtiman" },
   { id: 6, label: "Maunah Sari - Setoran" },
   { id: 7, label: "Kamar - Setoran" },
-  { id: 8, label: "Talaqi - Setoran" }
+  { id: 8, label: "Talaqi - Setoran" },
+  { id: 9, label: "MMA - Setoran" },
+  { id: 10, label: "MBQ - Ibtidaiyah" },
+  { id: 11, label: "MBQ - Tsanawiyah" },
+  { id: 12, label: "MBQ - Aliyah" }
+  
 ];
 
 
@@ -1512,8 +1545,7 @@ const exportBtn = document.getElementById('exportBtn');
 const aktifSantri = document.getElementById('aktifSantri');
 const kelasCount = document.getElementById('kelasCount');
 const unitCount = document.getElementById('unitCount');
-const currentDate = document.getElementById('currentDate');
-const currentTime = document.getElementById('currentTime');
+
 const Kategori = document.getElementById('Kategori');
 
 // populate selects
@@ -1558,19 +1590,8 @@ let editId = null;
 let usePagination = true;
 let allData = [];
 
-// Update date and time
-function updateDateTime() {
-  const now = new Date();
-  currentDate.textContent = now.toLocaleDateString('id-ID', { 
-    weekday: 'long', 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
-  });
-  currentTime.textContent = now.toLocaleTimeString('id-ID');
-}
-setInterval(updateDateTime, 1000);
-updateDateTime();
+
+
 
 // helper show msg
 function showAlert(text, type='success') {
@@ -1736,7 +1757,7 @@ function renderList(rows) {
         
        <div class="action-buttons">
 
-  <button class="btn btn-sm btn-warning action-btn tooltip-btn"
+  <button class="btn btn-sm btn-warning action-btn tooltip-btn admin-only"
     data-action="edit"
     data-id="${r.id}">
     <span class="tooltip">Edit Data</span>
@@ -1764,7 +1785,7 @@ function renderList(rows) {
     <i class="bi bi-telephone"></i>
   </button>
 
-  <button class="btn btn-sm btn-info action-btn tooltip-btn pdf-btn"
+  <button class="btn btn-sm btn-info action-btn tooltip-btn pdf-btn admin-only"
     data-action="pdf"
     data-id="${r.id}">
     <span class="tooltip">Download PDF</span>
@@ -1782,6 +1803,7 @@ function renderList(rows) {
       cardGrid.appendChild(div);
     });
   }
+  applyRoleAccess();
 }
 
 window.onEdit = async function(id) {
@@ -1798,7 +1820,7 @@ window.onEdit = async function(id) {
   document.getElementById('Stambuk').value = data.Stambuk || '';
   Unit_Ndalem.value = data.Unit_Ndalem || '';
   Ngaji.value = data.Ngaji || '';
-  Kategori.value = data.Kategori || 'Non-SKTM';
+
   document.getElementById('Asal_Daerah').value = data.Asal_Daerah || '';
   document.getElementById('Himpunan').value = data.Himpunan || '';
   document.getElementById('Kamar').value = data.Kamar || '';
@@ -1872,7 +1894,7 @@ if (file) {
 
   const payload = {
     Kelas: Kelas.value || null,
-	Kategori: Kategori.value || 'Non-SKTM',
+
     Bagian: document.getElementById('Bagian').value || null,
     Nama_Lengkap: document.getElementById('Nama_Lengkap').value || null,
     Foto: finalFoto,
@@ -2432,12 +2454,19 @@ window.onWA = async function (id) {
     .single();
 
   if (error || !data) {
-    alert("Nomor wali tidak ditemukan!");
+    alert("Data santri tidak ditemukan!");
     return;
   }
 
   const nomor = (data.No_Wali || "").toString().trim();
 
+  // 🔥 CEK KOSONG DULU
+  if (!nomor) {
+    alert("Nomor wali belum diisi!");
+    return;
+  }
+
+  // 🔥 CEK FORMAT
   if (!nomor.startsWith("62")) {
     alert("Format nomor wali harus 62xxxxxxxx");
     return;
@@ -2635,7 +2664,30 @@ document.addEventListener("click", function (e) {
   }
 });
 
+const toggleFormBtn = document.getElementById("toggleFormBtn");
+const formWrapper = document.getElementById("formWrapper");
 
+if (toggleFormBtn) {
+  toggleFormBtn.addEventListener("click", () => {
+    const isOpen = formWrapper.style.display === "block";
+
+    formWrapper.style.display = isOpen ? "none" : "block";
+
+    toggleFormBtn.innerHTML = isOpen
+      ? '<i class="bi bi-chevron-down"></i> Buka Form'
+      : '<i class="bi bi-chevron-up"></i> Tutup Form';
+  });
+}
+
+function applyRoleAccess() {
+  const userRole = localStorage.getItem("userRole") || "user";
+
+  document.querySelectorAll(".admin-only").forEach(el => {
+    el.style.display = (userRole === "admin") ? "" : "none";
+  });
+}
+
+document.addEventListener("DOMContentLoaded", applyRoleAccess);
 </script>
 <div class="app-footer">
   <img src="https://img.shields.io/badge/version-v2.1.5-orange" alt="Version">

@@ -148,7 +148,7 @@
     .grid-container {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      grid-template-rows: repeat(4, 1fr);
+      
       gap: 16px;
       margin-bottom: 20px;
     }
@@ -277,7 +277,16 @@
 		  --item-color-1: #822144;
 		  --item-color-2: #c22f65;
 		}
+	
+	.grid-item[data-module="ubkubq"] {
+	  --item-color-1: #3f51b5;
+	  --item-color-2: #6573c3;
+	}
 
+	.grid-item[data-module="sinkron"] {
+	  --item-color-1: #009688;
+	  --item-color-2: #26a69a;
+	}
 
     /* Responsive adjustments */
     @media (max-width: 480px) {
@@ -2757,6 +2766,109 @@ button:active {
   letter-spacing: 1px;
 }
 
+.status-ada {
+  color: green;
+}
+.status-belum {
+  color: red;
+}
+
+#pondok-table th:nth-child(2),
+#pondok-table td:nth-child(2) {
+  min-width: 80px;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  #pondok-table th:nth-child(1),
+	#pondok-table td:nth-child(1) {
+	  min-width: 130px;	  
+	}
+}
+
+#pondok-table tbody tr {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+}
+
+#pondok-table tbody tr:hover {
+  background-color: #f8fbff;
+  border-left: 3px solid #007bff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+#pondok-table tbody tr:active {
+  background-color: #eef4ff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.pondok-hint {
+  color: #888;
+  font-size: 13px;
+  margin-top: -5px;
+  margin-bottom: 10px;
+}
+
+.grid-item.admin-only {
+  text-align: center;
+}
+
+.grid-item.admin-only i {
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.table-photo {
+  width: 45px;
+  height: 55px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.photo-preview {
+  max-width: 100px;
+  display: none;
+  margin-top: 6px;
+  border-radius: 6px;
+}
+
+.detail-card {
+  max-width: 400px;
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+}
+
+.detail-header {
+  text-align: center;
+  padding: 15px;
+  background: #f5f5f5;
+}
+
+.detail-header img {
+  width: 120px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.detail-body {
+  padding: 15px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 6px 0;
+}
+
+.detail-divider {
+  border-top: 1px solid #ddd;
+  margin: 10px 0;
+}
 
   </style>
 </head>
@@ -2789,48 +2901,100 @@ button:active {
   </button>
 </div>
 
-    <div class="grid-container">
-      <div class="grid-item" data-module="guru">
-        <i class="material-icons">supervisor_account</i>
-        <span>Mustahiq</span>
-      </div>
-      <div class="grid-item" data-module="penasehat">
-        <i class="material-icons">diversity_3</i>
-        <span>Penasehat</span>
-      </div>
-      <div class="grid-item" data-module="santri">
-        <i class="material-icons">school</i>
-        <span>Siswa</span>
-      </div>
-	   <div class="grid-item" data-module="pendaftaran" onclick="window.location.href='pendaftaran.html'">
-		<i class="material-icons">add_to_queue</i>
-		<span>Pendaftaran</span>
-	  </div>
-	  <div class="grid-item" data-module="harian" onclick="window.location.href='nadhom.html'">
-		<i class="material-icons">list_alt</i>
-		<span>Harian</span>
-	  </div>
-      <div class="grid-item" data-module="absensi">
-        <i class="material-icons">event_available</i>
-        <span>Absensi</span>
-      </div>
-      <div class="grid-item" data-module="nilai">
-        <i class="material-icons">grading</i>
-        <span>Nilai</span>
-      </div>      
-	  <div class="grid-item" data-module="inventaris">
-	  <i class="material-icons">inventory_2</i>
-	  <span>Inventaris</span>
-	</div>
-	<div class="grid-item" data-module="pelanggaran">
-	  <i class="material-icons">report_problem</i>
-	  <span>Pelanggaran</span>
-	</div>
-	<div class="grid-item" data-module="info">
-        <i class="material-icons">info</i>
-        <span>Informasi</span>
-      </div>
-    </div>
+  <div class="grid-container">
+
+  <!-- ===== UTAMA ===== -->
+<div style="grid-column: 1/-1;">
+  <div style="text-align:center; font-weight:700; background:#e0e0e0; padding:8px; border-radius:8px;">
+    UMUM
+  </div>
+</div>
+
+  <div class="grid-item" data-module="guru">
+    <i class="material-icons">supervisor_account</i>
+    <span>Mustahiq</span>
+  </div>
+
+  <div class="grid-item" data-module="penasehat">
+    <i class="material-icons">diversity_3</i>
+    <span>Penasehat</span>
+  </div>
+
+  <div class="grid-item" data-module="santri">
+    <i class="material-icons">school</i>
+    <span>Siswa</span>
+  </div>
+
+  <div class="grid-item admin-only" data-module="sinkron">
+    <i class="material-icons">account_balance</i>
+    <span>Pondok Induk</span>
+  </div>
+
+  <div class="grid-item" data-module="pendaftaran" onclick="window.location.href='pendaftaran.html'">
+    <i class="material-icons">add_to_queue</i>
+    <span>Pendaftaran</span>
+  </div>
+
+  <div class="grid-item" data-module="info">
+    <i class="material-icons">info</i>
+    <span>Informasi</span>
+  </div>
+
+
+  <!-- ===== PENDIDIKAN ===== -->
+<div style="grid-column: 1/-1; margin-top: 15px;">
+  <div style="text-align:center; font-weight:700; background:#e0e0e0;  padding:8px; border-radius:8px;">
+    PENDIDIKAN
+  </div>
+</div>
+
+  <div class="grid-item" data-module="absensi">
+    <i class="material-icons">event_available</i>
+    <span>Absensi</span>
+  </div>
+
+  <div class="grid-item" data-module="nilai">
+    <i class="material-icons">grading</i>
+    <span>Nilai</span>
+  </div>
+
+  <div class="grid-item" data-module="ubkubq" onclick="window.location.href='ubk-ubq.html'">
+    <i class="material-icons">menu_book</i>
+    <span>UBK & UBQ</span>
+  </div>
+
+  <div class="grid-item" data-module="harian" onclick="window.location.href='nadhom.html'">
+    <i class="material-icons">list_alt</i>
+    <span>Harian</span>
+  </div>
+
+
+  <!-- ===== KOORDINATOR UNIT ===== -->
+<div style="grid-column: 1/-1; margin-top: 15px;">
+  <div style="text-align:center; font-weight:700; background:#e0e0e0; padding:8px; border-radius:8px;">
+    KOORDINATOR UNIT
+  </div>
+</div>
+
+  <div class="grid-item" data-module="inventaris">
+    <i class="material-icons">inventory_2</i>
+    <span>Inventaris</span>
+  </div>
+
+
+  <!-- ===== KEAMANAN ===== -->
+<div style="grid-column: 1/-1; margin-top: 15px;">
+  <div style="text-align:center; font-weight:700; background:#e0e0e0; padding:8px; border-radius:8px;">
+    KEAMANAN
+  </div>
+</div>
+
+  <div class="grid-item" data-module="pelanggaran">
+    <i class="material-icons">report_problem</i>
+    <span>Pelanggaran</span>
+  </div>
+
+</div>
   </div>
   
 
@@ -3206,7 +3370,11 @@ button:active {
         <option value="dapat">dapat</option>
         <option value="tidak">tidak</option>
       </select>
-
+	  
+	  <label>Foto</label>
+		<input type="file" id="add_foto" accept="image/*">
+		<img id="preview_add_foto" class="photo-preview">
+	 
       <div class="crud-actions">
         <button type="submit" class="crud-btn-save">💾 Simpan</button>
         <button type="button" class="crud-btn-cancel" onclick="closePenasehatAddModal()">❌ Batal</button>
@@ -3261,6 +3429,10 @@ button:active {
         <option value="dapat">dapat</option>
         <option value="tidak">tidak</option>
       </select>
+	  
+	  <label>Foto</label>
+		<input type="file" id="edit_foto" accept="image/*">
+		<img id="preview_edit_foto" class="photo-preview">
 
       <div class="crud-actions">
         <button type="submit" class="crud-btn-save">💾 Update</button>
@@ -3461,7 +3633,50 @@ button:active {
 </div>
 
 
-  
+<div id="sinkron-module" class="module-container">
+
+  <div class="back-button" onclick="showMainGrid()">
+    <i class="material-icons">arrow_back</i>
+    <span>Kembali</span>
+  </div>
+
+  <h2>Data Pondok Induk</h2>
+	<p class="pondok-hint">
+  Klik dua kali pada baris untuk menambah data ke KHARISMA
+</p>
+  <!-- SEARCH -->
+  <div style="margin-bottom:10px;">
+    <input 
+      type="text" 
+      id="searchPondok" 
+      placeholder="Cari Nama / Stambuk..." 
+      style="width:100%; padding:8px;"
+    >
+  </div>
+	<div id="pondok-count" style="margin-bottom:6px; font-weight:bold;">
+   0 
+</div>
+  <!-- TABLE -->
+  <div class="data-table-container">
+    <table class="data-table" id="pondok-table">
+      <thead>
+        <tr>
+          <th>Nama</th>
+          <th>Kelas</th>
+          <th>Bag</th>
+          <th>Stambuk</th>
+          <th>Asal</th>
+          <th>Himpunan</th>
+          <th>Kamar</th>
+          <th>Tgl Lahir</th>
+          <th>Kategori</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+<div id="pondok-pagination" style="margin-top:10px;"></div>
+</div>
 
 
 <!-- ========== MODAL FORM INVENTARIS (CRUD) ========== -->
@@ -3746,6 +3961,30 @@ button:active {
   </div>
 </div>
 
+<div id="pondokModal" class="crud-modal">
+  <div class="crud-modal-content">
+    <span class="crud-close" onclick="closePondokModal()">&times;</span>
+    
+    <h3 id="pondokNama"></h3>
+    <p id="pondokStambuk"></p>
+
+    <p id="pondokStatus" style="font-weight:bold;"></p>
+
+    <div class="crud-actions">
+      <button id="btnInsertSantri" class="crud-btn-save">Tambahkan</button>
+      <button class="crud-btn-cancel" onclick="closePondokModal()">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<div id="penasehatDetailModal" class="crud-modal">
+  <div class="crud-modal-content detail-card">
+    <span class="crud-close" onclick="closePenasehatDetail()">&times;</span>
+
+    <div id="penasehatDetailContent"></div>
+  </div>
+</div>
+
 </body>
   <script>
    
@@ -4014,8 +4253,10 @@ function showModule(moduleName) {
     } else if (moduleName === 'guru') {
       loadGuru();
     } else if (moduleName === 'info') {
-      loadInfo();
-    }
+	  loadInfo();
+	} else if (moduleName === 'sinkron') {
+	  loadSinkronData();
+	}
   }
 }
 
@@ -7741,7 +7982,7 @@ async function loadPenasehat() {
   try {
     const { data, error } = await supabaseClient
       .from('penasehat')
-      .select('id, Nama, Status_Penasehat, Status_Pengajar, Kode_Unit, Mutakhorijin, Mulai_Ngabdi, Hp, Status, id_penasehat, Status_Bisyaroh, referensi_unit_ndalem(Nama_Unit)')
+      .select('id, foto_url, Nama, Status_Penasehat, Status_Pengajar, Kode_Unit, Mutakhorijin, Mulai_Ngabdi, Hp, Status, id_penasehat, Status_Bisyaroh, referensi_unit_ndalem(Nama_Unit)')
       .eq('Status', 'aktif') // 🔹 hanya ambil penasehat aktif
       .order('Mulai_Ngabdi', { ascending: true });
 
@@ -7801,8 +8042,6 @@ function filterPenasehat() {
   renderPenasehatTable();
 }
 
-
-
 function renderPenasehatTable() {
   const table = document.getElementById("penasehat-table");
   table.innerHTML = "";
@@ -7811,6 +8050,7 @@ function renderPenasehatTable() {
     <thead>
       <tr>
         <th>No.</th>
+        <th>Foto</th>
         <th class="nama">Nama</th>
         <th>Organisasi</th>
         <th>Pengajar</th>
@@ -7822,6 +8062,30 @@ function renderPenasehatTable() {
       </tr>
     </thead>
   `;
+  
+penasehatFiltered.sort((a, b) => {
+  // 🔹 Ambil tahun (angka)
+  const mutA = parseInt(a.Mutakhorijin);
+  const mutB = parseInt(b.Mutakhorijin);
+
+  const isAEmpty = isNaN(mutA);
+  const isBEmpty = isNaN(mutB);
+
+  // 🔹 1. Yang kosong selalu di bawah
+  if (isAEmpty && !isBEmpty) return 1;
+  if (!isAEmpty && isBEmpty) return -1;
+
+  // 🔹 2. Kalau dua-duanya ada → urut tahun lama ke baru
+  if (!isAEmpty && !isBEmpty && mutA !== mutB) {
+    return mutA - mutB; // kecil (lama) di atas
+  }
+
+  // 🔹 3. Kalau sama → pakai masa khidmah
+  const dateA = new Date(a.Mulai_Ngabdi || 0);
+  const dateB = new Date(b.Mulai_Ngabdi || 0);
+
+  return dateA - dateB; // lebih lama di atas
+});
 
   const start = (penasehatCurrentPage - 1) * penasehatRowsPerPage;
   const end = start + penasehatRowsPerPage;
@@ -7830,20 +8094,28 @@ function renderPenasehatTable() {
   let rows = "";
   pageData.forEach((p, i) => {
     const masa = calculateMasaKhidmah(p.Mulai_Ngabdi);
-    const hpLink = p.Hp ? `<a href="https://wa.me/${p.Hp.replace(/\D/g, "")}" target="_blank">${p.Hp}</a>` : "-";
+
+    const foto = p.foto_url
+      ? `<img src="${p.foto_url}" class="table-photo">`
+      : "-";
+
+    const hpLink = p.Hp
+      ? `<a href="https://wa.me/${p.Hp.replace(/\D/g, "")}" target="_blank">${p.Hp}</a>`
+      : "-";
 
     const aksi = userRole === "admin"
       ? `
         <td style="text-align:center;">
-           <button class="crud-btn-save" data-id="${p.id}" onclick="handleEditPenasehat(this)">✏️</button>
-		  <button class="crud-btn-cancel" onclick='deletePenasehat("${p.id}")'>🗑️</button>
-		</td>
+          <button class="crud-btn-save" data-id="${p.id}" onclick="event.stopPropagation(); handleEditPenasehat(this)">✏️</button>
+          <button class="crud-btn-cancel" onclick='event.stopPropagation(); deletePenasehat("${p.id}")'>🗑️</button>
+        </td>
       `
       : "";
 
     rows += `
-      <tr>
+      <tr onclick="showPenasehatDetail(${p.id})" style="cursor:pointer;">
         <td>${start + i + 1}</td>
+        <td>${foto}</td>
         <td class="nama">${p.Nama || "-"}</td>
         <td>${p.Status_Penasehat || "-"}</td>
         <td>${p.Status_Pengajar || "-"}</td>
@@ -7860,6 +8132,83 @@ function renderPenasehatTable() {
   updatePenasehatPagination();
 }
 
+function showPenasehatDetail(id) {
+  const p = allPenasehatData.find(x => String(x.id) === String(id));
+  if (!p) return;
+
+  const masa = calculateMasaKhidmah(p.Mulai_Ngabdi);
+
+  const html = `
+    <div class="detail-header">
+      <img src="${p.foto_url || 'default.png'}">
+      <h3>${p.Nama || '-'}</h3>
+    </div>
+
+    <div class="detail-body">
+
+      <div class="detail-row">
+        <span>Organisasi</span>
+        <span>${p.Status_Penasehat || '-'}</span>
+      </div>
+	  
+	  <div class="detail-divider"></div>
+
+      <div class="detail-row">
+        <span>Pengajar</span>
+        <span>${p.Status_Pengajar || '-'}</span>
+      </div>
+
+      <div class="detail-divider"></div>
+
+      <div class="detail-row">
+        <span>Unit</span>
+        <span>${p.referensi_unit_ndalem?.Nama_Unit || p.Kode_Unit || '-'}</span>
+      </div>
+	  
+	  <div class="detail-divider"></div>
+
+      <div class="detail-row">
+        <span>Mutakhorijin</span>
+        <span>${p.Mutakhorijin || '-'}</span>
+      </div>
+	  
+	  <div class="detail-divider"></div>
+
+      <div class="detail-row">
+        <span>Masa Khidmah</span>
+        <span>${masa}</span>
+      </div>
+
+      <div class="detail-divider"></div>
+
+      <div class="detail-row">
+        <span>HP</span>
+        <span>${p.Hp ? `<a href="https://wa.me/${p.Hp.replace(/\D/g, "")}" target="_blank">${p.Hp}</a>` : '-'}</span>
+      </div>
+
+      <div class="detail-row">
+        <span>Status</span>
+        <span>${p.Status || '-'}</span>
+      </div>      
+
+    </div>
+  `;
+
+  document.getElementById("penasehatDetailContent").innerHTML = html;
+  document.getElementById("penasehatDetailModal").style.display = "block";
+}
+
+function closePenasehatDetail() {
+  document.getElementById("penasehatDetailModal").style.display = "none";
+}
+
+window.addEventListener("click", function(e) {
+  const modal = document.getElementById("penasehatDetailModal");
+  if (e.target === modal) {
+    modal.style.display = "none";
+  }
+});
+
 // ========== TAMBAH ==========
 function openAddPenasehat() {
   document.getElementById("penasehatAddForm").reset();
@@ -7873,6 +8222,17 @@ function closePenasehatAddModal() {
 document.getElementById("penasehatAddForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
+  const id_penasehat =
+    document.getElementById("add_id_penasehat").value ||
+    `PNSH-${Date.now().toString().slice(-6)}`;
+
+  let foto_url = null;
+
+  const file = document.getElementById("add_foto").files?.[0];
+  if (file) {
+    foto_url = await uploadFotoPenasehat(file, id_penasehat);
+  }
+
   const data = {
     Nama: document.getElementById("add_Nama").value.trim(),
     Status_Penasehat: document.getElementById("add_Status_Penasehat").value,
@@ -7881,23 +8241,71 @@ document.getElementById("penasehatAddForm").addEventListener("submit", async (e)
     Mutakhorijin: document.getElementById("add_Mutakhorijin").value,
     Hp: document.getElementById("add_Hp").value,
     Mulai_Ngabdi: document.getElementById("add_Mulai_Ngabdi").value || null,
-    id_penasehat: document.getElementById("add_id_penasehat").value || `PNSH-${Date.now().toString().slice(-6)}`,
+    id_penasehat,
     Status: document.getElementById("add_Status").value,
     Status_Bisyaroh: document.getElementById("add_Status_Bisyaroh").value,
+    ...(foto_url && { foto_url }) // ✅ hanya simpan kalau ada
   };
 
   try {
     const { error } = await supabaseClient.from("penasehat").insert([data]);
     if (error) throw error;
-    showToast("✅ Penasehat baru ditambahkan!");
+
+    showToast("✅ Berhasil tambah!");
     closePenasehatAddModal();
     await loadPenasehat();
+
   } catch (err) {
     console.error(err);
-    showToast("❌ Gagal menambah penasehat.", true);
+    showToast("❌ Gagal tambah", true);
   }
 });
 
+function previewImage(input, previewId) {
+  const file = input.files?.[0];
+  const preview = document.getElementById(previewId);
+
+  if (!file) {
+    preview.style.display = "none";
+    preview.src = "";
+    return;
+  }
+
+  preview.src = URL.createObjectURL(file);
+  preview.style.display = "block";
+}
+
+// event
+document.getElementById("add_foto").addEventListener("change", function () {
+  previewImage(this, "preview_add_foto");
+});
+
+document.getElementById("edit_foto").addEventListener("change", function () {
+  previewImage(this, "preview_edit_foto");
+});
+
+async function uploadFotoPenasehat(file, id_penasehat) {
+  try {
+    const ext = file.name.split('.').pop();
+    const fileName = `${id_penasehat}-${Date.now()}.${ext}`;
+
+    const { error } = await supabaseClient.storage
+      .from('penasehat')
+      .upload(fileName, file, { upsert: true });
+
+    if (error) throw error;
+
+    const { data } = supabaseClient.storage
+      .from('penasehat')
+      .getPublicUrl(fileName);
+
+    return data.publicUrl;
+
+  } catch (err) {
+    console.error("Upload gagal:", err);
+    return null;
+  }
+}
 
 // ========== EDIT ==========
 function handleEditPenasehat(btn) {
@@ -7924,6 +8332,20 @@ function openEditPenasehat(id) {
   set("Status", p.Status);
   set("Status_Bisyaroh", p.Status_Bisyaroh);
 
+  // 🔥 TAMBAHAN INI (WAJIB)
+  const preview = document.getElementById("preview_edit_foto");
+  const inputFile = document.getElementById("edit_foto");
+
+  inputFile.value = ""; // reset file input
+
+  if (p.foto_url) {
+    preview.src = p.foto_url;
+    preview.style.display = "block";
+  } else {
+    preview.src = "";
+    preview.style.display = "none";
+  }
+
   document.getElementById("penasehatEditModal").style.display = "block";
 }
 
@@ -7935,7 +8357,9 @@ document.getElementById("penasehatEditForm").addEventListener("submit", async (e
   e.preventDefault();
 
   const id = document.getElementById("edit_id").value;
-  const data = {
+  const id_penasehat = document.getElementById("edit_id_penasehat").value;
+
+  let data = {
     Nama: document.getElementById("edit_Nama").value.trim(),
     Status_Penasehat: document.getElementById("edit_Status_Penasehat").value,
     Status_Pengajar: document.getElementById("edit_Status_Pengajar").value,
@@ -7943,23 +8367,34 @@ document.getElementById("penasehatEditForm").addEventListener("submit", async (e
     Mutakhorijin: document.getElementById("edit_Mutakhorijin").value,
     Hp: document.getElementById("edit_Hp").value,
     Mulai_Ngabdi: document.getElementById("edit_Mulai_Ngabdi").value || null,
-    id_penasehat: document.getElementById("edit_id_penasehat").value,
+    id_penasehat,
     Status: document.getElementById("edit_Status").value,
     Status_Bisyaroh: document.getElementById("edit_Status_Bisyaroh").value,
   };
 
+  const file = document.getElementById("edit_foto").files?.[0];
+  if (file) {
+    const foto_url = await uploadFotoPenasehat(file, id_penasehat);
+    if (foto_url) data.foto_url = foto_url;
+  }
+
   try {
-    const { error } = await supabaseClient.from("penasehat").update(data).eq("id", id);
+    const { error } = await supabaseClient
+      .from("penasehat")
+      .update(data)
+      .eq("id", id);
+
     if (error) throw error;
-    showToast("✅ Data penasehat diperbarui!");
+
+    showToast("✅ Update berhasil!");
     closePenasehatEditModal();
     await loadPenasehat();
+
   } catch (err) {
     console.error(err);
-    showToast("❌ Gagal memperbarui data.", true);
+    showToast("❌ Gagal update", true);
   }
 });
-
 
 
 // ===========================
@@ -12760,6 +13195,249 @@ function applyFilterHP() {
     row.style.display = text.includes(key) ? "" : "none";
   });
 }
+
+
+let pondokData = [];
+let currentPage = 1;
+let totalData = 0;
+let currentSearch = '';
+
+async function loadSinkronData(page = 1) {
+  currentPage = page;
+
+  let query = supabaseClient
+    .from('pondok_induk')
+    .select('*', { count: 'exact' });
+
+  // 🔍 SEARCH SERVER SIDE
+  if (currentSearch) {
+    query = query.or(
+      `nama_lengkap.ilike.%${currentSearch}%,stambuk.ilike.%${currentSearch}%`
+    );
+  }
+
+  // 📄 PAGINATION
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  const { data, error, count } = await query
+    .order('nama_lengkap')
+    .range(from, to)
+	.limit(pageSize);
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  totalData = count || 0;
+
+  renderPondokTable(data);
+  renderPagination();
+}
+
+function renderPondokTable(data) {
+  const tbody = document.querySelector('#pondok-table tbody');
+  const countEl = document.getElementById('pondok-count');
+
+  tbody.innerHTML = '';
+
+  // 🔢 total data
+  countEl.textContent = `Total: ${totalData} data (Halaman ${currentPage})`;
+
+  data.forEach(row => {
+    const tr = document.createElement('tr');
+
+    tr.innerHTML = `
+      <td>${row.nama_lengkap || ''}</td>
+      <td>${row.kelas || ''}</td>
+      <td>${row.bagian || ''}</td>
+      <td>${row.stambuk || ''}</td>
+      <td>${row.asal_daerah || ''}</td>
+      <td>${row.himpunan || ''}</td>
+      <td>${row.kamar || ''}</td>
+      <td>${row.tgl_lahir || ''}</td>
+      <td>${row.kategori || ''}</td>
+    `;
+
+    // 🖱️ tooltip
+    tr.title = "Double klik untuk lihat / insert";
+
+    // 📱 efek sentuh HP
+    tr.addEventListener('touchstart', () => {
+      tr.style.backgroundColor = '#f5faff';
+    });
+
+    tr.addEventListener('touchend', () => {
+      tr.style.backgroundColor = '';
+    });
+
+    // 🖱️ double klik
+    tr.ondblclick = () => openPondokModal(row);
+
+    tbody.appendChild(tr);
+  });
+}
+
+async function openPondokModal(row) {
+  document.getElementById('pondokModal').style.display = 'block';
+
+  const btnInsert = document.getElementById('btnInsertSantri');
+  const statusEl = document.getElementById('pondokStatus');
+
+  // 🔥 RESET TOTAL SETIAP BUKA MODAL
+  btnInsert.disabled = false;
+  btnInsert.textContent = 'Masukkan ke Santri';
+  btnInsert.style.display = 'inline-block';
+  btnInsert.onclick = null;
+
+  // isi data
+  document.getElementById('pondokNama').textContent = row.nama_lengkap || '-';
+  document.getElementById('pondokStambuk').textContent = 'Stambuk: ' + (row.stambuk || '-');
+
+  // jika stambuk kosong
+  if (!row.stambuk) {
+    statusEl.textContent = 'Stambuk kosong!';
+    statusEl.className = 'status-belum';
+    btnInsert.style.display = 'none';
+    return;
+  }
+
+  // 🔍 CEK KE DATABASE
+  const { data, error } = await supabaseClient
+    .from('santri_kharisma')
+    .select('id')
+    .eq('Stambuk', row.stambuk)
+    .maybeSingle();
+
+  if (error) {
+    console.error(error);
+    statusEl.textContent = 'Error cek data!';
+    statusEl.className = 'status-belum';
+    btnInsert.style.display = 'none';
+    return;
+  }
+
+  if (data) {
+    // ✅ SUDAH ADA
+    statusEl.textContent = '✔ Santri SUDAH ada di Kharisma';
+    statusEl.className = 'status-ada';
+    btnInsert.style.display = 'none';
+  } else {
+    // ❌ BELUM ADA
+    statusEl.textContent = '✖ Santri BELUM ada di KHARISMA';
+    statusEl.className = 'status-belum';
+    btnInsert.style.display = 'inline-block';
+
+    // klik tombol
+    btnInsert.onclick = function () {
+      insertSantri(row);
+    };
+  }
+}
+
+let searchTimeout;
+
+document.getElementById('searchPondok').addEventListener('input', function () {
+  clearTimeout(searchTimeout);
+
+  searchTimeout = setTimeout(() => {
+    currentSearch = this.value.trim();
+    loadSinkronData(1);
+  }, 400);
+});
+
+function renderPagination() {
+  const container = document.getElementById('pondok-pagination');
+  container.innerHTML = '';
+
+  const totalPage = Math.ceil(totalData / pageSize);
+
+  const maxButton = 5; // tampil 5 tombol saja
+  let start = Math.max(1, currentPage - 2);
+  let end = Math.min(totalPage, start + maxButton - 1);
+
+  if (end - start < maxButton - 1) {
+    start = Math.max(1, end - maxButton + 1);
+  }
+
+  // tombol sebelumnya
+  if (currentPage > 1) {
+    const prev = document.createElement('button');
+    prev.textContent = '«';
+    prev.onclick = () => loadSinkronData(currentPage - 1);
+    container.appendChild(prev);
+  }
+
+  for (let i = start; i <= end; i++) {
+    const btn = document.createElement('button');
+    btn.textContent = i;
+
+    if (i === currentPage) {
+      btn.style.background = '#007bff';
+      btn.style.color = 'white';
+    }
+
+    btn.onclick = () => loadSinkronData(i);
+    container.appendChild(btn);
+  }
+
+  // tombol selanjutnya
+  if (currentPage < totalPage) {
+    const next = document.createElement('button');
+    next.textContent = '»';
+    next.onclick = () => loadSinkronData(currentPage + 1);
+    container.appendChild(next);
+  }
+}
+
+async function insertSantri(row) {
+  const btn = document.getElementById('btnInsertSantri');
+
+  // 🔒 cegah double klik
+  if (btn.disabled) return;
+
+  btn.disabled = true;
+  btn.textContent = 'Menyimpan...';
+
+  const { error } = await supabaseClient
+    .from('santri_kharisma')
+    .insert([
+      {
+        "Stambuk": row.stambuk
+      }
+    ]);
+
+  if (error) {
+    console.error(error);
+    showToast('Gagal / kemungkinan sudah ada', 'error');
+
+    btn.disabled = false;
+    btn.textContent = 'Masukkan ke Santri';
+    return;
+  }
+
+  // ✅ sukses
+  showToast('Berhasil masuk ke Kharisma');
+
+  // 🔥 UPDATE STATUS TANPA RELOAD MODAL
+  const statusEl = document.getElementById('pondokStatus');
+
+  statusEl.textContent = '✔ Santri SUDAH ada di Kharisma';
+  statusEl.className = 'status-ada';
+
+  btn.style.display = 'none';
+
+  // ⏱️ tutup otomatis
+  setTimeout(() => {
+    closePondokModal();
+  }, 1500);
+}
+
+function closePondokModal() {
+  document.getElementById('pondokModal').style.display = 'none';
+}
+
 
 /* =====================================================
    🔄 PWA UPDATE HANDLER (FINAL & BULLETPROOF)

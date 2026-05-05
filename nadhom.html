@@ -26,11 +26,6 @@
   <meta name="theme-color" content="#1a73e8">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
 
- <script src="/libs/pdf-lib.min.js"></script>
-<script src="/libs/fontkit.umd.min.js"></script>
-<script src="/libs/arabic-reshaper.js"></script>
-<script src="/libs/bidi.min.js"></script>
-
 
   <style>
   
@@ -2807,10 +2802,9 @@ document.addEventListener("click", (e) => {
   // ===================== KELAS PER KATEGORI =====================
   const kelasPagi = [
     'IV Ibtidaiyah', 'V Ibtidaiyah', 'VI Ibtidaiyah',
-    'I Tsanawiyah', 'II Tsanawiyah', "I'dadiyah I", "I'dadiyah II"
+    'I Tsanawiyah', 'II Tsanawiyah', 'III Tsanawiyah', "I'dadiyah I", "I'dadiyah II"
   ];
-  const kelasMalam = [
-    'III Tsanawiyah',
+  const kelasMalam = [    
     'I Aliyah', 'II Aliyah', 'III Aliyah',
     "I-II Ma'had Aly", "III-IV Ma'had Aly", "V-VI Ma'had Aly", "I'dadiyah III"
   ];
@@ -4140,10 +4134,9 @@ document.addEventListener('DOMContentLoaded', () => {
 // daftar kelas per kategori
 const kelasPagi = [
   'IV Ibtidaiyah', 'V Ibtidaiyah', 'VI Ibtidaiyah',
-  'I Tsanawiyah', 'II Tsanawiyah', "I'dadiyah I", "I'dadiyah II"
+  'I Tsanawiyah', 'II Tsanawiyah', 'III Tsanawiyah', "I'dadiyah I", "I'dadiyah II"
 ];
-const kelasMalam = [
-  'III Tsanawiyah',
+const kelasMalam = [  
   'I Aliyah', 'II Aliyah', 'III Aliyah',
   "I-II Ma'had Aly", "III-IV Ma'had Aly", "V-VI Ma'had Aly", "I'dadiyah III"
 ];
@@ -4907,147 +4900,6 @@ function isNadhomKitab(judulKitab) {
   return KITAB_NADHOM.includes(judulKitab);
 }
 
-let __arabicLibPromise = null;
-
-function loadScriptOnce(src) {
-  return new Promise((resolve, reject) => {
-    if ([...document.scripts].some(s => s.src.includes(src) || s.getAttribute("src") === src)) {
-      return resolve();
-    }
-    const s = document.createElement("script");
-    s.src = src;
-    s.async = true;
-    s.onload = resolve;
-    s.onerror = () => reject(new Error("Gagal load " + src));
-    document.head.appendChild(s);
-  });
-}
-
-function ensureArabicLibs() {
-  // Simple: only load reshaper. Bidi is handled by simple reverse.
-  if (window.ArabicReshaper) return Promise.resolve();
-
-  return new Promise(async (resolve, reject) => {
-    try {
-      // Coba load local relative
-      await loadScriptOnce("libs/arabic-reshaper.js");
-      resolve();
-    } catch (e) {
-      console.warn("Gagal load arabic-reshaper local, trying CDN:", e);
-      try {
-         // Fallback CDN
-         await loadScriptOnce("https://cdn.jsdelivr.net/npm/arabic-reshaper@2.0.1/index.min.js");
-         resolve();
-      } catch (e2) {
-         console.warn("CDN failed too:", e2);
-         resolve(); // Tetap lanjut
-      }
-    }
-  });
-}
-
-function reverseString(str) {
-  return str.split("").reverse().join("");
-}
-
-
-function containsArabic(text = "") {
-  return /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/.test(text);
-}
-
-// 4) Small adapter: try multiple API shapes (sync)
-function fixArabicRawUsingAvailableAPI(txt) {
-  if (!txt) return "";
-  try {
-    if (window.ArabicReshaper && typeof window.ArabicReshaper.convertArabic === 'function') {
-      return window.ArabicReshaper.convertArabic(txt);
-    }
-    if (window.ArabicReshaper && typeof window.ArabicReshaper.reshape === 'function') {
-      return window.ArabicReshaper.reshape(txt);
-    }
-    if (window.ArabicReshaper && typeof window.ArabicReshaper === 'function') {
-      return window.ArabicReshaper(txt);
-    }
-  } catch (e) {
-    console.warn('reshaper API error', e);
-  }
-  return txt;
-}
-function applyBidiIfAvailable(shaped) {
-  if (!shaped) return shaped;
-  try {
-    if (window.Bidi && typeof window.Bidi === 'function') {
-      const b = new window.Bidi();
-      if (typeof b.setLine === 'function' && typeof b.getText === 'function') {
-        b.setLine(shaped);
-        return b.getText();
-      }
-      if (typeof b.reorderVisually === 'function') {
-        return b.reorderVisually(shaped);
-      }
-    }
-    if (window.Bidi && typeof window.Bidi.reorderVisually === 'function') {
-      return window.Bidi.reorderVisually(shaped);
-    }
-  } catch (e) {
-    console.warn('bidi API error', e);
-  }
-  return shaped;
-}
-
-function fixArabicSync(text) {
-  if (!text) return "";
-
-  let shaped = text;
-
-  try {
-    // 1. Reshape (Connect letters)
-    if (window.ArabicReshaper && typeof window.ArabicReshaper.convertArabic === 'function') {
-      shaped = window.ArabicReshaper.convertArabic(shaped);
-    }
-  } catch (e) {
-    console.warn("Reshape error:", e);
-  }
-
-  // 2. Reverse (Simple Bidi)
-  return reverseString(shaped);
-}
-
-async function fixArabicForPDFAsync(text) {
-  if (!text) return "";
-
-  try {
-    await ensureArabicLibs();
-    return fixArabicSync(text);
-  } catch (e) {
-    console.warn("fixArabicForPDFAsync fallback:", e);
-    return text;
-  }
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  // --- IMMEDIATE LOAD ARABIC RESHAPER ---
-  // Kita inject script global agar tersedia saat downloadPDFHarian dipanggil
-  if (!window.ArabicReshaper) {
-     const s = document.createElement("script");
-     s.src = "https://cdn.jsdelivr.net/npm/arabic-reshaper@2.0.1/index.min.js";
-     s.onload = () => console.log("Arabic Reshaper CDN loaded");
-     s.onerror = (e) => console.warn("Arabic Reshaper CDN failed", e);
-     document.head.appendChild(s);
-  }
-
-  try {
-    if (!window.PDFLib || !window.fontkit) return;
-    const PDFDocument = window.PDFLib.PDFDocument;
-    if (PDFDocument?.registerFontkit) {
-      PDFDocument.registerFontkit(window.fontkit);
-      console.log("Fontkit registered");
-    }
-  } catch (e) {
-    console.error("Fontkit register error:", e);
-  }
-});
-
 async function drawPDFHeader(doc) {
   const marginX = 36;
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -5102,134 +4954,48 @@ async function drawPDFHeader(doc) {
   doc.text("LAPORAN SETORAN HARIAN", pageWidth / 2, 82, { align: "center" });
 }
 
+
+
 async function downloadPDFHarian() {
-  const btn = document.getElementById("btnDownloadHarian");
-  if (btn) {
-    btn.classList.add("downloading");
-    btn.setAttribute("aria-disabled", "true");
+  // 🔹 ambil data tabel
+  const rows = []
+
+  document.querySelectorAll(".table-container tbody tr").forEach(tr => {
+    const tds = tr.querySelectorAll("td")
+
+    rows.push({
+      nama: tds[0]?.innerText || "",
+      kelas: tds[1]?.innerText || "",
+      setoran: tds[2]?.innerText || ""
+    })
+  })
+
+  // 🔹 invoke function
+  const res = await fetch(
+    `${SUPABASE_URL}/functions/v1/generate-pdf`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${SUPABASE_KEY}`
+      },
+      body: JSON.stringify({ rows })
+    }
+  )
+
+  if (!res.ok) {
+    throw new Error("Gagal generate PDF")
   }
 
-  try {
-    // === PASTIKAN html2canvas ===
-    if (!window.html2canvas) {
-      await new Promise(r => {
-        const s = document.createElement("script");
-        s.src = "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js";
-        s.onload = r;
-        document.head.appendChild(s);
-      });
-    }
+  // 🔥 penting: ambil sebagai blob
+  const blob = await res.blob()
 
-    // === PASTIKAN jsPDF ===
-    if (!window.jspdf) {
-      await new Promise(r => {
-        const s = document.createElement("script");
-        s.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
-        s.onload = r;
-        document.head.appendChild(s);
-      });
-    }
-
-    const { jsPDF } = window.jspdf;
-
-    // === TARGET TABEL HARIAN ===
-    const originalElement = document.querySelector(".table-container");
-    if (!originalElement) throw new Error("Data tabel tidak ditemukan");
-
-    // === CLONE UNTUK CAPTURE ===
-    const clone = originalElement.cloneNode(true);
-    clone.style.width = "1580px";
-    clone.style.padding = "20px";
-    clone.style.background = "white";
-    clone.style.position = "absolute";
-    clone.style.top = "-9999px";
-    clone.style.left = "0";
-
-    // === HAPUS BUTTON / AKSI ===
-    clone.querySelectorAll("button, .btn-download-all, .action-buttons")
-      .forEach(el => el.remove());
-
-    document.body.appendChild(clone);
-
-    // === CAPTURE ===
-    const canvas = await html2canvas(clone, {
-      scale: 2,
-      useCORS: true,
-      logging: false,
-      windowWidth: 1600,
-      width: 1580
-    });
-
-    document.body.removeChild(clone);
-
-    const imgData = canvas.toDataURL("image/jpeg", 0.9);
-
-    // === PDF A3 LANDSCAPE ===
-    const pdf = new jsPDF({
-      orientation: "landscape",
-      unit: "px",
-      format: "a3",
-      compress: true
-    });
-
-    // === HEADER (SAMA PERSIS DENGAN downloadPDFAll) ===
-    await drawPDFHeader(pdf);
-
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
-
-    const imgWidth = canvas.width;
-    const imgHeight = canvas.height;
-    const ratio = pdfWidth / imgWidth;
-    const imgRenderHeight = imgHeight * ratio;
-
-    let heightLeft = imgRenderHeight;
-    let position = 110; // 🔽 aman, tidak tabrak header
-
-    // === PAGE 1 ===
-    pdf.addImage(imgData, "JPEG", 0, position, pdfWidth, imgRenderHeight);
-    heightLeft -= pdfHeight;
-
-    // === PAGE SELANJUTNYA ===
-    while (heightLeft > 0) {
-      pdf.addPage();
-      await drawPDFHeader(pdf); // header ulang tiap halaman
-      position = heightLeft - imgRenderHeight + 110;
-      pdf.addImage(imgData, "JPEG", 0, position, pdfWidth, imgRenderHeight);
-      heightLeft -= pdfHeight;
-    }
-
-    // === FOOTER (SAMA DENGAN downloadPDFAll) ===
-    const totalPages = pdf.internal.getNumberOfPages();
-    pdf.setPage(totalPages);
-    pdf.setFont("helvetica", "italic");
-    pdf.setFontSize(9);
-    pdf.setTextColor(120);
-    pdf.text(
-      `Admin – Simponi Kharisma – ${new Date().toLocaleString("id-ID")}`,
-      pdfWidth - 36,
-      pdfHeight - 30,
-      { align: "right" }
-    );
-
-    // === SIMPAN ===
-    pdf.save(`Rekap_Setoran_Harian_${new Date().toISOString().slice(0,10)}.pdf`);
-
-    if (btn) {
-      btn.classList.remove("downloading");
-      btn.classList.add("complete");
-      setTimeout(() => btn.classList.remove("complete"), 600);
-      btn.removeAttribute("aria-disabled");
-    }
-
-  } catch (err) {
-    console.error("downloadPDFHarian error:", err);
-    alert("Gagal membuat PDF: " + err.message);
-    if (btn) {
-      btn.classList.remove("downloading");
-      btn.removeAttribute("aria-disabled");
-    }
-  }
+  // 🔹 download
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement("a")
+  a.href = url
+  a.download = "laporan.pdf"
+  a.click()
 }
 
 (function ensureHarianButtonExists() {
