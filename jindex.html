@@ -2870,6 +2870,36 @@ button:active {
   margin: 10px 0;
 }
 
+.penasehat-preview-modal{
+  display:none;
+  position:fixed;
+  z-index:99999;
+  left:0;
+  top:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.92);
+
+  justify-content:center;
+  align-items:center;
+}
+
+.penasehat-preview-image{
+  max-width:95%;
+  max-height:95%;
+  object-fit:contain;
+  border-radius:12px;
+}
+
+.penasehat-preview-close{
+  position:absolute;
+  top:15px;
+  right:25px;
+  color:#fff;
+  font-size:42px;
+  font-weight:bold;
+  cursor:pointer;
+}
   </style>
 </head>
 <body>
@@ -3985,6 +4015,19 @@ button:active {
   </div>
 </div>
 
+<!-- Modal Preview Foto Penasehat -->
+<div id="penasehatPreviewModal" class="penasehat-preview-modal">
+
+  <span class="penasehat-preview-close"
+        onclick="closePenasehatPreview()">
+    &times;
+  </span>
+
+  <img id="penasehatPreviewImage"
+       class="penasehat-preview-image"
+       src="">
+</div>
+
 </body>
   <script>
    
@@ -4529,27 +4572,58 @@ function createSantriCard(santri) {
     }
   `;
 
-  // ==== FITUR DOUBLE TAP UNTUK SCREENSHOT (KHUSUS HP) ====
-  let lastTap = 0;
-  card.addEventListener('touchend', function(e) {
-    const currentTime = new Date().getTime();
-    const tapLength = currentTime - lastTap;
+  // ==== FITUR KLIK TAHAN LAMA UNTUK SCREENSHOT ====
+let pressTimer;
+let isLongPress = false;
 
-    if (tapLength < 500 && tapLength > 0) {
-      // Double tap terdeteksi!
-      e.preventDefault(); // cegah aksi klik biasa
-      e.stopPropagation(); // agar tidak trigger selectSantri
+// HP (touch)
+card.addEventListener('touchstart', function(e) {
+  isLongPress = false;
 
-      screenshotCard(card, santri.Nama_Lengkap || 'santri');
-    }
-    lastTap = currentTime;
-  });
+  pressTimer = setTimeout(() => {
+    isLongPress = true;
 
-  // Opsional: double click di desktop (mouse)
-  card.addEventListener('dblclick', function(e) {
-    e.preventDefault();
+    // getar kecil jika support
+    if (navigator.vibrate) navigator.vibrate(50);
+
     screenshotCard(card, santri.Nama_Lengkap || 'santri');
-  });
+  }, 700); // 700ms tahan
+});
+
+card.addEventListener('touchend', function() {
+  clearTimeout(pressTimer);
+});
+
+card.addEventListener('touchmove', function() {
+  clearTimeout(pressTimer);
+});
+
+// Desktop (mouse)
+card.addEventListener('mousedown', function() {
+  isLongPress = false;
+
+  pressTimer = setTimeout(() => {
+    isLongPress = true;
+    screenshotCard(card, santri.Nama_Lengkap || 'santri');
+  }, 700);
+});
+
+card.addEventListener('mouseup', function() {
+  clearTimeout(pressTimer);
+});
+
+card.addEventListener('mouseleave', function() {
+  clearTimeout(pressTimer);
+});
+
+// Cegah klik biasa setelah long press
+card.addEventListener('click', function(e) {
+  if (isLongPress) {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  }
+});
 
   return card;
 }
@@ -8140,7 +8214,11 @@ function showPenasehatDetail(id) {
 
   const html = `
     <div class="detail-header">
-      <img src="${p.foto_url || 'default.png'}">
+      <img 
+		  src="${p.foto_url || 'default.png'}"
+		  onclick="openPenasehatPreview('${p.foto_url || 'default.png'}')"
+		  style="cursor:pointer"
+		>
       <h3>${p.Nama || '-'}</h3>
     </div>
 
@@ -8150,8 +8228,8 @@ function showPenasehatDetail(id) {
         <span>Organisasi</span>
         <span>${p.Status_Penasehat || '-'}</span>
       </div>
-	  
-	  <div class="detail-divider"></div>
+
+      <div class="detail-divider"></div>
 
       <div class="detail-row">
         <span>Pengajar</span>
@@ -8164,15 +8242,15 @@ function showPenasehatDetail(id) {
         <span>Unit</span>
         <span>${p.referensi_unit_ndalem?.Nama_Unit || p.Kode_Unit || '-'}</span>
       </div>
-	  
-	  <div class="detail-divider"></div>
+
+      <div class="detail-divider"></div>
 
       <div class="detail-row">
         <span>Mutakhorijin</span>
         <span>${p.Mutakhorijin || '-'}</span>
       </div>
-	  
-	  <div class="detail-divider"></div>
+
+      <div class="detail-divider"></div>
 
       <div class="detail-row">
         <span>Masa Khidmah</span>
@@ -8183,23 +8261,33 @@ function showPenasehatDetail(id) {
 
       <div class="detail-row">
         <span>HP</span>
-        <span>${p.Hp ? `<a href="https://wa.me/${p.Hp.replace(/\D/g, "")}" target="_blank">${p.Hp}</a>` : '-'}</span>
+        <span>
+          ${p.Hp
+            ? `<a href="https://wa.me/${p.Hp.replace(/\D/g, "")}" target="_blank">${p.Hp}</a>`
+            : '-'}
+        </span>
       </div>
 
       <div class="detail-row">
         <span>Status</span>
         <span>${p.Status || '-'}</span>
-      </div>      
+      </div>
 
     </div>
   `;
 
   document.getElementById("penasehatDetailContent").innerHTML = html;
-  document.getElementById("penasehatDetailModal").style.display = "block";
+
+  const modal = document.getElementById("penasehatDetailModal");
+  modal.style.display = "block";
+
+  // Tambahkan state history
+  history.pushState({ modalOpen: true }, "");
 }
 
 function closePenasehatDetail() {
-  document.getElementById("penasehatDetailModal").style.display = "none";
+  const modal = document.getElementById("penasehatDetailModal");
+  modal.style.display = "none";
 }
 
 window.addEventListener("click", function(e) {
@@ -8208,6 +8296,49 @@ window.addEventListener("click", function(e) {
     modal.style.display = "none";
   }
 });
+
+window.addEventListener("popstate", function() {
+
+  const previewModal = document.getElementById("penasehatPreviewModal");
+  const detailModal = document.getElementById("penasehatDetailModal");
+
+  // jika preview terbuka
+  if (previewModal &&
+      previewModal.style.display === "flex") {
+
+    previewModal.style.display = "none";
+  }
+
+  // tutup juga modal detail
+  if (detailModal &&
+      detailModal.style.display === "block") {
+
+    detailModal.style.display = "none";
+  }
+});
+
+
+function openPenasehatPreview(src) {
+
+  const modal = document.getElementById("penasehatPreviewModal");
+  const img = document.getElementById("penasehatPreviewImage");
+
+  if (!modal || !img) return;
+
+  img.src = src;
+  modal.style.display = "flex";
+
+  history.pushState({ penasehatPreview: true }, "");
+}
+
+function closePenasehatPreview() {
+
+  const modal = document.getElementById("penasehatPreviewModal");
+
+  if (modal) {
+    modal.style.display = "none";
+  }
+}
 
 // ========== TAMBAH ==========
 function openAddPenasehat() {
