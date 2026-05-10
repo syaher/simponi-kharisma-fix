@@ -191,7 +191,6 @@
       background: #f8fafc;
     }
     
-    /* Grade Styles baru sesuai permintaan */
     .grade-JydI { background: #10b981; color: white; padding: 4px 10px; border-radius: 20px; display: inline-block; font-weight: bold; font-size: 0.75rem; }
     .grade-JydII { background: #3b82f6; color: white; padding: 4px 10px; border-radius: 20px; display: inline-block; font-weight: bold; font-size: 0.75rem; }
     .grade-MwtI { background: #eab308; color: white; padding: 4px 10px; border-radius: 20px; display: inline-block; font-weight: bold; font-size: 0.75rem; }
@@ -202,12 +201,9 @@
     .nilai-badge { background: #e0e7ff; display: inline-block; padding: 3px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; margin: 2px; }
     
     .aksi-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
-    .btn-edit {  border: none; cursor: pointer; padding: 4px 8px; border-radius: 20px; font-size: 0.7rem; }
-    .btn-edit { background: #3b82f6; color: white; }
-	  .btn-delete {  border: none; cursor: pointer; padding: 4px 8px; border-radius: 20px; font-size: 0.7rem; }
-    .btn-delete { background: #ef4444; color: white; }
+    .btn-edit { border: none; cursor: pointer; padding: 4px 8px; border-radius: 20px; font-size: 0.7rem; background: #3b82f6; color: white; }
+    .btn-delete { border: none; cursor: pointer; padding: 4px 8px; border-radius: 20px; font-size: 0.7rem; background: #ef4444; color: white; }
     
-    /* Tally Counter (UBK) */
     .tally-counter {
       background: #fef3c7;
       border-radius: 16px;
@@ -276,7 +272,6 @@
     .tally-btn-sub { background: #ef4444; color: white; }
     .tally-btn-reset { background: #6b7280; color: white; }
     
-    /* Nilai Tambahan UBK */
     .nilai-tambahan-box {
       background: #e0e7ff;
       border-radius: 16px;
@@ -290,7 +285,7 @@
     .tambahan-field label { font-size: 0.7rem; font-weight: 600; color: #1e40af; display: block; margin-bottom: 4px; }
     .tambahan-field select, .tambahan-field input { width: 100%; padding: 10px 12px; border: 1px solid #c7d2fe; border-radius: 12px; font-size: 0.85rem; background: white; }
     
-    /* UBQ Scoring Area Tiga Komponen dengan Grade baru */
+    /* UBQ Scoring Area */
     .ubq-scoring-area {
       background: linear-gradient(135deg, #ecfdf5, #d1fae5);
       border-radius: 16px;
@@ -512,120 +507,6 @@
     .pagination-controls button.active { background: #1a73e8; color: white; border-color: #1a73e8; }
     .pagination-controls button:disabled { opacity: 0.5; cursor: not-allowed; }
     
-    .kitab-library-container {
-      background: linear-gradient(145deg, #e8eef5 0%, #dce3ec 100%);
-      border-radius: 20px;
-      padding: 20px;
-      min-height: 70vh;
-    }
-    .library-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-    .library-title { font-size: 1.3rem; font-weight: 700; color: #1e293b; }
-    .library-actions button {
-      background: #1a73e8;
-      color: white;
-      border: none;
-      padding: 8px 20px;
-      border-radius: 40px;
-      cursor: pointer;
-    }
-    .kitab-shelf {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 20px;
-      margin-top: 20px;
-      max-height: 550px;
-      overflow-y: auto;
-      padding: 10px;
-    }
-    .kitab-card {
-      background: white;
-      border-radius: 12px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      position: relative;
-    }
-    .kitab-card:hover { transform: translateY(-5px); }
-    .kitab-cover {
-      background: linear-gradient(135deg, #2d3a4a, #1a2533);
-      padding: 30px 15px;
-      text-align: center;
-    }
-    .kitab-cover i { font-size: 48px; color: #e2e8f0; }
-    .kitab-cover .kitab-nama { color: white; font-size: 0.9rem; margin-top: 10px; font-family: 'Amiri', serif; }
-    .kitab-delete {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      background: rgba(239,68,68,0.9);
-      color: white;
-      border: none;
-      border-radius: 20px;
-      width: 28px;
-      height: 28px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-    }
-    .kitab-card:hover .kitab-delete { opacity: 1; }
-    
-    .reader-container { position: relative; overflow: hidden; }
-    .reader-nav {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 20px;
-      margin-top: 20px;
-      padding: 12px 20px;
-      background: #1e293b;
-      border-radius: 60px;
-      flex-wrap: wrap;
-    }
-    .reader-nav button {
-      background: #1a73e8;
-      color: white;
-      border: none;
-      padding: 10px 28px;
-      border-radius: 40px;
-      cursor: pointer;
-      font-weight: 600;
-    }
-    .reader-nav button:disabled { background: #64748b; cursor: not-allowed; }
-    .reader-tools {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      margin-top: 15px;
-      flex-wrap: wrap;
-    }
-    .reader-tools select, .reader-tools input {
-      padding: 8px 16px;
-      border-radius: 40px;
-      border: none;
-      background: white;
-      font-size: 0.85rem;
-    }
-    .back-to-library {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: #1e293b;
-      color: white;
-      padding: 8px 20px;
-      border-radius: 40px;
-      margin-bottom: 20px;
-      cursor: pointer;
-    }
     .app-footer {
       background: #ffffff;
       padding: 1rem 0.75rem;
@@ -636,8 +517,6 @@
       gap: 0.75rem;
       margin-top: 1.5rem;
     }
-    #mainPage { width: 100%; }
-    .row-utama { cursor: pointer; }
     
     @media (max-width: 768px) {
       .module-container { padding: 12px; }
@@ -647,26 +526,9 @@
       .tally-display { font-size: 1.2rem; letter-spacing: 3px; }
       .tally-marks { font-size: 1rem; letter-spacing: 3px; }
       .grade-letter, .ubq-grade-letter { font-size: 1rem; padding: 4px 10px; }
+      .asiliah-table, .asiliah-table th, .asiliah-table td { font-size: 0.7rem !important; }
+      .asiliah-table th, .asiliah-table td { padding: 8px 6px !important; }
     }
-	
-	/* Perbaikan font As'ilah di HP */
-@media (max-width: 768px) {
-  .asiliah-table,
-  .asiliah-table th,
-  .asiliah-table td {
-    font-size: 0.7rem !important;
-  }
-  
-  .asiliah-table th,
-  .asiliah-table td {
-    padding: 8px 6px !important;
-  }
-  
-  .asiliah-table td span {
-    font-size: 0.65rem !important;
-    padding: 2px 8px !important;
-  }
-}
   </style>
 </head>
 <body>
@@ -681,7 +543,6 @@
   <div class="main-tabs">
     <button class="main-tab active" data-panel="ubk-panel">📘 UBK</button>
     <button class="main-tab" data-panel="ubq-panel">🕋 UBQ</button>
-    <button class="main-tab" data-panel="kitab-panel">📚 Perpustakaan Kitab</button>
   </div>
 
   <!-- UBK PANEL -->
@@ -727,11 +588,6 @@
     <div id="paginationUbqSoal" class="pagination"></div>
   </div>
 </div>
-
-  <!-- KITAB PANEL -->
-  <div id="kitab-panel" class="main-panel">
-    <div class="kitab-library-container"><div id="libraryView"><div class="library-header"><div class="library-title">📚 Pustaka Kitab Digital</div><div class="library-actions"><button id="uploadKitabBtn" class="admin-only" onclick="uploadKitabToSupabase()"><i class="material-icons">upload</i> Upload PDF</button><button onclick="refreshKitabList()"><i class="material-icons">refresh</i> Refresh</button></div></div><div class="filter-row"><div class="filter-group"><label>🔍 Cari Kitab</label><input type="text" id="searchKitabInput" placeholder="Cari nama kitab..." oninput="filterKitabList()"></div></div><div id="kitabShelf" class="kitab-shelf"><div style="text-align:center;padding:40px;">⏳ Memuat data...</div></div></div><div id="readerView" style="display:none;"><button class="back-to-library" onclick="showLibraryView()"><i class="material-icons">arrow_back</i> Kembali ke Pustaka</button><div class="flip-reader-container"><div class="reader-container"><canvas id="mainPage"></canvas></div><div class="reader-nav"><button id="prevBtn" onclick="prevPage()" disabled><i class="material-icons">chevron_left</i></button><span id="pageIndicator">0 / 0</span><button id="nextBtn" onclick="nextPage()" disabled><i class="material-icons">chevron_right</i></button></div><div class="reader-tools"><select id="readerZoom" onchange="changeZoom()"><option value="1.5">Zoom 100%</option><option value="2">Zoom 130%</option><option value="2.5">Zoom 160%</option></select></div></div></div></div>
-  </div>
 </div>
 
 <!-- MODAL NILAI -->
@@ -746,8 +602,6 @@
 
 <!-- MODAL SOAL -->
 <div id="modalSoal" class="crud-modal"><div class="crud-modal-content"><span class="crud-close" onclick="closeModalSoal()">&times;</span><h3 id="modalSoalTitle">Tambah Soal</h3><form id="formSoal" class="crud-form"><input type="hidden" id="soalId"><input type="hidden" id="soalJenis"><label>Kategori</label><select id="soalKategori" required><option value="">-- Pilih Kategori --</option><option value="Umum">Umum</option><option value="Tajwid">Tajwid</option><option value="Nahwu">Nahwu</option><option value="Shorof">Shorof</option><option value="Fikih">Fikih</option></select><label>Soal *</label><textarea id="soalPertanyaan" required placeholder="Tulis soal..."></textarea><label>Jawaban *</label><textarea id="soalJawaban" required placeholder="Tulis jawaban..."></textarea><div class="crud-actions"><button type="button" class="crud-btn-cancel" onclick="closeModalSoal()">Batal</button><button type="submit" class="crud-btn-save">Simpan</button></div></form></div></div>
-
-<div id="modalConfirmDelete" class="crud-modal"><div class="crud-modal-content" style="max-width:400px;"><h3>Hapus Kitab</h3><p id="deleteConfirmText">Yakin ingin menghapus kitab ini?</p><div class="crud-actions"><button class="crud-btn-cancel" onclick="closeConfirmModal()">Batal</button><button class="crud-btn-save" id="confirmDeleteBtn" style="background:#ef4444;">Hapus</button></div></div></div>
 
 <div class="app-footer"><img src="https://img.shields.io/badge/version-v3.0-orange" alt="Version"><img src="https://img.shields.io/badge/UBK-Tally%20Marks%20卌-blue" alt="UBK"><img src="https://img.shields.io/badge/UBQ-3%20Components%20%7C%20Majelisi-green" alt="UBQ"><img src="https://img.shields.io/badge/%C2%A9%202025%20Ndalem%20Kharisma-red" alt="Copyright"></div>
 
@@ -764,9 +618,6 @@ let currentPageNilai = 1, currentPageNilaiUbq = 1;
 let currentPageSoal = 1;
 const PAGE_SIZE = 10;
 let tallyKaidah = 0, tallyMakna = 0;
-let kitabList = [];
-let currentPDFDoc = null, currentPageNum = 1, totalPages = 0;
-let pendingDeleteId = null;
 
 function isAdmin() { return localStorage.getItem('userRole') === 'admin'; }
 function showToast(msg, isError = false) { const toast = document.createElement('div'); toast.className = 'toast-message' + (isError ? ' error' : ''); toast.textContent = msg; document.body.appendChild(toast); setTimeout(() => toast.classList.add('show'), 10); setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 2500); }
@@ -775,19 +626,9 @@ function formatDate(dateStr) { if (!dateStr) return '-'; return new Date(dateStr
 
 function getGradeClass(grade) {
   if (!grade) return '';
-  
-  // Normalisasi: trim, lowercase, hapus semua jenis apostrof/kutip
   const cleanGrade = grade.trim().toLowerCase().replace(/['’""]/g, '');
-
-  const gradeMap = {
-    'jyd i': 'grade-JydI',
-    'jyd ii': 'grade-JydII',
-    'mwt i': 'grade-MwtI',
-    'mwt ii': 'grade-MwtII',
-    'rodi': 'grade-Rodi'
-  };
-
-  return gradeMap[cleanGrade] || ''; // Fallback jika tidak cocok
+  const gradeMap = { 'jyd i': 'grade-JydI', 'jyd ii': 'grade-JydII', 'mwt i': 'grade-MwtI', 'mwt ii': 'grade-MwtII', 'rodi': 'grade-Rodi' };
+  return gradeMap[cleanGrade] || '';
 }
 
 // ==================== UBK TALLY ====================
@@ -834,7 +675,7 @@ function subtractTally(type) { if (type === 'kaidah' && tallyKaidah > 0) tallyKa
 function resetTally(type) { if (type === 'kaidah') tallyKaidah = 0; else tallyMakna = 0; updateTallyDisplay(); }
 function resetAllTally() { tallyKaidah = 0; tallyMakna = 0; if (document.getElementById('nilaiMurod')) document.getElementById('nilaiMurod').value = ''; if (document.getElementById('nilaiNahwuShorof')) document.getElementById('nilaiNahwuShorof').value = ''; updateTallyDisplay(); }
 
-// ==================== UBQ TIGA KOMPONEN dengan aturan mayoritas/median ====================
+// ==================== UBQ TIGA KOMPONEN ====================
 const gradeOrder = ['Jyd I', 'Jyd II', 'Mwt I', 'Mwt II', "Rodi'"];
 function getGradeValue(grade) {
   if (grade === 'Jyd I') return 90;
@@ -959,7 +800,6 @@ function renderNilaiUbq(page = 1) {
       const gradeMatch = item.keterangan.match(/Grade Akhir:([^|]+)/); 
       if (gradeMatch) grade = gradeMatch[1];
       
-      // Ambil detail nilai hafalan, membaca, ghorib
       const hafalanMatch = item.keterangan.match(/Hafalan:([^|]+)/);
       const membacaMatch = item.keterangan.match(/Membaca:([^|]+)/);
       const ghoribMatch = item.keterangan.match(/Ghorib:([^|]+)/);
@@ -993,7 +833,7 @@ function renderNilaiUbq(page = 1) {
   let html = filtered.length === 0 ? 
     '<div style="text-align:center;padding:40px;">📭 Belum ada data nilai UBQ</div>' : 
     `<table class="nilai-main-table"><thead>
-      <tr><th style="width:50px;">No</th><th>Nama</th><th style="width:80px;">Nilai</th><th style="width:100px;">Grade</th></tr>
+       <tr><th style="width:50px;">No</th><th>Nama</th><th style="width:80px;">Nilai</th><th style="width:100px;">Grade</th></tr>
       </thead><tbody>${rows}</tbody></table>`;
   
   document.getElementById('nilaiUbqContainer').innerHTML = html; 
@@ -1014,29 +854,13 @@ document.getElementById('formSoal').onsubmit = async (e) => { e.preventDefault()
 window.openAddSoal = function(jenis) { document.getElementById('modalSoalTitle').innerText = `Tambah Soal ${jenis.toUpperCase()}`; document.getElementById('soalId').value = ''; document.getElementById('soalJenis').value = jenis; document.getElementById('soalKategori').value = ''; document.getElementById('soalPertanyaan').value = ''; document.getElementById('soalJawaban').value = ''; document.getElementById('modalSoal').style.display = 'flex'; };
 window.editSoal = function(jenis, id) { const data = jenis === 'ubk' ? soalUbk : soalUbq; const item = data.find(d => d.id == id); if (!item) return; document.getElementById('modalSoalTitle').innerText = `Edit Soal ${jenis.toUpperCase()}`; document.getElementById('soalId').value = item.id; document.getElementById('soalJenis').value = jenis; document.getElementById('soalKategori').value = item.kategori || ''; document.getElementById('soalPertanyaan').value = item.soal; document.getElementById('soalJawaban').value = item.jawaban; document.getElementById('modalSoal').style.display = 'flex'; };
 window.deleteSoal = async function(jenis, id) { if (!confirm('Yakin hapus soal ini?')) return; const table = jenis === 'ubk' ? 'soal_ubk' : 'soal_ubq'; const { error } = await supabaseClient.from(table).delete().eq('id', id); if (error) showToast('Gagal hapus', true); else { showToast('Soal dihapus'); await loadSoal(jenis); } };
-async function loadKitabList() { try { const { data, error } = await supabaseClient.from('perpustakaan_kitab').select('*').order('created_at', { ascending: false }); if (error) throw error; kitabList = data || []; renderKitabShelf(); } catch (error) { showToast('Gagal memuat kitab', true); } }
-function renderKitabShelf() { const searchTerm = document.getElementById('searchKitabInput')?.value.toLowerCase() || ''; const filtered = kitabList.filter(k => (k.nama && k.nama.toLowerCase().includes(searchTerm))); let html = ''; for (const kitab of filtered) { html += `<div class="kitab-card"><button class="kitab-delete admin-only" onclick="event.stopPropagation(); confirmDeleteKitab(${kitab.id}, '${escapeHtml(kitab.nama)}')"><i class="material-icons">delete</i></button><div onclick="openKitab(${kitab.id})"><div class="kitab-cover"><i class="material-icons">menu_book</i><div class="kitab-nama">${escapeHtml(kitab.nama)}</div></div><div class="kitab-info"><div style="padding:8px;text-align:center;">📄 ${kitab.total_halaman || '?'} halaman</div></div></div></div>`; } if (filtered.length === 0) html = '<div style="text-align:center;padding:60px;">📭 Belum ada kitab. Klik Upload PDF</div>'; document.getElementById('kitabShelf').innerHTML = html; }
-window.uploadKitabToSupabase = function() { if (!isAdmin()) { showToast('❌ Hanya admin!', true); return; } const input = document.createElement('input'); input.type = 'file'; input.accept = 'application/pdf'; input.onchange = async (e) => { const file = e.target.files[0]; if (!file) return; const nama = prompt('Nama kitab:', file.name.replace('.pdf', '')); if (!nama) return; const penulis = prompt('Penulis:', 'Tidak diketahui'); try { const filePath = `kitab_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`; await supabaseClient.storage.from('kitab-pdfs').upload(filePath, file); const { data: urlData } = supabaseClient.storage.from('kitab-pdfs').getPublicUrl(filePath); await supabaseClient.from('perpustakaan_kitab').insert([{ nama, penulis, file_url: urlData.publicUrl }]); showToast(`✅ "${nama}" berhasil diupload`); await loadKitabList(); } catch (error) { showToast('Gagal upload', true); } }; input.click(); };
-window.confirmDeleteKitab = function(id, nama) { if (!isAdmin()) return; pendingDeleteId = id; document.getElementById('deleteConfirmText').innerHTML = `Yakin hapus <strong>${escapeHtml(nama)}</strong>?`; document.getElementById('modalConfirmDelete').style.display = 'flex'; document.getElementById('confirmDeleteBtn').onclick = async () => { await deleteKitabFromSupabase(pendingDeleteId); closeConfirmModal(); }; };
-window.closeConfirmModal = function() { document.getElementById('modalConfirmDelete').style.display = 'none'; };
-async function deleteKitabFromSupabase(id) { try { const kitab = kitabList.find(k => k.id == id); if (!kitab) throw new Error('Kitab tidak ditemukan'); await supabaseClient.from('perpustakaan_kitab').delete().eq('id', id); if (kitab.file_url) { const urlParts = kitab.file_url.split('/'); const filePath = urlParts.slice(urlParts.indexOf('kitab-pdfs') + 1).join('/'); if (filePath) await supabaseClient.storage.from('kitab-pdfs').remove([filePath]); } showToast('Kitab dihapus'); await loadKitabList(); } catch (error) { showToast('Gagal hapus', true); } }
-window.openKitab = async function(kitabId) { const kitab = kitabList.find(k => k.id == kitabId); if (!kitab || !kitab.file_url) { showToast('URL tidak valid', true); return; } document.getElementById('libraryView').style.display = 'none'; document.getElementById('readerView').style.display = 'block'; await loadPDFFromUrl(kitab.file_url); };
-async function loadPDFFromUrl(url) { const loadingTask = pdfjsLib.getDocument(url); currentPDFDoc = await loadingTask.promise; totalPages = currentPDFDoc.numPages; currentPageNum = 1; await renderPage(currentPageNum); showToast(`✅ ${totalPages} halaman`, false); }
-async function renderPage(pageNum) { if (!currentPDFDoc) return; const canvas = document.getElementById('mainPage'); const ctx = canvas.getContext('2d'); const page = await currentPDFDoc.getPage(pageNum); const scale = window.innerWidth < 500 ? 1.2 : 1.6; const viewport = page.getViewport({ scale }); canvas.width = viewport.width; canvas.height = viewport.height; await page.render({ canvasContext: ctx, viewport }).promise; document.getElementById('pageIndicator').innerHTML = `${pageNum} / ${totalPages}`; updateNavButtons(); }
-function updateNavButtons() { const prevBtn = document.getElementById('prevBtn'); const nextBtn = document.getElementById('nextBtn'); if (prevBtn) prevBtn.disabled = currentPageNum <= 1; if (nextBtn) nextBtn.disabled = currentPageNum >= totalPages; }
-window.nextPage = async function() { if (currentPageNum < totalPages) { currentPageNum++; await renderPage(currentPageNum); } };
-window.prevPage = async function() { if (currentPageNum > 1) { currentPageNum--; await renderPage(currentPageNum); } };
-window.changeZoom = function() { if (currentPDFDoc) renderPage(currentPageNum); };
-window.showLibraryView = function() { document.getElementById('libraryView').style.display = 'block'; document.getElementById('readerView').style.display = 'none'; currentPDFDoc = null; };
-window.refreshKitabList = function() { loadKitabList(); };
-window.filterKitabList = function() { renderKitabShelf(); };
 async function populateFilters() { const kelasSet = new Set(), unitSet = new Set(); allSantri.forEach(s => { if (s.Kelas) kelasSet.add(s.Kelas); if (s.Unit_Ndalem) unitSet.add(s.Unit_Ndalem); }); const kelasOpt = Array.from(kelasSet).sort().map(k => `<option value="${k}">${k}</option>`).join(''); const unitOpt = Array.from(unitSet).sort().map(u => `<option value="${u}">${u}</option>`).join(''); document.getElementById('filterUbkKelas').innerHTML = '<option value="semua">Semua Kelas</option>' + kelasOpt; document.getElementById('filterUbkUnit').innerHTML = '<option value="semua">Semua Unit</option>' + unitOpt; document.getElementById('filterUbqKelas').innerHTML = '<option value="semua">Semua Kelas</option>' + kelasOpt; document.getElementById('filterUbqUnit').innerHTML = '<option value="semua">Semua Unit</option>' + unitOpt; }
 function initTabs() { document.querySelectorAll('.main-tab').forEach(tab => { tab.addEventListener('click', () => { document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('.main-panel').forEach(p => p.classList.remove('active')); tab.classList.add('active'); document.getElementById(tab.dataset.panel).classList.add('active'); }); }); document.querySelectorAll('#ubk-panel .sub-tab').forEach(tab => { tab.addEventListener('click', () => { document.querySelectorAll('#ubk-panel .sub-tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('#ubk-panel .sub-panel').forEach(p => p.classList.remove('active')); tab.classList.add('active'); document.getElementById(tab.dataset.subpanel).classList.add('active'); }); }); document.querySelectorAll('#ubq-panel .sub-tab').forEach(tab => { tab.addEventListener('click', () => { document.querySelectorAll('#ubq-panel .sub-tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('#ubq-panel .sub-panel').forEach(p => p.classList.remove('active')); tab.classList.add('active'); document.getElementById(tab.dataset.subpanel).classList.add('active'); }); }); }
 window.goBackToMain = function() { window.location.href = 'jindex.html'; };
 window.closeModalNilai = function() { document.getElementById('modalNilai').style.display = 'none'; };
 window.closeModalSoal = function() { document.getElementById('modalSoal').style.display = 'none'; };
 window.updateUbqFinalGrade = updateUbqFinalGrade;
-async function init() { await loadMasterData(); await populateFilters(); await loadNilai('ubk'); await loadNilai('ubq'); await loadSoal('ubk'); await loadSoal('ubq'); await loadKitabList(); initTabs(); const adminOnly = document.querySelectorAll('.admin-only'); if (!isAdmin()) adminOnly.forEach(el => el.style.display = 'none'); else adminOnly.forEach(el => el.style.display = 'inline-flex'); }
+async function init() { await loadMasterData(); await populateFilters(); await loadNilai('ubk'); await loadNilai('ubq'); await loadSoal('ubk'); await loadSoal('ubq'); initTabs(); const adminOnly = document.querySelectorAll('.admin-only'); if (!isAdmin()) adminOnly.forEach(el => el.style.display = 'none'); else adminOnly.forEach(el => el.style.display = 'inline-flex'); }
 init();
 </script>
 </body>

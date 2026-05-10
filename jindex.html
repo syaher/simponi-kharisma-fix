@@ -232,6 +232,11 @@
       --item-color-2: #4caf50;
       --item-color-1: #2e7d32;
     }
+	
+	.grid-item[data-module="kitab"] {
+      --item-color-2: #4caf50;
+      --item-color-1: #2e7d32;
+    }
 
     .grid-item[data-module="penasehat"] {
       --item-color-2: #9c27b0;
@@ -277,13 +282,18 @@
 		  --item-color-1: #822144;
 		  --item-color-2: #c22f65;
 		}
+		
+	.grid-item[data-module="sinkron"] {
+		  --item-color-1: #822144;
+		  --item-color-2: #c22f65;
+		}
 	
 	.grid-item[data-module="ubkubq"] {
 	  --item-color-1: #3f51b5;
 	  --item-color-2: #6573c3;
-	}
-
-	.grid-item[data-module="sinkron"] {
+	}	
+	
+	.grid-item[data-module="alumni"] {
 	  --item-color-1: #009688;
 	  --item-color-2: #26a69a;
 	}
@@ -2900,6 +2910,667 @@ button:active {
   font-weight:bold;
   cursor:pointer;
 }
+
+/* =====================================================
+   GRID INVENTARIS
+===================================================== */
+
+.inventaris-grid{
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(auto-fill,minmax(280px,1fr));
+
+  gap:16px;
+
+  margin-top:15px;
+
+  padding:4px;
+}
+
+
+/* =====================================================
+   CARD
+===================================================== */
+
+.inventaris-card{
+
+  background:#fff;
+
+  border-radius:16px;
+
+  overflow:hidden;
+
+  border:1px solid #e5e5e5;
+
+  box-shadow:
+    0 2px 10px rgba(0,0,0,.08);
+
+  display:flex;
+
+  flex-direction:column;
+
+  min-width:0;
+
+  transition:.2s ease;
+}
+
+.inventaris-card:hover{
+
+  transform:translateY(-2px);
+
+  box-shadow:
+    0 6px 18px rgba(0,0,0,.12);
+}
+
+
+/* =====================================================
+   SLIDER FOTO
+===================================================== */
+
+.inventaris-slider{
+
+  width:100%;
+
+  aspect-ratio:16/10;
+
+  display:flex;
+
+  overflow-x:auto;
+
+  overflow-y:hidden;
+
+  scroll-snap-type:x mandatory;
+
+  scroll-behavior:smooth;
+
+  -webkit-overflow-scrolling:touch;
+
+  background:#f3f3f3;
+
+  border-bottom:1px solid #eee;
+
+  scrollbar-width:none;
+
+  -ms-overflow-style:none;
+
+  cursor:grab;
+}
+
+.inventaris-slider::-webkit-scrollbar{
+
+  display:none;
+}
+
+.inventaris-slider:active{
+
+  cursor:grabbing;
+}
+
+
+/* =====================================================
+   FOTO
+===================================================== */
+
+.slide-img{
+
+  width:100%;
+
+  height:100%;
+
+  flex:0 0 100%;
+
+  object-fit:cover;
+
+  scroll-snap-align:start;
+
+  display:block;
+
+  background:#f1f1f1;
+
+  user-select:none;
+
+  -webkit-user-drag:none;
+}
+
+
+/* =====================================================
+   BODY
+===================================================== */
+
+.inventaris-body{
+
+  padding:14px;
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:8px;
+}
+
+
+/* =====================================================
+   TITLE
+===================================================== */
+
+.inventaris-title{
+
+  font-size:18px;
+
+  font-weight:700;
+
+  line-height:1.3;
+
+  color:#222;
+
+  word-break:break-word;
+}
+
+
+/* =====================================================
+   ITEM
+===================================================== */
+
+.inventaris-item{
+
+  font-size:14px;
+
+  color:#444;
+
+  line-height:1.5;
+
+  word-break:break-word;
+}
+
+
+/* =====================================================
+   ACTION BUTTON
+===================================================== */
+
+.inventaris-actions{
+
+  display:flex;
+
+  gap:8px;
+
+  margin-top:10px;
+}
+
+.inventaris-actions button{
+
+  flex:1;
+}
+
+
+/* =====================================================
+   PREVIEW FOTO MODAL
+===================================================== */
+
+.inventaris-preview-wrapper{
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(2,1fr);
+
+  gap:10px;
+
+  margin-top:12px;
+}
+
+.inventaris-preview-item{
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:6px;
+
+  text-align:center;
+}
+
+.inventaris-preview-item small{
+
+  font-size:12px;
+
+  color:#666;
+}
+
+
+/* =====================================================
+   PREVIEW IMAGE
+===================================================== */
+
+.inventaris-preview-img{
+
+  width:100%;
+
+  aspect-ratio:1/1;
+
+  object-fit:cover;
+
+  border-radius:12px;
+
+  border:1px solid #ddd;
+
+  background:#f1f1f1;
+
+  display:block;
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media(max-width:768px){
+
+  .inventaris-grid{
+
+    grid-template-columns:1fr;
+
+    gap:14px;
+
+    padding:0;
+  }
+
+  .inventaris-slider{
+
+    aspect-ratio:16/11;
+  }
+
+  .inventaris-title{
+
+    font-size:17px;
+  }
+
+  .inventaris-body{
+
+    padding:12px;
+  }
+
+  .inventaris-preview-wrapper{
+
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+
+/* =====================================================
+   TABLET
+===================================================== */
+
+@media(min-width:769px)
+and (max-width:1024px){
+
+  .inventaris-grid{
+
+    grid-template-columns:
+      repeat(2,1fr);
+  }
+}
+
+
+/* =====================================================
+   DESKTOP LARGE
+===================================================== */
+
+@media(min-width:1200px){
+
+  .inventaris-grid{
+
+    grid-template-columns:
+      repeat(auto-fill,minmax(320px,1fr));
+  }
+}
+
+/* =========================
+   WRAPPER
+========================= */
+
+.inventaris-slider-wrapper{
+
+  position:relative;
+}
+
+
+/* =========================
+   NAV BUTTON
+========================= */
+
+.inventaris-nav{
+
+  position:absolute;
+
+  top:50%;
+
+  transform:translateY(-50%);
+
+  border:none;
+
+  background:none;
+
+  color:#fff;
+
+  font-size:26px;
+
+  font-weight:bold;
+
+  line-height:1;
+
+  z-index:5;
+
+  cursor:pointer;
+
+  padding:0;
+
+  transition:.15s ease;
+
+  text-shadow:
+    0 1px 4px rgba(0,0,0,.8);
+}
+
+.inventaris-nav:hover{
+
+  transform:
+    translateY(-50%)
+    scale(1.1);
+
+  opacity:.85;
+}
+
+
+/* =========================
+   POSISI
+========================= */
+
+.inventaris-nav.prev{
+
+  left:8px;
+}
+
+.inventaris-nav.next{
+
+  right:8px;
+}
+
+/* =========================
+   BODY
+========================= */
+
+.inventaris-body{
+
+  padding:12px;
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:10px;
+}
+
+
+/* =========================
+   TITLE TENGAH
+========================= */
+
+.inventaris-title{
+
+  text-align:center;
+
+  font-size:17px;
+
+  font-weight:700;
+
+  color:#222;
+
+  line-height:1.3;
+
+  padding-bottom:8px;
+
+  border-bottom:1px solid #eee;
+
+  word-break:break-word;
+}
+
+
+/* =========================
+   INFO GRID
+========================= */
+
+.inventaris-info{
+
+  display:grid;
+
+  grid-template-columns:1fr 1fr;
+
+  gap:6px 12px;
+}
+
+
+/* =========================
+   ITEM
+========================= */
+
+.inventaris-item{
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:2px;
+
+  font-size:12px;
+
+  color:#444;
+
+  min-width:0;
+}
+
+.inventaris-item strong{
+
+  font-size:11px;
+
+  color:#888;
+
+  font-weight:600;
+
+  text-transform:uppercase;
+
+  letter-spacing:.3px;
+}
+
+.inventaris-item span{
+
+  font-size:13px;
+
+  color:#222;
+
+  line-height:1.35;
+
+  word-break:break-word;
+}
+
+
+/* =========================
+   ACTIONS
+========================= */
+
+.inventaris-actions{
+
+  display:flex;
+
+  gap:8px;
+
+  margin-top:8px;
+}
+
+.inventaris-actions button{
+
+  flex:1;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:768px){
+
+  .inventaris-body{
+
+    padding:10px;
+  }
+
+  .inventaris-title{
+
+    font-size:16px;
+  }
+
+  .inventaris-info{
+
+    gap:5px 10px;
+  }
+
+  .inventaris-item{
+
+    font-size:11px;
+  }
+
+  .inventaris-item strong{
+
+    font-size:10px;
+  }
+
+  .inventaris-item span{
+
+    font-size:12px;
+  }
+}
+
+.inventaris-info{
+
+  max-width:350px;
+
+  margin:auto;
+}
+
+/* =========================
+   INFO GRID
+========================= */
+
+.inventaris-info{
+
+  display:grid;
+
+  grid-template-columns:1fr 1fr;
+
+  gap:10px;
+
+  justify-content:center;
+
+  align-items:start;
+
+  text-align:center;
+}
+
+
+/* =========================
+   ITEM
+========================= */
+
+.inventaris-item{
+
+  display:flex;
+
+  flex-direction:column;
+
+  align-items:center;
+
+  justify-content:center;
+
+  gap:3px;
+
+  font-size:12px;
+
+  color:#444;
+
+  min-width:0;
+}
+
+
+/* LABEL */
+
+.inventaris-item strong{
+
+  font-size:11px;
+
+  color:#888;
+
+  font-weight:600;
+
+  text-transform:uppercase;
+
+  letter-spacing:.3px;
+}
+
+
+/* VALUE */
+
+.inventaris-item span{
+
+  font-size:13px;
+
+  color:#222;
+
+  line-height:1.35;
+
+  word-break:break-word;
+
+  text-align:center;
+}
+
+/* =========================
+   MODAL DETAIL PENASEHAT
+========================= */
+
+#penasehatDetailModal {
+  overflow-y: auto;
+  padding: 20px 10px;
+  box-sizing: border-box;
+}
+
+#penasehatDetailModal .detail-content,
+#penasehatDetailContent {
+  max-height: 90vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* isi modal */
+#penasehatDetailContent {
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px;
+  margin: auto;
+  width: 100%;
+  max-width: 500px;
+  box-sizing: border-box;
+}
+
+/* scrollbar lebih halus */
+#penasehatDetailContent::-webkit-scrollbar {
+  width: 6px;
+}
+
+#penasehatDetailContent::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.2);
+  border-radius: 10px;
+}
+
+
   </style>
 </head>
 <body>
@@ -2940,6 +3611,11 @@ button:active {
   </div>
 </div>
 
+<div class="grid-item" data-module="alumni" onclick="window.location.href='alumni.html'">
+    <i class="material-icons">diversity_2</i>
+    <span>Alumni</span>
+  </div>
+
   <div class="grid-item" data-module="guru">
     <i class="material-icons">supervisor_account</i>
     <span>Mustahiq</span>
@@ -2947,7 +3623,7 @@ button:active {
 
   <div class="grid-item" data-module="penasehat">
     <i class="material-icons">diversity_3</i>
-    <span>Penasehat</span>
+    <span>Penasihat</span>
   </div>
 
   <div class="grid-item" data-module="santri">
@@ -2989,7 +3665,7 @@ button:active {
   </div>
 
   <div class="grid-item" data-module="ubkubq" onclick="window.location.href='ubk-ubq.html'">
-    <i class="material-icons">menu_book</i>
+    <i class="material-icons">account_box</i>
     <span>UBK & UBQ</span>
   </div>
 
@@ -2998,6 +3674,10 @@ button:active {
     <span>Harian</span>
   </div>
 
+<div class="grid-item" data-module="kitab" onclick="window.location.href='kitab.html'">
+    <i class="material-icons">menu_book</i>
+    <span>Perpustakaan</span>
+  </div>
 
   <!-- ===== KOORDINATOR UNIT ===== -->
 <div style="grid-column: 1/-1; margin-top: 15px;">
@@ -3324,7 +4004,7 @@ button:active {
     <i class="material-icons">arrow_back</i>
     <span>Kembali ke Menu Utama</span>
   </div>
-  <h2>Data Penasehat</h2>
+  <h2>Data Penasihat</h2>
   
   <div class="admin-tools">
     <button class="admin-only" onclick="openAddPenasehat()">➕ Tambah</button>
@@ -3401,6 +4081,25 @@ button:active {
         <option value="tidak">tidak</option>
       </select>
 	  
+	  <div id="add_bisyaroh_fields" style="display:none;">
+	  
+	   <label>Posisi Tugas</label>
+  <input type="text" id="add_posisi_tugas" placeholder="Jaga / Masak / dll">
+
+  <label>Shift</label>
+  <select id="add_shift">
+    <option value="">-- pilih shift --</option>
+    <option value="pagi">Pagi</option>
+    <option value="sore">Sore</option>
+    <option value="malam">Malam</option>
+	<option value="dini">Dini</option>
+  </select>
+
+  <label>Jam Tugas</label>
+  <input type="text" id="add_jam_tugas" placeholder="18.00 - 21.00"> 
+
+</div>
+	  
 	  <label>Foto</label>
 		<input type="file" id="add_foto" accept="image/*">
 		<img id="preview_add_foto" class="photo-preview">
@@ -3431,8 +4130,10 @@ button:active {
       <label>Pengajar</label>
       <input type="text" id="edit_Status_Pengajar">
 
-      <label>Kode Unit</label>
-      <input type="text" id="edit_Kode_Unit">
+      <label>Unit Ndalem</label>
+		<select id="edit_Kode_Unit" required>
+		  <option value="">-- Pilih Unit --</option>
+		</select>
 
       <label>Mutakhorijin</label>
       <input type="text" id="edit_Mutakhorijin">
@@ -3459,6 +4160,25 @@ button:active {
         <option value="dapat">dapat</option>
         <option value="tidak">tidak</option>
       </select>
+	  
+	  <div id="edit_bisyaroh_fields" style="display:none;">
+	  
+	  <label>Posisi Tugas</label>
+  <input type="text" id="edit_posisi_tugas" placeholder="Jaga / Masak / dll">
+
+  <label>Shift</label>
+  <select id="edit_shift">
+    <option value="">-- pilih shift --</option>
+    <option value="pagi">Pagi</option>
+    <option value="sore">Sore</option>
+    <option value="malam">Malam</option>
+	<option value="dini">Dini</option>
+  </select>
+
+  <label>Jam Tugas</label>
+  <input type="text" id="edit_jam_tugas" placeholder="18.00 - 21.00">  
+
+</div>
 	  
 	  <label>Foto</label>
 		<input type="file" id="edit_foto" accept="image/*">
@@ -3624,11 +4344,8 @@ button:active {
 
 
 
-    <div id="inventaris-table-container" class="inventaris-scroll">
-      <div class="inventaris-scroll-inner">
-        <table id="inventaris-table" class="simple-table inventaris-table"></table>
-      </div>
-      <div id="paginationControls"></div>
+    <div id="inventaris-grid" class="inventaris-grid"></div>
+<div id="paginationControls"></div>
     </div>
   </div>
 
@@ -3765,9 +4482,53 @@ button:active {
 
       <label>Tanggal Pajak</label>
       <input type="date" id="Update_Tgl">
+	  
+	  
+		<label>Foto Depan</label>
+<input type="file" id="Foto_1" accept="image/*">
+
+<label>Foto Samping</label>
+<input type="file" id="Foto_2" accept="image/*">
+
+<label>Foto Belakang</label>
+<input type="file" id="Foto_3" accept="image/*">
+
+<label>Foto Tambahan</label>
+<input type="file" id="Foto_4" accept="image/*">
+
+<div id="inventaris-preview-wrapper" class="inventaris-preview-wrapper">
+
+  <div class="inventaris-preview-item">
+    <img id="previewFoto1" class="inventaris-preview-img">
+    <small>Foto Depan</small>
+  </div>
+
+  <div class="inventaris-preview-item">
+    <img id="previewFoto2" class="inventaris-preview-img">
+    <small>Foto Samping</small>
+  </div>
+
+  <div class="inventaris-preview-item">
+    <img id="previewFoto3" class="inventaris-preview-img">
+    <small>Foto Belakang</small>
+  </div>
+
+  <div class="inventaris-preview-item">
+    <img id="previewFoto4" class="inventaris-preview-img">
+    <small>Foto Tambahan</small>
+  </div>
+
+</div>
 
       <div class="crud-actions">
-        <button type="submit" class="crud-btn-save">💾 Simpan</button>
+        <button 
+		  type="submit"
+		  class="crud-btn-save"
+		  id="btnSaveInventaris">
+
+		  💾 Simpan
+
+		</button>
         <button type="button" class="crud-btn-cancel" onclick="closeInventarisModal()">❌ Batal</button>
       </div>
     </form>
@@ -4084,6 +4845,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	let infoCurrentPage = 1;
 	const infoRowsPerPage = 50;
 	let santriDict = {};            // dictionary: key = Stambuk
+	let inventarisData = [];
 
 	// NILAI (baru, pola absensi1)
 	let nilaiFiltered = [];
@@ -8056,7 +8818,7 @@ async function loadPenasehat() {
   try {
     const { data, error } = await supabaseClient
       .from('penasehat')
-      .select('id, foto_url, Nama, Status_Penasehat, Status_Pengajar, Kode_Unit, Mutakhorijin, Mulai_Ngabdi, Hp, Status, id_penasehat, Status_Bisyaroh, referensi_unit_ndalem(Nama_Unit)')
+      .select('id, foto_url, Nama, Status_Penasehat, Status_Pengajar, Kode_Unit, Mutakhorijin, Mulai_Ngabdi, Hp, Status, id_penasehat, Status_Bisyaroh, shift, jam_tugas, posisi_tugas, referensi_unit_ndalem(Nama_Unit)')
       .eq('Status', 'aktif') // 🔹 hanya ambil penasehat aktif
       .order('Mulai_Ngabdi', { ascending: true });
 
@@ -8267,11 +9029,39 @@ function showPenasehatDetail(id) {
             : '-'}
         </span>
       </div>
+	  
+	  
+	  
+	  ${
+  p.Status_Bisyaroh === "dapat"
+  ? `
+    <div class="detail-divider"></div>
+	
+	<div class="detail-row">
+      <span>Posisi Tugas</span>
+      <span>${p.posisi_tugas || '-'}</span>
+    </div>
+	
+	<div class="detail-divider"></div>
 
-      <div class="detail-row">
-        <span>Status</span>
-        <span>${p.Status || '-'}</span>
-      </div>
+    <div class="detail-row">
+      <span>Shift</span>
+      <span>${p.shift || '-'}</span>
+    </div>
+
+    <div class="detail-divider"></div>
+
+    <div class="detail-row">
+      <span>Jam Tugas</span>
+      <span>${p.jam_tugas || '-'}</span>
+    </div>
+
+    
+
+    
+  `
+  : ""
+}
 
     </div>
   `;
@@ -8375,6 +9165,9 @@ document.getElementById("penasehatAddForm").addEventListener("submit", async (e)
     id_penasehat,
     Status: document.getElementById("add_Status").value,
     Status_Bisyaroh: document.getElementById("add_Status_Bisyaroh").value,
+	shift: document.getElementById("add_shift").value || null,
+jam_tugas: document.getElementById("add_jam_tugas").value || null,
+posisi_tugas: document.getElementById("add_posisi_tugas").value || null,
     ...(foto_url && { foto_url }) // ✅ hanya simpan kalau ada
   };
 
@@ -8449,25 +9242,34 @@ function openEditPenasehat(id) {
   const p = allPenasehatData.find(x => String(x.id) === String(id));
   if (!p) return alert("❌ Data tidak ditemukan");
 
-  const set = (field, val) => document.getElementById("edit_" + field).value = val || "";
+  const set = (field, val) => {
+    const el = document.getElementById("edit_" + field);
+    if (el) el.value = val || "";
+  };
 
   set("id", p.id);
   set("Nama", p.Nama);
   set("Status_Penasehat", p.Status_Penasehat);
   set("Status_Pengajar", p.Status_Pengajar);
-  set("Kode_Unit", p.Kode_Unit);
+  
+  // Ini akan otomatis memilih Nama_Unit yang sesuai karena value-nya adalah Kode_Unit
+  set("Kode_Unit", p.Kode_Unit); 
+
   set("Mutakhorijin", p.Mutakhorijin);
   set("Hp", p.Hp);
   set("Mulai_Ngabdi", p.Mulai_Ngabdi ? String(p.Mulai_Ngabdi).slice(0,10) : "");
   set("id_penasehat", p.id_penasehat);
   set("Status", p.Status);
   set("Status_Bisyaroh", p.Status_Bisyaroh);
+  set("shift", p.shift);
+set("jam_tugas", p.jam_tugas);
+set("posisi_tugas", p.posisi_tugas);
+toggleBisyarohFields("edit");
 
-  // 🔥 TAMBAHAN INI (WAJIB)
+  // Preview Foto
   const preview = document.getElementById("preview_edit_foto");
   const inputFile = document.getElementById("edit_foto");
-
-  inputFile.value = ""; // reset file input
+  inputFile.value = ""; 
 
   if (p.foto_url) {
     preview.src = p.foto_url;
@@ -8479,6 +9281,61 @@ function openEditPenasehat(id) {
 
   document.getElementById("penasehatEditModal").style.display = "block";
 }
+
+async function refreshUnitNdalemDropdown() {
+  try {
+    const { data, error } = await supabaseClient
+      .from("referensi_unit_ndalem")
+      .select("Nama_Unit, Kode_Unit")
+      .order("Nama_Unit", { ascending: true });
+
+    if (error) throw error;
+
+    const selectEdit = document.getElementById("edit_Kode_Unit");
+    // Kosongkan kecuali opsi pertama
+    selectEdit.innerHTML = '<option value="">-- Pilih Unit Ndalem --</option>';
+
+    data.forEach(unit => {
+      const opt = document.createElement("option");
+      opt.value = unit.Kode_Unit; // Nilai yang dikirim ke tabel penasehat
+      opt.textContent = unit.Nama_Unit; // Teks yang dilihat user
+      selectEdit.appendChild(opt);
+    });
+  } catch (err) {
+    console.error("Gagal load referensi unit:", err);
+  }
+}
+
+// Panggil fungsi ini satu kali saat aplikasi pertama kali dimuat
+document.addEventListener("DOMContentLoaded", refreshUnitNdalemDropdown);
+
+async function fetchReferensiUnit() {
+  try {
+    const { data, error } = await supabaseClient
+      .from("referensi_unit_ndalem")
+      .select("Nama_Unit, Kode_Unit")
+      .order("Nama_Unit", { ascending: true });
+
+    if (error) throw error;
+
+    const selectUnit = document.getElementById("edit_Kode_Unit");
+    
+    // Reset isi dropdown kecuali opsi pertama
+    selectUnit.innerHTML = '<option value="">-- Pilih Unit --</option>';
+
+    data.forEach(unit => {
+      const option = document.createElement("option");
+      option.value = unit.Kode_Unit; // Tersimpan sebagai Kode_Unit
+      option.textContent = unit.Nama_Unit; // Tampilan sebagai Nama_Unit
+      selectUnit.appendChild(option);
+    });
+  } catch (err) {
+    console.error("Gagal mengambil referensi unit:", err);
+  }
+}
+
+// Panggil fungsi ini saat halaman dimuat
+document.addEventListener("DOMContentLoaded", fetchReferensiUnit);
 
 function closePenasehatEditModal() {
   document.getElementById("penasehatEditModal").style.display = "none";
@@ -8501,6 +9358,9 @@ document.getElementById("penasehatEditForm").addEventListener("submit", async (e
     id_penasehat,
     Status: document.getElementById("edit_Status").value,
     Status_Bisyaroh: document.getElementById("edit_Status_Bisyaroh").value,
+	shift: document.getElementById("edit_shift").value || null,
+jam_tugas: document.getElementById("edit_jam_tugas").value || null,
+posisi_tugas: document.getElementById("edit_posisi_tugas").value || null,
   };
 
   const file = document.getElementById("edit_foto").files?.[0];
@@ -8609,6 +9469,47 @@ function getSelectedUnitPenasehat() {
   ).map(cb => cb.value);
 }
 
+
+// ===========================
+// BISYAROH FIELD TOGGLE
+// ===========================
+
+function toggleBisyarohFields(type) {
+
+  const status = document.getElementById(`${type}_Status_Bisyaroh`)?.value;
+
+  const wrapper = document.getElementById(`${type}_bisyaroh_fields`);
+
+  if (!wrapper) return;
+
+  if (status === "dapat") {
+    wrapper.style.display = "block";
+  } else {
+
+    wrapper.style.display = "none";
+
+    // kosongkan field
+    const shift = document.getElementById(`${type}_shift`);
+    const jam = document.getElementById(`${type}_jam_tugas`);
+    const posisi = document.getElementById(`${type}_posisi_tugas`);
+
+    if (shift) shift.value = "";
+    if (jam) jam.value = "";
+    if (posisi) posisi.value = "";
+  }
+}
+
+// ADD
+document.getElementById("add_Status_Bisyaroh")
+  .addEventListener("change", () => {
+    toggleBisyarohFields("add");
+  });
+
+// EDIT
+document.getElementById("edit_Status_Bisyaroh")
+  .addEventListener("change", () => {
+    toggleBisyarohFields("edit");
+  });
 
 async function loadGuru() {
   showLoading(true);
@@ -9923,49 +10824,56 @@ function normalizeKategori(kategori) {
   return result;
 }
 
-
-
-// ================= DOWNLOAD SANTRI PDF CUSTOM (Fix Filter Penasehat) =================
+// ================= DOWNLOAD SANTRI PDF CUSTOM (Fix Filter Penasehat - Header Tabel Hanya Halaman Pertama) =================
 async function downloadSantriPDFCustom() {
   const exportData = (lastFilteredData && lastFilteredData.length)
-  ? lastFilteredData
-  : allSantriData;
+    ? lastFilteredData
+    : allSantriData;
 
   if (!exportData.length) return alert("Tidak ada data untuk diunduh!");
 
+  // ===== STEP 1: FILTER SANTRI AKTIF DULU (SEBELUM PROMPT NOMOR) =====
+  const aktifSantri = exportData.filter(s =>
+    String(s.Status || "").toLowerCase() === "aktif"
+  );
+
+  if (aktifSantri.length === 0) {
+    return alert("Tidak ada santri dengan status aktif untuk diekspor!");
+  }
+
+  // ===== STEP 2: PROMPT NOMOR BERDASARKAN JUMLAH SANTRI AKTIF =====
   const startInput = prompt("Mulai dari nomor berapa? (Kosongkan untuk mulai dari 1)", "1");
   if (startInput === null) return;
+  
   const endInput = prompt("Sampai nomor berapa? (Kosongkan untuk semua)", "");
   if (endInput === null) return;
 
   let startNo = parseInt(startInput) || 1;
-  let endNo = parseInt(endInput) || exportData.length;
-  if (startNo < 1 || endNo < startNo || startNo > exportData.length) return alert("Nomor tidak valid!");
-
-  const limitedData = exportData.slice(startNo - 1, endNo);
+  let endNo = parseInt(endInput) || aktifSantri.length;
   
-  // ===== FILTER SANTRI: HANYA STATUS AKTIF =====
-	const filteredSantri = limitedData.filter(s =>
-	  String(s.Status || "").toLowerCase() === "aktif"
-	);
+  if (startNo < 1 || endNo < startNo || startNo > aktifSantri.length) {
+    return alert("Nomor tidak valid! Pastikan range sesuai jumlah santri aktif (" + aktifSantri.length + " santri).");
+  }
 
+  // ===== STEP 3: POTONG DATA SANTRI AKTIF BERDASARKAN NOMOR PROMPT =====
+  const filteredSantri = aktifSantri.slice(startNo - 1, endNo);
 
+  // ===== AMBIL FILTER UNIT & KELAS UNTUK HEADER PDF =====
   const selectedUnit = Array.from(
-	  document.querySelectorAll('#filterUnit input[type="checkbox"]:checked')
-	).map(cb => cb.value);
+    document.querySelectorAll('#filterUnit input[type="checkbox"]:checked')
+  ).map(cb => cb.value);
 
-	const selectedKelas = Array.from(
-	  document.querySelectorAll('#filterKelas input[type="checkbox"]:checked')
-	).map(cb => cb.value);
+  const selectedKelas = Array.from(
+    document.querySelectorAll('#filterKelas input[type="checkbox"]:checked')
+  ).map(cb => cb.value);
 
-
+  // ===== INISIALISASI jsPDF =====
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF("landscape", "pt", "a4");
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
-  let currentY = 130;
-
-  // ==== HEADER ====
+  
+  // ==== GAMBAR HEADER UTAMA (HANYA SEKALI DI HALAMAN 1) ====
   try {
     const logoUrl = "https://i.imgur.com/Irgu32G.png";
     const logoData = await loadImageToBase64(logoUrl);
@@ -9983,33 +10891,28 @@ async function downloadSantriPDFCustom() {
 
   doc.setFont("helvetica", "bold"); 
   doc.setFontSize(15);
-  doc.text("LAPORAN DATA PENASEHAT, SISWA & INVENTARIS", pageWidth / 2, 135, { align: "center" });
+  doc.text("LAPORAN DATA PENASIHAT, SISWA & INVENTARIS", pageWidth / 2, 135, { align: "center" });
 
   doc.setFont("helvetica", "bold");
   doc.setFontSize(13);
+  
+  let currentY = 155;
   if (selectedUnit.length || selectedKelas.length) {
-  const info = [];
-  if (selectedUnit.length) {
-    info.push(`Unit: ${selectedUnit.join(", ")}`);
+    const info = [];
+    if (selectedUnit.length) {
+      info.push(`Unit: ${selectedUnit.join(", ")}`);
+    }
+    if (selectedKelas.length) {
+      info.push(`Kelas: ${selectedKelas.join(", ")}`);
+    }
+    doc.text(info.join("   |   "), 40, 180);
+    currentY = 200;
   }
-  if (selectedKelas.length) {
-    info.push(`Kelas: ${selectedKelas.join(", ")}`);
-  }
 
-  doc.text(info.join("   |   "), 40, 180);
-  currentY = 200;
-} else {
-  currentY = 155;
-}
-
-
-  // ==== QUERY PENASEHAT (Status aktif + dapat bisyaroh) ====
+  // ==== TABEL PENASEHAT (TIDAK TERPENGARUH NOMOR PROMPT) ====
   try {
     console.log("🟡 Menjalankan query penasehat (aktif + bisyaroh)...");
-    const unitFilterName = selectedUnit.length === 1
-  ? selectedUnit[0]
-  : null;
-
+    const unitFilterName = selectedUnit.length === 1 ? selectedUnit[0] : null;
 
     let query = supabaseClient
       .from("penasehat")
@@ -10025,17 +10928,15 @@ async function downloadSantriPDFCustom() {
     if (error) console.error("❌ Error ambil penasehat:", error);
 
     const daftarPenasehat = (penasehatData || [])
-    .filter(p => !unitFilterName || p.referensi_unit_ndalem?.Nama_Unit === unitFilterName)
-    .sort((a, b) => {
-      const dateA = a.Mulai_Ngabdi ? new Date(a.Mulai_Ngabdi) : null;
-      const dateB = b.Mulai_Ngabdi ? new Date(b.Mulai_Ngabdi) : null;
-
-      if (!dateA && !dateB) return 0;
-      if (!dateA) return 1;
-      if (!dateB) return -1;
-
-      return dateA - dateB;
-    });
+      .filter(p => !unitFilterName || p.referensi_unit_ndalem?.Nama_Unit === unitFilterName)
+      .sort((a, b) => {
+        const dateA = a.Mulai_Ngabdi ? new Date(a.Mulai_Ngabdi) : null;
+        const dateB = b.Mulai_Ngabdi ? new Date(b.Mulai_Ngabdi) : null;
+        if (!dateA && !dateB) return 0;
+        if (!dateA) return 1;
+        if (!dateB) return -1;
+        return dateA - dateB;
+      });
 
     doc.setFont("helvetica", "normal"); doc.setFontSize(13);
     doc.text("Daftar Penasehat", 40, currentY);
@@ -10047,18 +10948,23 @@ async function downloadSantriPDFCustom() {
       currentY += 40;
     } else {
       doc.autoTable({
-        head: [["No", "Nama", "Organisasi", "Pengajar", "Mutakhorijin", "Masa Khidmah"]],
+        head: [["No", "Nama", "Organisasi", "Pengajar", "Mutakhorijin", "Posisi Tugas", "Shift", "Jam Tugas", "Masa Khidmah"]],
         body: daftarPenasehat.map((p, i) => [
           i + 1,
           p.Nama || "-",
           p.Status_Penasehat || "-",
           p.Status_Pengajar || "-",
-          p.Mutakhorijin || "-",   
+          p.Mutakhorijin || "-", 
+          p.posisi_tugas || "-",
+          p.shift || "-",
+          p.jam_tugas || "-",  		  
           calculateMasaKhidmah(p.Mulai_Ngabdi)
         ]),
         startY: currentY + 5,
         margin: { left: 40, right: 40 },
         tableWidth: "wrap",
+        showHead: "firstPage",
+        pageBreak: "auto",
         styles: { 
           fontSize: 9,
           halign: "center",
@@ -10087,55 +10993,57 @@ async function downloadSantriPDFCustom() {
         },
         alternateRowStyles: { fillColor: [255, 255, 255] },
         columnStyles: {
-          1: { halign: "left" },
-		  2: { halign: "left" },
-		  3: { halign: "left" },
+          0: { cellWidth: 25 },
+          1: { halign: "left", cellWidth: 100 },
+          2: { halign: "left", cellWidth: 90 },
+          3: { halign: "left", cellWidth: 120 },
+          4: { cellWidth: 65 },
+          5: { cellWidth: 80 },
+          6: { cellWidth: 75 },
+          7: { halign: "left", cellWidth: 90 },
+          8: { cellWidth: 65 }
         }
       });
-
       currentY = doc.lastAutoTable.finalY + 30;
     }
   } catch (err) {
     console.error("🚨 Gagal ambil data penasehat:", err);
   }
   
-  // ==== TABEL SANTRI ====
+  // ==== TABEL SANTRI (SUDAH DIPOTONG SESUAI NOMOR PROMPT) ====
   doc.setFont("helvetica", "normal");
   doc.setFontSize(12);
   doc.text("Daftar Siswa", 40, currentY);
   currentY += 5;
 
   const headers = [
-  "No","Foto","Nama","Kelas","Asal Daerah","Kategori","Usia",
-  "Posisi Tugas","Shift","Jam Tugas","Masa Khidmah"
-];
-
-const rows = await Promise.all(filteredSantri.map(async (s, i) => {
-
-  let foto = null;
-  if (s.Foto) {
-    try {
-      foto = await loadImageToBase64(s.Foto);
-    } catch (e) {
-      console.warn("Gagal load foto:", s.Foto);
-    }
-  }
-
-  return [
-    i + 1,
-    foto,
-    s.Nama_Lengkap || "-",
-    s.Kelas || "-",
-    s.Asal_Daerah || "-",
-    normalizeKategori(s.Kategori1),
-    calculateUsia(s.Tgl_Lahir),
-    s.Posisi_Tugas || "-",
-    s.Shift || "-",
-    s.Jam_Tugas || "-",
-    calculateMasaKhidmah(s.Mulai_Ngabdi)
+    "No","Foto","Nama","Kelas","Asal Daerah","Kategori","Usia",
+    "Posisi Tugas","Shift","Jam Tugas","Masa Khidmah"
   ];
-}));
 
+  const rows = await Promise.all(filteredSantri.map(async (s, i) => {
+    let foto = null;
+    if (s.Foto) {
+      try {
+        foto = await loadImageToBase64(s.Foto);
+      } catch (e) {
+        console.warn("Gagal load foto:", s.Foto);
+      }
+    }
+    return [
+      i + 1,
+      foto,
+      s.Nama_Lengkap || "-",
+      s.Kelas || "-",
+      s.Asal_Daerah || "-",
+      normalizeKategori(s.Kategori1),
+      calculateUsia(s.Tgl_Lahir),
+      s.Posisi_Tugas || "-",
+      s.Shift || "-",
+      s.Jam_Tugas || "-",
+      calculateMasaKhidmah(s.Mulai_Ngabdi)
+    ];
+  }));
 
   doc.autoTable({
     head: [headers],
@@ -10144,7 +11052,8 @@ const rows = await Promise.all(filteredSantri.map(async (s, i) => {
     margin: { left: 40, right: 40 },
     tableWidth: "wrap",
     scaleFactor: 0.99,
-
+    showHead: "firstPage",
+    pageBreak: "auto",
     styles: {
       fontSize: 9,
       halign: "center",
@@ -10157,7 +11066,6 @@ const rows = await Promise.all(filteredSantri.map(async (s, i) => {
       fillColor: [255, 255, 255],
       textColor: [0, 0, 0],
     },
-
     headStyles: {
       fillColor: [0, 102, 204],
       textColor: [255, 255, 255],
@@ -10167,18 +11075,15 @@ const rows = await Promise.all(filteredSantri.map(async (s, i) => {
       lineWidth: 0.6,
       lineColor: [0, 0, 0],
     },
-
     bodyStyles: {
       fillColor: [255, 255, 255],
       textColor: [0, 0, 0],
       lineWidth: 0.5,
       lineColor: [0, 0, 0],
     },
-
     alternateRowStyles: {
       fillColor: [255, 255, 255],
     },
-
     columnStyles: {
       0: { cellWidth: 25 },
       1: { cellWidth: 35 },
@@ -10192,15 +11097,12 @@ const rows = await Promise.all(filteredSantri.map(async (s, i) => {
       9: { cellWidth: 90 },
       10:{ cellWidth: 70 }
     },
-
     rowPageBreak: "avoid",
-
     willDrawCell(data) {
       if (data.section === "body" && data.column.index === 1) {
         data.cell.text = [""];
       }
     },
-
     didDrawCell(data) {
       if (data.section === "body" && data.column.index === 1) {
         const foto = data.cell.raw;
@@ -10230,9 +11132,7 @@ const rows = await Promise.all(filteredSantri.map(async (s, i) => {
 
   // ==== TABEL INVENTARIS UNIT (DENGAN NAMA PENANGGUNG JAWAB) ====
   try {
-    const unitFilterName =
-  selectedUnit.length === 1 ? selectedUnit[0] : null;
-
+    const unitFilterName = selectedUnit.length === 1 ? selectedUnit[0] : null;
 
     if (unitFilterName && unitFilterName !== "semua") {
       const { data: unitRows } = await supabaseClient
@@ -10249,14 +11149,12 @@ const rows = await Promise.all(filteredSantri.map(async (s, i) => {
           .select("*")
           .eq("Kode_Unit", kodeUnit);
 
-        // Estimasi tinggi tabel inventaris unit
         const estimasiTinggiUnit = invData && invData.length > 0 ? 
           (invData.length * 20 + 100) : 50;
 
-        // CEK APAKAH PERLU PINDAH HALAMAN BARU
         if (!cekRuangTersedia(estimasiTinggiUnit)) {
           doc.addPage();
-          doc.lastAutoTable.finalY = 40; // Reset posisi Y di halaman baru
+          doc.lastAutoTable.finalY = 40;
         }
 
         doc.setFont("helvetica", "normal");
@@ -10282,7 +11180,6 @@ const rows = await Promise.all(filteredSantri.map(async (s, i) => {
               .from("santri_kharisma")
               .select("Stambuk, Nama_Lengkap")
               .in("Stambuk", stambukList);
-
             santriRows?.forEach(s => {
               santriMap[s.Stambuk] = s.Nama_Lengkap;
             });
@@ -10294,7 +11191,6 @@ const rows = await Promise.all(filteredSantri.map(async (s, i) => {
               .from("penasehat")
               .select("id_penasehat, Nama")
               .in("id_penasehat", penasehatList);
-
             penRows?.forEach(p => {
               penasehatMap[p.id_penasehat] = p.Nama;
             });
@@ -10305,14 +11201,12 @@ const rows = await Promise.all(filteredSantri.map(async (s, i) => {
             head: [["No", "Jenis", "Merk", "NOPOL", "Keterangan", "STNK", "BPKB", "Penanggung Jawab"]],
             body: invData.map((row, i) => {
               let pjName = "-";
-
               if (row.Penanggung_Jawab_Tipe === "santri") {
                 pjName = santriMap[row.Penanggung_Jawab_ID] || "(Santri tidak ditemukan)";
               }
               if (row.Penanggung_Jawab_Tipe === "penasehat") {
                 pjName = penasehatMap[row.Penanggung_Jawab_ID] || "(Penasehat tidak ditemukan)";
               }
-
               return [
                 i + 1,
                 row.Jenis_Kendaraan ?? "-",
@@ -10324,10 +11218,10 @@ const rows = await Promise.all(filteredSantri.map(async (s, i) => {
                 pjName                
               ];
             }),
-
             margin: { left: 40, right: 40 },
             tableWidth: "wrap",
-
+            showHead: "firstPage",
+            pageBreak: "auto",
             styles: { 
               fontSize: 9,
               halign: "center",
@@ -10339,7 +11233,6 @@ const rows = await Promise.all(filteredSantri.map(async (s, i) => {
               fillColor: [255, 255, 255], 
               textColor: [0, 0, 0]
             },
-
             headStyles: { 
               fillColor: [0, 102, 204],
               textColor: [255, 255, 255],
@@ -10349,16 +11242,13 @@ const rows = await Promise.all(filteredSantri.map(async (s, i) => {
               lineWidth: 0.5,
               lineColor: [0, 0, 0]
             },
-
             bodyStyles: {
               fillColor: [255, 255, 255],
               textColor: [0, 0, 0],
               lineWidth: 0.5,
               lineColor: [0, 0, 0]
             },
-
             alternateRowStyles: { fillColor: [255, 255, 255] },
-
             columnStyles: {
               7: { halign: "left" },
               1: { halign: "left" },
@@ -10375,9 +11265,7 @@ const rows = await Promise.all(filteredSantri.map(async (s, i) => {
 
   // ==== TABEL INVENTARIS HANDPHONE (FORMAT SERAGAM) ====
   try {
-    const unitFilterName =
-  selectedUnit.length === 1 ? selectedUnit[0] : null;
-
+    const unitFilterName = selectedUnit.length === 1 ? selectedUnit[0] : null;
 
     if (unitFilterName && unitFilterName !== "semua") {
       const { data: unitRows } = await supabaseClient
@@ -10394,14 +11282,12 @@ const rows = await Promise.all(filteredSantri.map(async (s, i) => {
           .select("*")
           .eq("kode_unit", kodeUnit);
 
-        // Estimasi tinggi tabel inventaris handphone
         const estimasiTinggiHP = hpData && hpData.length > 0 ? 
           (hpData.length * 20 + 100) : 50;
 
-        // CEK APAKAH PERLU PINDAH HALAMAN BARU
         if (!cekRuangTersedia(estimasiTinggiHP)) {
           doc.addPage();
-          doc.lastAutoTable.finalY = 40; // Reset posisi Y di halaman baru
+          doc.lastAutoTable.finalY = 40;
         }
 
         doc.setFont("helvetica", "normal");
@@ -10428,7 +11314,6 @@ const rows = await Promise.all(filteredSantri.map(async (s, i) => {
               .from("santri_kharisma")
               .select("Stambuk, Nama_Lengkap")
               .in("Stambuk", stambukList);
-
             santriRows?.forEach(s => {
               santriMap[s.Stambuk] = s.Nama_Lengkap;
             });
@@ -10440,7 +11325,6 @@ const rows = await Promise.all(filteredSantri.map(async (s, i) => {
               .from("penasehat")
               .select("id_penasehat, Nama")
               .in("id_penasehat", penasehatList);
-
             penRows?.forEach(p => {
               penasehatMap[p.id_penasehat] = p.Nama;
             });
@@ -10451,15 +11335,12 @@ const rows = await Promise.all(filteredSantri.map(async (s, i) => {
             head: [["No", "Merk", "IMEI", "No. Kontak", "Penanggung Jawab"]],
             body: hpData.map((row, i) => {
               let pjName = "-";
-
               if (row.penanggung_jawab_tipe === "santri") {
                 pjName = santriMap[row.penanggung_jawab_id] || "(Santri tidak ditemukan)";
               }
-
               if (row.penanggung_jawab_tipe === "penasehat") {
                 pjName = penasehatMap[row.penanggung_jawab_id] || "(Penasehat tidak ditemukan)";
               }
-
               return [
                 i + 1,
                 row.merk ?? "-",
@@ -10468,10 +11349,10 @@ const rows = await Promise.all(filteredSantri.map(async (s, i) => {
                 pjName
               ];
             }),
-
             margin: { left: 40, right: 40 },
             tableWidth: "wrap",
-
+            showHead: "firstPage",
+            pageBreak: "auto",
             styles: {
               fontSize: 9,
               halign: "center",
@@ -10482,7 +11363,6 @@ const rows = await Promise.all(filteredSantri.map(async (s, i) => {
               fillColor: [255,255,255],
               textColor: [0,0,0],
             },
-
             headStyles: {
               fillColor: [0,102,204],
               textColor: [255,255,255],
@@ -10492,18 +11372,15 @@ const rows = await Promise.all(filteredSantri.map(async (s, i) => {
               lineWidth: 0.5,
               lineColor: [0,0,0],
             },
-
             bodyStyles: {
               fillColor: [255,255,255],
               textColor: [0,0,0],
               lineWidth: 0.5,
               lineColor: [0,0,0]
             },
-
             alternateRowStyles: {
               fillColor: [255,255,255]
             },
-
             columnStyles: {
               4: { halign: "left" }
             }
@@ -10530,226 +11407,25 @@ const rows = await Promise.all(filteredSantri.map(async (s, i) => {
     }
   }
 
-  // ==== SIMPAN FILE ====
-  const filters = {};
-  const filename = getExportFileName(`Laporan_Unit`, "pdf", filters);
-  doc.save(filename);
-}
-
-// ================= DOWNLOAD SANTRI PDF KOORDINASI (Tanpa Penasehat & Inventaris) =================
-async function downloadSantriPDFKoordinasi() {
-  const exportData = (lastFilteredData && lastFilteredData.length)
-    ? lastFilteredData
-    : allSantriData;
-
-  if (!exportData.length) return alert("Tidak ada data untuk diunduh!");
-
-  const startInput = prompt("Mulai dari nomor berapa? (Kosongkan untuk mulai dari 1)", "1");
-  if (startInput === null) return;
-  const endInput = prompt("Sampai nomor berapa? (Kosongkan untuk semua)", "");
-  if (endInput === null) return;
-
-  let startNo = parseInt(startInput) || 1;
-  let endNo = parseInt(endInput) || exportData.length;
-  if (startNo < 1 || endNo < startNo || startNo > exportData.length) return alert("Nomor tidak valid!");
-
-  const limitedData = exportData.slice(startNo - 1, endNo);
-  
-  // ===== FILTER SANTRI: HANYA STATUS AKTIF =====
-  const filteredSantri = limitedData.filter(s =>
-    String(s.Status || "").toLowerCase() === "aktif"
-  );
-
-  const selectedUnit = Array.from(
-    document.querySelectorAll('#filterUnit input[type="checkbox"]:checked')
-  ).map(cb => cb.value);
-
-  const selectedKelas = Array.from(
-    document.querySelectorAll('#filterKelas input[type="checkbox"]:checked')
-  ).map(cb => cb.value);
-
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF("landscape", "pt", "a4");
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
-  let currentY = 130;
-
-  // ==== HEADER ====
-  try {
-    const logoUrl = "https://i.imgur.com/Irgu32G.png";
-    const logoData = await loadImageToBase64(logoUrl);
-    if (logoData) doc.addImage(logoData.base64, "PNG", 40, 40, 60, 60);
-  } catch (e) { console.warn("Logo gagal dimuat:", e); }
-
-  doc.setFont("helvetica", "bold"); doc.setFontSize(20);
-  doc.text("KHUDAMA' KHARISMA", pageWidth / 2, 55, { align: "center" });
-  doc.setFont("helvetica", "normal"); doc.setFontSize(13);
-  doc.text("Pondok Pesantren Lirboyo Kota Kediri Jawa Timur", pageWidth / 2, 75, { align: "center" });
-  doc.setFont("helvetica", "italic"); doc.setFontSize(10);
-  doc.text("Sekretariat: Kantor KHARISMA Gedung Nafis Lt. 02 Lirboyo Kota Kediri", pageWidth / 2, 95, { align: "center" });
-  doc.setLineWidth(1);
-  doc.line(40, 110, pageWidth - 40, 110);
-
-  doc.setFont("helvetica", "bold"); 
-  doc.setFontSize(15);
-  doc.text("LAPORAN DATA SISWA", pageWidth / 2, 135, { align: "center" });
-
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(13);
-  if (selectedUnit.length || selectedKelas.length) {
-    const info = [];
-    if (selectedUnit.length) {
-      info.push(`Unit: ${selectedUnit.join(", ")}`);
-    }
-    if (selectedKelas.length) {
-      info.push(`Kelas: ${selectedKelas.join(", ")}`);
-    }
-    doc.text(info.join("   |   "), 40, 180);
-    currentY = 200;
-  } else {
-    currentY = 155;
+  // ==== MEMBUAT NAMA FILE SESUAI FILTER UNIT ====
+  let fileNameUnit = "Semua_Unit";
+  if (selectedUnit.length === 1 && selectedUnit[0] !== "semua") {
+    // Jika hanya 1 unit yang dipilih dan bukan "semua"
+    fileNameUnit = selectedUnit[0].replace(/\s+/g, '_');
+  } else if (selectedUnit.length > 1) {
+    // Jika lebih dari 1 unit dipilih
+    fileNameUnit = selectedUnit.map(u => u.replace(/\s+/g, '_')).join('_');
   }
   
-  // ==== TABEL SANTRI (FORMAT KOORDINASI) ====
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(12);
-  doc.text("Daftar Siswa", 40, currentY);
-  currentY += 5;
-
-  const headers = [
-    "No", "Foto", "Nama", "Kelas", "Bagian", 
-    "Himpunan", "Kamar", "Unit Ndalem", "Posisi Tugas", "Shift", "Jam Tugas"
-  ];
-
-  const rows = await Promise.all(filteredSantri.map(async (s, i) => {
-    let foto = null;
-    if (s.Foto) {
-      try {
-        foto = await loadImageToBase64(s.Foto);
-      } catch (e) {
-        console.warn("Gagal load foto:", s.Foto);
-      }
-    }
-
-    return [
-      i + 1,
-      foto,
-      s.Nama_Lengkap || "-",
-      s.Kelas || "-",
-      s.Bagian || "-",
-      s.Himpunan || "-",
-      s.Kamar || "-",
-	  s.Unit_Ndalem || "-",
-      s.Posisi_Tugas || "-",
-	  s.Shift || "-" ,
-      s.Jam_Tugas || "-"           
-    ];
-  }));
-
-  doc.autoTable({
-    head: [headers],
-    body: rows,
-    startY: currentY + 5,
-    margin: { left: 40, right: 40 },
-    tableWidth: "wrap",
-    scaleFactor: 0.99,
-
-    styles: {
-      fontSize: 9,
-      halign: "center",
-      valign: "middle",
-      minCellHeight: 15,
-      lineWidth: 0.5,
-      lineColor: [0, 0, 0],
-      cellPadding: 5,
-      overflow: "linebreak",
-      fillColor: [255, 255, 255],
-      textColor: [0, 0, 0],
-    },
-
-    headStyles: {
-      fillColor: [0, 102, 204],
-      textColor: [255, 255, 255],
-      fontStyle: "bold",
-      halign: "center",
-      valign: "middle",
-      lineWidth: 0.6,
-      lineColor: [0, 0, 0],
-    },
-
-    bodyStyles: {
-      fillColor: [255, 255, 255],
-      textColor: [0, 0, 0],
-      lineWidth: 0.5,
-      lineColor: [0, 0, 0],
-    },
-
-    alternateRowStyles: {
-      fillColor: [255, 255, 255],
-    },
-
-    columnStyles: {
-      0: { cellWidth: 25 },
-      1: { cellWidth: 35 },
-      2: { cellWidth: 100, halign: "left" },
-      3: { cellWidth: 70 },
-      4: { cellWidth: 70 },
-      5: { cellWidth: 70 },
-      6: { cellWidth: 70 },
-      7: { cellWidth: 80 },
-      8: { cellWidth: 70 },
-      9: { cellWidth: 80 },
-      10: { cellWidth: 90, halign: "left" }
-    },
-
-    rowPageBreak: "avoid",
-
-    willDrawCell(data) {
-      if (data.section === "body" && data.column.index === 1) {
-        data.cell.text = [""];
-      }
-    },
-
-    didDrawCell(data) {
-      if (data.section === "body" && data.column.index === 1) {
-        const foto = data.cell.raw;
-        if (foto && foto.base64) {
-          const pad = 2;
-          const cw = data.cell.width - pad * 2;
-          const ch = data.cell.height - pad * 2;
-          const ratio = Math.min(cw / foto.w, ch / foto.h);
-          const nw = foto.w * ratio;
-          const nh = foto.h * ratio;
-          const x = data.cell.x + (data.cell.width - nw) / 2;
-          const y = data.cell.y + (data.cell.height - nh) / 2;
-          try {
-            doc.addImage(foto.base64, "PNG", x, y, nw, nh);
-          } catch {}
-        }
-      }
-    },
-  });
-
-  // ==== FOOTER HALAMAN ====
-  const pageCount = doc.internal.getNumberOfPages();
-  for (let i = 1; i <= pageCount; i++) {
-    doc.setPage(i);
-    doc.setFont("helvetica", "normal"); doc.setFontSize(9);
-    doc.text(`Halaman ${i} dari ${pageCount}`, pageWidth / 2, pageHeight - 20, { align: "center" });
-    if (i === pageCount) {
-      doc.setFont("helvetica", "italic");
-      doc.setTextColor(120);
-      doc.text(`Admin – Simponi Kharisma – ${new Date().toLocaleString("id-ID")}`,
-        pageWidth - 40, pageHeight - 20, { align: "right" });
-      doc.setTextColor(0);
-    }
-  }
-
+  // Format tanggal untuk nama file
+  const now = new Date();
+  const tanggal = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const waktu = `${String(now.getHours()).padStart(2, '0')}_${String(now.getMinutes()).padStart(2, '0')}_${String(now.getSeconds()).padStart(2, '0')}`;
+  
+  // Nama file final dengan format: Laporan_Unit_NamaUnit_Tanggal_Waktu.pdf
+  const filename = `Laporan_Unit_${fileNameUnit}_${tanggal}_${waktu}.pdf`;
+  
   // ==== SIMPAN FILE ====
-  const filters = {};
-  if (selectedUnit.length) filters.unit = selectedUnit.join("-");
-  if (selectedKelas.length) filters.kelas = selectedKelas.join("-");
-  const filename = getExportFileName(`Laporan_Data_Siswa_Koordinasi`, "pdf", filters);
   doc.save(filename);
 }
 
@@ -11426,7 +12102,256 @@ function renderTable(tableId, rows, columns) {
   table.appendChild(tbody);
 }
 
+function renderInventarisGrid(data) {
 
+  const container =
+    document.getElementById("inventaris-grid");
+
+  if (!container) return;
+
+
+  // =========================
+  // EMPTY
+  // =========================
+
+  if (!data || data.length === 0) {
+
+    container.innerHTML = `
+      <div style="
+        padding:20px;
+        text-align:center;
+      ">
+        Tidak ada data inventaris
+      </div>
+    `;
+
+    return;
+  }
+
+
+  // =========================
+  // ROLE
+  // =========================
+
+  const userRole =
+    localStorage.getItem("userRole") || "user";
+
+
+  // =========================
+  // RENDER
+  // =========================
+
+  container.innerHTML = data.map(row => {
+
+    const safeRow =
+      encodeURIComponent(JSON.stringify(row));
+
+
+    // =========================
+    // FOTO
+    // =========================
+
+    const images = [
+
+      row.Foto_1,
+      row.Foto_2,
+      row.Foto_3,
+      row.Foto_4
+
+    ].filter(Boolean);
+
+
+    return `
+
+      <div class="inventaris-card">
+
+
+        <!-- =========================
+             SLIDER WRAPPER
+        ========================== -->
+
+        <div class="inventaris-slider-wrapper">
+
+
+          ${
+            images.length > 1
+            ? `
+              <button
+                class="inventaris-nav prev"
+                onclick="slideInventaris(this,-1)">
+
+                ❮
+
+              </button>
+            `
+            : ""
+          }
+
+
+          <!-- =========================
+               SLIDER
+          ========================== -->
+
+          <div class="inventaris-slider">
+
+            ${
+              images.length > 0
+
+              ? images.map(img => `
+
+                  <img
+                    src="${img}"
+                    class="slide-img"
+                    loading="lazy"
+                  >
+
+                `).join("")
+
+              : `
+
+                <img
+                  src="https://placehold.co/600x400?text=No+Image"
+                  class="slide-img"
+                >
+
+              `
+            }
+
+          </div>
+
+
+          ${
+            images.length > 1
+            ? `
+              <button
+                class="inventaris-nav next"
+                onclick="slideInventaris(this,1)">
+
+                ❯
+
+              </button>
+            `
+            : ""
+          }
+
+        </div>
+
+
+        <!-- =========================
+             BODY
+        ========================== -->
+
+        <div class="inventaris-body">
+
+  <div class="inventaris-title">
+    ${row.Merk || "-"}
+  </div>
+
+  <div class="inventaris-info">
+
+    <div class="inventaris-item">
+      <strong>Unit</strong>
+      <span>${row.Nama_Unit || "-"}</span>
+    </div>
+
+    <div class="inventaris-item">
+      <strong>Jenis</strong>
+      <span>${row.Jenis_Kendaraan || "-"}</span>
+    </div>
+
+    <div class="inventaris-item">
+      <strong>Nopol</strong>
+      <span>${row.NOPOL || "-"}</span>
+    </div>
+
+    <div class="inventaris-item">
+      <strong>Tahun</strong>
+      <span>${row.Tahun_Produksi || "-"}</span>
+    </div>
+
+    <div class="inventaris-item">
+      <strong>Penanggung Jawab</strong>
+      <span>${row.Penanggung_Jawab || "-"}</span>
+    </div>
+
+    <div class="inventaris-item">
+      <strong>STNK</strong>
+      <span>${row.STNK || "-"}</span>
+    </div>
+
+    <div class="inventaris-item">
+      <strong>BPKB</strong>
+      <span>${row.BPKB || "-"}</span>
+    </div>
+
+    <div class="inventaris-item">
+      <strong>Keterangan</strong>
+      <span>${row.Keterangan || "-"}</span>
+    </div>
+
+  </div>
+
+
+          ${
+            userRole === "admin"
+
+            ? `
+
+              <div class="inventaris-actions">
+
+                <button
+                  class="crud-btn-save"
+                  data-row="${safeRow}"
+                  onclick="handleEditInventaris(this)">
+
+                  ✏️ Edit
+
+                </button>
+
+
+                <button
+                  class="crud-btn-cancel"
+                  onclick='deleteInventaris("${row.id}")'>
+
+                  🗑️ Hapus
+
+                </button>
+
+              </div>
+
+            `
+
+            : ""
+          }
+
+        </div>
+
+      </div>
+
+    `;
+
+  }).join("");
+}
+
+function slideInventaris(btn, direction){
+
+  const wrapper =
+    btn.closest(".inventaris-slider-wrapper");
+
+  if (!wrapper) return;
+
+  const slider =
+    wrapper.querySelector(".inventaris-slider");
+
+  if (!slider) return;
+
+  const width = slider.clientWidth;
+
+  slider.scrollBy({
+    left: width * direction,
+    behavior: "smooth"
+  });
+}
 
 /* === Load Inventaris dari Supabase (manual join, PascalCase, clean) === */
 async function loadInventaris() {
@@ -11435,7 +12360,7 @@ async function loadInventaris() {
     // 1) Ambil inventaris
     const { data: inv, error: errInv } = await supabaseClient
       .from("inventaris")
-      .select("id, Kode_Unit, Jenis_Kendaraan, Merk, NOPOL, Tahun_Produksi, Keterangan, STNK, BPKB, Update_Tgl, Penanggung_Jawab_Tipe, Penanggung_Jawab_ID");
+      .select("id, Kode_Unit, Jenis_Kendaraan, Merk,Foto_1,Foto_2,Foto_3,Foto_4, NOPOL, Tahun_Produksi, Keterangan, STNK, BPKB, Update_Tgl, Penanggung_Jawab_Tipe, Penanggung_Jawab_ID");
 
     if (errInv) throw errInv;
     if (!inv || inv.length === 0) {
@@ -11456,6 +12381,7 @@ async function loadInventaris() {
 
     // 4) Mapping inventaris + join manual
     const mapped = inv.map(row => {
+	
       const rawDate = row.Update_Tgl || null;
       let isoDate = "";
       if (rawDate) {
@@ -11479,6 +12405,10 @@ async function loadInventaris() {
       return {
         id: row.id,
         Kode_Unit: row.Kode_Unit ?? "",
+		Foto_1: row.Foto_1 || null,
+		Foto_2: row.Foto_2 || null,
+		Foto_3: row.Foto_3 || null,
+		Foto_4: row.Foto_4 || null,
         Nama_Unit: unit?.Nama_Unit ?? "-",
         Jenis_Kendaraan: row.Jenis_Kendaraan ?? "-",
         Merk: row.Merk ?? "-",
@@ -11497,6 +12427,7 @@ async function loadInventaris() {
 	
 	// 4b) Urutkan default by Nama_Unit ASC
 	mapped.sort((a, b) => a.Nama_Unit.localeCompare(b.Nama_Unit));
+	inventarisData = mapped;
 	
 	// 5) Buat ringkasan
 	const summary = {
@@ -11526,12 +12457,13 @@ async function loadInventaris() {
 
 
     await saveToDB("inventaris", mapped);
-    renderTable("inventaris-table", mapped, getInventarisCols());
+    renderInventarisGrid(mapped);
 
   } catch (err) {
     const cached = await getFromDB("inventaris");
     if (cached && cached.length > 0) {
-      renderTable("inventaris-table", cached, getInventarisCols());
+	  inventarisData = cached;
+      renderInventarisGrid(cached);
     } else {
       showError("Tidak ada data Inventaris offline.");
     }
@@ -11666,74 +12598,245 @@ async function openEditInventaris(row) {
   document.getElementById("STNK").value = row.STNK || "";
   document.getElementById("BPKB").value = row.BPKB || "";
   document.getElementById("Update_Tgl").value = row.Update_Tgl_iso || "";
+  document.getElementById("previewFoto1").src =
+  row.Foto_1 || "https://placehold.co/300x200?text=No+Image";
+
+document.getElementById("previewFoto2").src =
+  row.Foto_2 || "https://placehold.co/300x200?text=No+Image";
+
+document.getElementById("previewFoto3").src =
+  row.Foto_3 || "https://placehold.co/300x200?text=No+Image";
+
+document.getElementById("previewFoto4").src =
+  row.Foto_4 || "https://placehold.co/300x200?text=No+Image";
 
   document.getElementById("inventarisModal").style.display = "block";
+  
 }
 
 /* === Handler Tambah Inventaris === */
+/* === Handler Tambah Inventaris === */
 async function openAddInventaris() {
-  document.getElementById("inventarisModalTitle").textContent = "Tambah Inventaris";
+
+  document.getElementById("inventarisModalTitle").textContent =
+    "Tambah Inventaris";
+
   document.getElementById("inventarisForm").reset();
+
   document.getElementById("inventarisId").value = "";
 
   // isi dropdown Unit
   await loadUnitOptions("Kode_Unit_inventaris", "");
+
   document.getElementById("Kode_Unit_inventaris").value = "";
 
   // kosongkan dropdown penanggung jawab
   const pjSelect = document.getElementById("Penanggung_Jawab");
-  pjSelect.innerHTML = '<option value="">-- Pilih Penanggung Jawab --</option>';
+
+  pjSelect.innerHTML =
+    '<option value="">-- Pilih Penanggung Jawab --</option>';
+
+  // reset preview foto
+  document.getElementById("previewFoto1").src =
+    "https://placehold.co/300x200?text=No+Image";
+
+  document.getElementById("previewFoto2").src =
+    "https://placehold.co/300x200?text=No+Image";
+
+  document.getElementById("previewFoto3").src =
+    "https://placehold.co/300x200?text=No+Image";
+
+  document.getElementById("previewFoto4").src =
+    "https://placehold.co/300x200?text=No+Image";
 
   document.getElementById("inventarisModal").style.display = "block";
 }
 
 
 
+
+/* === Upload Single Foto Inventaris === */
+async function uploadSingleInventarisImage(file) {
+
+  if (!file) return null;
+
+  const ext = file.name.split(".").pop();
+
+  const fileName = `
+    kendaraan-${Date.now()}-${Math.random()}.${ext}
+  `.replace(/\s/g, "");
+
+  const filePath = `kendaraan/${fileName}`;
+
+  const { error } = await supabaseClient
+    .storage
+    .from("inventaris")
+    .upload(filePath, file);
+
+  if (error) throw error;
+
+  const { data } = supabaseClient
+    .storage
+    .from("inventaris")
+    .getPublicUrl(filePath);
+
+  return data.publicUrl;
+}
+
 /* === Submit Form Inventaris === */
 document.getElementById("inventarisForm").addEventListener("submit", async (e) => {
+
   e.preventDefault();
 
-  const hiddenId = document.getElementById("inventarisId").value; // id PK
-  const selectUnit = document.getElementById("Kode_Unit_inventaris");
-  const selectedKode = selectUnit ? selectUnit.value : null;
-  const pjSelect = document.getElementById("Penanggung_Jawab");
-  let pjData = pjSelect && pjSelect.value ? JSON.parse(pjSelect.value) : null;
+const saveBtn = document.getElementById("btnSaveInventaris");
 
-  const payload = {
-    Kode_Unit: selectedKode || null,
-    Jenis_Kendaraan: document.getElementById("Jenis_Kendaraan").value?.trim() || null,
-    Merk: document.getElementById("Merk").value?.trim() || null,
-    NOPOL: document.getElementById("NOPOL").value?.trim() || null,
-	Tahun_Produksi: document.getElementById("Tahun_Produksi").value?.trim() || null,
-    Keterangan: document.getElementById("Keterangan").value?.trim() || null,
-    STNK: document.getElementById("STNK").value?.trim() || null,
-    BPKB: document.getElementById("BPKB").value?.trim() || null,
-    Update_Tgl: document.getElementById("Update_Tgl").value || null,
-    Penanggung_Jawab_Tipe: pjData ? pjData.tipe : null,
-    Penanggung_Jawab_ID: pjData ? pjData.id : null
-  };  
+saveBtn.disabled = true;
 
-  try {
+saveBtn.innerHTML = "⏳ Uploading...";
+
+await new Promise(resolve => setTimeout(resolve, 50));
+
+try {
+
+    const hiddenId = document.getElementById("inventarisId").value;
+
+    const selectUnit = document.getElementById("Kode_Unit_inventaris");
+
+    const selectedKode = selectUnit
+      ? selectUnit.value
+      : null;
+
+    const pjSelect = document.getElementById("Penanggung_Jawab");
+
+    let pjData = pjSelect && pjSelect.value
+      ? JSON.parse(pjSelect.value)
+      : null;
+
+
+    // =====================================
+    // FOTO
+    // =====================================
+
+    const foto1 = document.getElementById("Foto_1").files[0];
+    const foto2 = document.getElementById("Foto_2").files[0];
+    const foto3 = document.getElementById("Foto_3").files[0];
+    const foto4 = document.getElementById("Foto_4").files[0];
+
+    const foto1Url = await uploadSingleInventarisImage(foto1);
+    const foto2Url = await uploadSingleInventarisImage(foto2);
+    const foto3Url = await uploadSingleInventarisImage(foto3);
+    const foto4Url = await uploadSingleInventarisImage(foto4);
+
+
+    // =====================================
+    // PAYLOAD
+    // =====================================
+
+    const payload = {
+
+      Kode_Unit: selectedKode || null,
+
+      Jenis_Kendaraan:
+        document.getElementById("Jenis_Kendaraan").value?.trim() || null,
+
+      Merk:
+        document.getElementById("Merk").value?.trim() || null,
+
+      Foto_1: foto1Url,
+      Foto_2: foto2Url,
+      Foto_3: foto3Url,
+      Foto_4: foto4Url,
+
+      NOPOL:
+        document.getElementById("NOPOL").value?.trim() || null,
+
+      Tahun_Produksi:
+        document.getElementById("Tahun_Produksi").value?.trim() || null,
+
+      Keterangan:
+        document.getElementById("Keterangan").value?.trim() || null,
+
+      STNK:
+        document.getElementById("STNK").value?.trim() || null,
+
+      BPKB:
+        document.getElementById("BPKB").value?.trim() || null,
+
+      Update_Tgl:
+        document.getElementById("Update_Tgl").value || null,
+
+      Penanggung_Jawab_Tipe:
+        pjData ? pjData.tipe : null,
+
+      Penanggung_Jawab_ID:
+        pjData ? pjData.id : null
+    };
+
+
+    // =====================================
+    // UPDATE
+    // =====================================
+
     if (hiddenId) {
+
+      const { data: oldData } = await supabaseClient
+        .from("inventaris")
+        .select("Foto_1, Foto_2, Foto_3, Foto_4")
+        .eq("id", hiddenId)
+        .single();
+
+      if (!foto1Url) payload.Foto_1 = oldData?.Foto_1 || null;
+      if (!foto2Url) payload.Foto_2 = oldData?.Foto_2 || null;
+      if (!foto3Url) payload.Foto_3 = oldData?.Foto_3 || null;
+      if (!foto4Url) payload.Foto_4 = oldData?.Foto_4 || null;
+
       const { error } = await supabaseClient
         .from("inventaris")
         .update(payload)
-        .eq("id", hiddenId); // pakai id PK
+        .eq("id", hiddenId);
+
       if (error) throw error;
+
       showToast("Inventaris berhasil diupdate");
+
     } else {
+
       const { error } = await supabaseClient
         .from("inventaris")
         .insert([payload]);
+
       if (error) throw error;
+
       showToast("Inventaris berhasil ditambahkan");
     }
 
-    closeInventarisModal();
-    loadInventaris();
+    saveBtn.innerHTML = "✅ Berhasil";
+
+    await loadInventaris();
+
+    setTimeout(() => {
+
+      closeInventarisModal();
+
+    }, 700);
+
   } catch (err) {
+
     console.error("Gagal simpan inventaris:", err);
+
     showToast("Gagal simpan inventaris", true);
+
+    saveBtn.innerHTML = "❌ Gagal";
+
+  } finally {
+
+    setTimeout(() => {
+
+      saveBtn.disabled = false;
+
+      saveBtn.innerHTML = "💾 Simpan";
+
+    }, 1200);
   }
 });
 
@@ -11742,6 +12845,37 @@ function closeInventarisModal() {
   const modal = document.getElementById("inventarisModal");
   if (modal) modal.style.display = "none";
 }
+
+/* === Preview Foto Inventaris === */
+function previewInventarisImage(inputId, previewId){
+
+  const input = document.getElementById(inputId);
+
+  const preview = document.getElementById(previewId);
+
+  if (!input || !preview) return;
+
+  input.addEventListener("change", () => {
+
+    const file = input.files[0];
+
+    if (!file) return;
+
+    preview.src = URL.createObjectURL(file);
+
+  });
+}
+
+/* === Init Preview Foto === */
+
+previewInventarisImage("Foto_1", "previewFoto1");
+
+previewInventarisImage("Foto_2", "previewFoto2");
+
+previewInventarisImage("Foto_3", "previewFoto3");
+
+previewInventarisImage("Foto_4", "previewFoto4");
+
 
 // ================= DOWNLOAD PENASEHAT PDF =================
 async function downloadPenasehatPDF() {
@@ -11788,7 +12922,7 @@ async function downloadPenasehatPDF() {
     // ==== Judul ====
     let y = 150;
     pdf.setFont("helvetica", "bold"); pdf.setFontSize(16);
-    pdf.text("LAPORAN DATA PENASEHAT", pageWidth / 2, y, { align: "center" });
+    pdf.text("LAPORAN DATA PENASIHAT", pageWidth / 2, y, { align: "center" });
     y += 18;
 
     // ==== Tabel ====
@@ -13218,52 +14352,6 @@ document.getElementById("Kode_Unit_hp").addEventListener("change", async (e) => 
 });
 
 
-document.getElementById("inventarisHpForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const id = document.getElementById("inventarisHpId").value;
-
-  const payload = {
-    kode_unit: document.getElementById("Kode_Unit_hp").value,
-    merk: document.getElementById("Merk_hp").value.trim(),
-    imei: document.getElementById("IMEI_hp").value.trim(),
-    no_kontak: document.getElementById("No_Kontak_hp").value.trim(),
-  };
-
-  const pjSel = document.getElementById("Penanggung_Jawab_hp");
-  const pjData = pjSel.value ? JSON.parse(pjSel.value) : null;
-
-  payload.penanggung_jawab_tipe = pjData?.tipe || null;
-  payload.penanggung_jawab_id = pjData?.id || null;
-
-  console.log("PAYLOAD HP:", payload); // debug
-
-  try {
-    let result;
-    if (id) {
-      result = await supabaseClient
-        .from("inventaris_handphone")
-        .update(payload)
-        .eq("id", id);
-    } else {
-      result = await supabaseClient
-        .from("inventaris_handphone")
-        .insert([payload]);
-    }
-
-    if (result.error) throw result.error;
-
-    showToast("Data handphone berhasil disimpan");
-    closeInventarisHpModal();
-    loadInventarisHP();
-
-  } catch (err) {
-    console.error("ERROR SAVE HP:", err);
-    showToast("Gagal menyimpan data handphone", true);
-  }
-});
-
-
 async function deleteInventarisHP(id) {
   if (localStorage.getItem("userRole") !== "admin") return;
 
@@ -13286,13 +14374,84 @@ async function deleteInventarisHP(id) {
 }
 
 async function handleDownloadInventarisKendaraan(btn) {
+
+  if (!inventarisData || inventarisData.length === 0) {
+    showToast("Tidak ada data inventaris", true);
+    return;
+  }
+
   btn.classList.add("loading");
-  btn.querySelector("span").textContent = "Membuat PDF...";
+
   try {
-    await downloadInventarisPDF("kendaraan");
+
+    const rows = inventarisData.map(x => ({
+      unit: x.Nama_Unit || "-",
+      jenis: x.Jenis_Kendaraan || "-",
+      merk: x.Merk || "-",
+      nopol: x.NOPOL || "-",
+      tahun: x.Tahun_Produksi || "-",
+      pj: x.Penanggung_Jawab || "-",
+      stnk: x.STNK || "-",
+      bpkb: x.BPKB || "-",
+      ket: x.Keterangan || "-"
+    }));
+
+
+    // ===== GENERATE PDF =====
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF("l", "mm", "a4");
+
+    doc.setFontSize(16);
+    doc.text("Data Inventaris Kendaraan", 14, 15);
+
+    doc.autoTable({
+      startY: 22,
+      head: [[
+        "Unit",
+        "Jenis",
+        "Merk",
+        "NOPOL",
+        "Tahun",
+        "PJ",
+        "STNK",
+        "BPKB",
+        "Keterangan"
+      ]],
+
+      body: rows.map(r => [
+        r.unit,
+        r.jenis,
+        r.merk,
+        r.nopol,
+        r.tahun,
+        r.pj,
+        r.stnk,
+        r.bpkb,
+        r.ket
+      ]),
+
+      styles: {
+        fontSize: 8
+      },
+
+      headStyles: {
+        fillColor: [41, 128, 185]
+      }
+    });
+
+    doc.save("inventaris-kendaraan.pdf");
+
+    showToast("PDF berhasil dibuat");
+
+  } catch (err) {
+
+    console.error(err);
+    showToast("Gagal download PDF", true);
+
   } finally {
+
     btn.classList.remove("loading");
-    btn.querySelector("span").textContent = "Download PDF";
+
   }
 }
 
@@ -13308,13 +14467,24 @@ async function handleDownloadInventarisHP(btn) {
 }
 
 function applyFilterKendaraan() {
-  const key = document.getElementById("searchKendaraan").value.toLowerCase();
-  const rows = document.querySelectorAll("#inventaris-table tbody tr");
 
-  rows.forEach(row => {
-    const text = row.innerText.toLowerCase();
-    row.style.display = text.includes(key) ? "" : "none";
+  const key = document
+    .getElementById("searchKendaraan")
+    .value
+    .toLowerCase();
+
+  const filtered = inventarisData.filter(x => {
+
+    return (
+      (x.Nama_Unit || "").toLowerCase().includes(key) ||
+      (x.Jenis_Kendaraan || "").toLowerCase().includes(key) ||
+      (x.Merk || "").toLowerCase().includes(key) ||
+      (x.NOPOL || "").toLowerCase().includes(key)
+    );
+
   });
+
+  renderInventarisGrid(filtered);
 }
 
 function applyFilterHP() {
@@ -13704,7 +14874,7 @@ function showPopupUpdate(msg) {
   <img src="https://img.shields.io/badge/version-v2.2.2-orange" alt="Version">
   <img src="https://img.shields.io/badge/license-Proprietary-red" alt="License">
   <img src="https://img.shields.io/badge/status-Internal%20Use-blue" alt="Status">
-  <img src="https://img.shields.io/badge/%C2%A9%202025%20Ndalem%20Kharisma-Semua%20hak%20dilindungi%20undang%E2%80%90undang-red" 
+  <img src="https://img.shields.io/badge/%C2%A9%202026%20Ndalem%20Kharisma-Semua%20hak%20dilindungi%20undang%E2%80%90undang-red" 
        alt="Copyright">
 </div>
 
