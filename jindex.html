@@ -3872,7 +3872,7 @@ and (max-width:1024px){
     
     <div class="admin-tools">
 	  <button class="admin-only" onclick="openAddAbsensi()">➕ Tambah</button>
-
+	  <button class="admin-only" onclick="window.location.href='import_excel.html'">📥 Import Excel</button>
 	  <button onclick="showAbsensiMerahTrendModule()">🔎 Detail Absen Merah</button>
 
 
@@ -11427,6 +11427,343 @@ async function downloadSantriPDFCustom() {
   
   // ==== SIMPAN FILE ====
   doc.save(filename);
+}
+
+// ================= DOWNLOAD SANTRI PDF KOORDINASI (HANYA SANTRI) =================
+async function downloadSantriPDFKoordinasi() {
+  const exportData = (lastFilteredData && lastFilteredData.length)
+    ? lastFilteredData
+    : allSantriData;
+
+  if (!exportData.length) {
+    return alert("Tidak ada data untuk diunduh!");
+  }
+
+  // ===== FILTER SANTRI AKTIF =====
+  const aktifSantri = exportData.filter(s =>
+    String(s.Status || "").toLowerCase() === "aktif"
+  );
+
+  if (aktifSantri.length === 0) {
+    return alert("Tidak ada santri aktif!");
+  }
+
+  // ===== PROMPT NOMOR =====
+  const startInput = prompt(
+    "Mulai dari nomor berapa? (Kosongkan untuk mulai dari 1)",
+    "1"
+  );
+  if (startInput === null) return;
+
+  const endInput = prompt(
+    "Sampai nomor berapa? (Kosongkan untuk semua)",
+    ""
+  );
+  if (endInput === null) return;
+
+  let startNo = parseInt(startInput) || 1;
+  let endNo = parseInt(endInput) || aktifSantri.length;
+
+  if (
+    startNo < 1 ||
+    endNo < startNo ||
+    startNo > aktifSantri.length
+  ) {
+    return alert(
+      `Nomor tidak valid! Jumlah santri aktif: ${aktifSantri.length}`
+    );
+  }
+
+  // ===== DATA FINAL =====
+  const filteredSantri = aktifSantri.slice(startNo - 1, endNo);
+
+  // ===== FILTER UNTUK HEADER =====
+  const selectedUnit = Array.from(
+    document.querySelectorAll('#filterUnit input[type="checkbox"]:checked')
+  ).map(cb => cb.value);
+
+  const selectedKelas = Array.from(
+    document.querySelectorAll('#filterKelas input[type="checkbox"]:checked')
+  ).map(cb => cb.value);
+
+  // ===== INIT PDF =====
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF("landscape", "pt", "a4");
+
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+
+  // ===== HEADER =====
+  try {
+    const logoUrl = "https://i.imgur.com/Irgu32G.png";
+    const logoData = await loadImageToBase64(logoUrl);
+
+    if (logoData) {
+      doc.addImage(logoData.base64, "PNG", 40, 40, 60, 60);
+    }
+  } catch (e) {
+    console.warn("Logo gagal dimuat:", e);
+  }
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(20);
+  doc.text("KHUDAMA' KHARISMA", pageWidth / 2, 55, {
+    align: "center"
+  });
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(13);
+  doc.text(
+    "Pondok Pesantren Lirboyo Kota Kediri Jawa Timur",
+    pageWidth / 2,
+    75,
+    { align: "center" }
+  );
+
+  doc.setFont("helvetica", "italic");
+  doc.setFontSize(10);
+  doc.text(
+    "Sekretariat: Kantor KHARISMA Gedung Nafis Lt. 02 Lirboyo Kota Kediri",
+    pageWidth / 2,
+    95,
+    { align: "center" }
+  );
+
+  doc.setLineWidth(1);
+  doc.line(40, 110, pageWidth - 40, 110);
+
+  // ===== JUDUL =====
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(16);
+  doc.text(
+    "LAPORAN DATA SANTRI",
+    pageWidth / 2,
+    140,
+    { align: "center" }
+  );
+
+  let currentY = 165;
+
+  // ===== INFO FILTER =====
+  if (selectedUnit.length || selectedKelas.length) {
+    const info = [];
+
+    if (selectedUnit.length) {
+      info.push(`Unit: ${selectedUnit.join(", ")}`);
+    }
+
+    if (selectedKelas.length) {
+      info.push(`Kelas: ${selectedKelas.join(", ")}`);
+    }
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+
+    doc.text(info.join("   |   "), 40, currentY);
+
+    currentY += 25;
+  }
+
+  // ===== JUDUL TABEL =====
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(12);
+  doc.text("Daftar Santri", 40, currentY);
+
+  // ===== HEADER TABEL =====
+  const headers = [[
+    "No",
+    "Foto",
+    "Nama",
+    "Kelas",
+	"Bag",
+    "Kamar",
+    "Himpunan",    
+    "Posisi Tugas",
+    "Shift",
+    "Jam Tugas",
+    "Masa Khidmah"
+  ]];
+
+  // ===== ROWS =====
+  const rows = await Promise.all(
+    filteredSantri.map(async (s, i) => {
+      let foto = null;
+
+      if (s.Foto) {
+        try {
+          foto = await loadImageToBase64(s.Foto);
+        } catch (e) {
+          console.warn("Gagal load foto:", s.Foto);
+        }
+      }
+
+      return [
+        i + startNo,
+        foto,
+        s.Nama_Lengkap || "-",
+        s.Kelas || "-",
+		s.Bagian || "-",
+        s.Kamar || "-",
+        s.Himpunan || "-",        
+        s.Posisi_Tugas || "-",
+        s.Shift || "-",
+        s.Jam_Tugas || "-",
+        calculateMasaKhidmah(s.Mulai_Ngabdi)
+      ];
+    })
+  );
+
+  // ===== TABEL =====
+  doc.autoTable({
+    head: headers,
+    body: rows,
+    startY: currentY + 10,
+
+    margin: {
+      left: 40,
+      right: 40
+    },
+
+    tableWidth: "wrap",
+    pageBreak: "auto",
+    showHead: "firstPage",
+
+    styles: {
+      fontSize: 9,
+      halign: "center",
+      valign: "middle",
+      minCellHeight: 15,
+      lineWidth: 0.5,
+      lineColor: [0, 0, 0],
+      cellPadding: 5,
+      overflow: "linebreak",
+      fillColor: [255, 255, 255],
+      textColor: [0, 0, 0]
+    },
+
+    headStyles: {
+      fillColor: [0, 102, 204],
+      textColor: [255, 255, 255],
+      fontStyle: "bold",
+      halign: "center",
+      valign: "middle",
+      lineWidth: 0.6,
+      lineColor: [0, 0, 0]
+    },
+
+    bodyStyles: {
+      fillColor: [255, 255, 255],
+      textColor: [0, 0, 0],
+      lineWidth: 0.5,
+      lineColor: [0, 0, 0]
+    },
+
+    alternateRowStyles: {
+      fillColor: [255, 255, 255]
+    },
+
+    columnStyles: {
+      0: { cellWidth: 25 },
+      1: { cellWidth: 35 },
+      2: { cellWidth: 110, halign: "left" },
+      3: { cellWidth: 80 },
+      4: { cellWidth: 35 },
+      5: { cellWidth: 50 },
+      6: { cellWidth: 80 },
+      7: { cellWidth: 100 },
+      8: { cellWidth: 80 },
+      9: { cellWidth: 90 },
+      10: { cellWidth: 70 }
+    },
+
+    rowPageBreak: "avoid",
+
+    willDrawCell(data) {
+      if (
+        data.section === "body" &&
+        data.column.index === 1
+      ) {
+        data.cell.text = [""];
+      }
+    },
+
+    didDrawCell(data) {
+      if (
+        data.section === "body" &&
+        data.column.index === 1
+      ) {
+        const foto = data.cell.raw;
+
+        if (foto && foto.base64) {
+          const pad = 2;
+
+          const cw = data.cell.width - pad * 2;
+          const ch = data.cell.height - pad * 2;
+
+          const ratio = Math.min(
+            cw / foto.w,
+            ch / foto.h
+          );
+
+          const nw = foto.w * ratio;
+          const nh = foto.h * ratio;
+
+          const x =
+            data.cell.x +
+            (data.cell.width - nw) / 2;
+
+          const y =
+            data.cell.y +
+            (data.cell.height - nh) / 2;
+
+          try {
+            doc.addImage(
+              foto.base64,
+              "PNG",
+              x,
+              y,
+              nw,
+              nh
+            );
+          } catch {}
+        }
+      }
+    }
+  });
+
+  // ===== FOOTER =====
+  const pageCount = doc.internal.getNumberOfPages();
+
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+
+    doc.text(
+      `Halaman ${i} dari ${pageCount}`,
+      pageWidth / 2,
+      pageHeight - 20,
+      { align: "center" }
+    );
+
+    if (i === pageCount) {
+      doc.setFont("helvetica", "italic");
+      doc.setTextColor(120);
+
+      doc.text(
+        `Admin – Simponi Kharisma – ${new Date().toLocaleString("id-ID")}`,
+        pageWidth - 40,
+        pageHeight - 20,
+        { align: "right" }
+      );
+
+      doc.setTextColor(0);
+    }
+  }
+
+  // ===== SAVE PDF =====
+  doc.save("laporan-santri-koordinasi.pdf");
 }
 
 function formatTanggalDMY(dateStr) {

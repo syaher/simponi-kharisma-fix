@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Upload Massal Excel Absensi</title>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+<style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  background:#f3f4f6;
+  padding:20px;
+}
+
+.container{
+  max-width:1600px;
+  margin:auto;
+}
+
+.card{
+  background:white;
+  padding:20px;
+  border-radius:15px;
+  margin-bottom:20px;
+  box-shadow:0 2px 10px rgba(0,0,0,0.08);
+}
+
+h1{
+  margin-bottom:20px;
+}
+
+.form-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:15px;
+  margin-bottom:20px;
+}
+
+label{
+  display:block;
+  margin-bottom:5px;
+  font-weight:bold;
+}
+
+input,
+select{
+  width:100%;
+  padding:12px;
+  border:1px solid #ddd;
+  border-radius:10px;
+}
+
+button{
+  border:none;
+  padding:12px 18px;
+  border-radius:10px;
+  cursor:pointer;
+  color:white;
+  margin-right:10px;
+  margin-bottom:10px;
+}
+
+.btn-preview{
+  background:#2563eb;
+}
+
+.btn-upload{
+  background:#16a34a;
+}
+
+.btn-refresh{
+  background:#ea580c;
+}
+
+button:disabled{
+  background:gray;
+}
+
+.summary{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:15px;
+  margin-bottom:20px;
+}
+
+.summary-card{
+  background:white;
+  padding:20px;
+  border-radius:15px;
+  box-shadow:0 2px 10px rgba(0,0,0,0.08);
+}
+
+.summary-card p{
+  font-size:28px;
+  font-weight:bold;
+  margin-top:10px;
+}
+
+.green{
+  border-left:6px solid #16a34a;
+}
+
+.red{
+  border-left:6px solid #dc2626;
+}
+
+.table-card{
+  background:white;
+  padding:20px;
+  border-radius:15px;
+  margin-bottom:20px;
+  box-shadow:0 2px 10px rgba(0,0,0,0.08);
+}
+
+.table-wrapper{
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+th,td{
+  padding:12px;
+  border-bottom:1px solid #eee;
+  text-align:left;
+}
+
+th{
+  background:#f9fafb;
+}
+
+.row-baru{
+  background:#f0fdf4;
+}
+
+.row-ada{
+  background:#fef2f2;
+}
+
+.status-baru{
+  color:#16a34a;
+  font-weight:bold;
+}
+
+.status-ada{
+  color:#dc2626;
+  font-weight:bold;
+}
+
+.pagination{
+  display:flex;
+  gap:10px;
+  margin-top:20px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+
+.pagination button{
+  background:#374151;
+}
+
+#status{
+  margin-top:15px;
+  font-weight:bold;
+}
+
+#fileInfo{
+  margin-top:10px;
+  font-size:14px;
+  color:#555;
+}
+
+@media(max-width:768px){
+
+  body{
+    padding:10px;
+  }
+
+  th,td{
+    font-size:12px;
+    padding:8px;
+  }
+
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<button
+  onclick="window.location.href='jindex.html'"
+  style="
+    background:#374151;
+    color:white;
+    border:none;
+    padding:10px 16px;
+    border-radius:10px;
+    cursor:pointer;
+    margin-bottom:20px;
+  "
+>
+  ← Kembali
+</button>
+
+<h1>Upload Massal Excel Absensi</h1>
+
+<div class="card">
+
+<div class="form-grid">
+
+<div>
+<label>Pilih File Excel</label>
+
+<input
+  type="file"
+  id="excelFile"
+  accept=".xls,.xlsx"
+  multiple
+>
+
+<div id="fileInfo"></div>
+
+</div>
+
+<div>
+<label>Bulan</label>
+<select id="bulan"></select>
+</div>
+
+</div>
+
+<h3 style="margin-bottom:15px;">
+Mapping Kolom Excel
+</h3>
+
+<div class="form-grid">
+
+<div>
+<label>Kolom Stambuk</label>
+<select id="colStambuk"></select>
+</div>
+
+<div>
+<label>Kolom Sakit</label>
+<select id="colSakit"></select>
+</div>
+
+<div>
+<label>Kolom Izin</label>
+<select id="colIzin"></select>
+</div>
+
+<div>
+<label>Kolom Tanpa Izin</label>
+<select id="colTanpaIzin"></select>
+</div>
+
+</div>
+
+<button class="btn-preview" id="btnPreview">
+Preview Excel
+</button>
+
+<button class="btn-upload" id="btnUpload" disabled>
+Upload ke Supabase
+</button>
+
+<button class="btn-refresh" id="btnRefresh">
+Refresh Data
+</button>
+
+<div id="status"></div>
+
+</div>
+
+<div class="summary">
+
+<div class="summary-card">
+<h3>Total Excel</h3>
+<p id="totalExcel">0</p>
+</div>
+
+<div class="summary-card green">
+<h3>Data Baru</h3>
+<p id="dataBaru">0</p>
+</div>
+
+<div class="summary-card red">
+<h3>Sudah Ada</h3>
+<p id="dataSudahAda">0</p>
+</div>
+
+</div>
+
+<div class="table-card">
+
+<h2 style="margin-bottom:15px;">
+Preview Excel
+</h2>
+
+<div class="table-wrapper">
+
+<table>
+
+<thead>
+<tr>
+<th>Status</th>
+<th>Stambuk</th>
+<th>Sakit</th>
+<th>Izin</th>
+<th>Tanpa Izin</th>
+</tr>
+</thead>
+
+<tbody id="previewBody"></tbody>
+
+</table>
+
+</div>
+
+<div class="pagination">
+
+<button id="prevPage">
+Prev
+</button>
+
+<span id="pageInfo"></span>
+
+<button id="nextPage">
+Next
+</button>
+
+</div>
+
+</div>
+
+<div class="table-card">
+
+<h2 style="margin-bottom:15px;">
+Data Supabase
+</h2>
+
+<div class="table-wrapper">
+
+<table>
+
+<thead>
+<tr>
+<th>Stambuk</th>
+<th>Bulan</th>
+<th>Sakit</th>
+<th>Izin</th>
+<th>Tanpa Izin</th>
+</tr>
+</thead>
+
+<tbody id="supabaseBody"></tbody>
+
+</table>
+
+</div>
+
+<div class="pagination">
+
+<button id="prevSupabase">
+Prev
+</button>
+
+<span id="supabasePageInfo"></span>
+
+<button id="nextSupabase">
+Next
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+// =============================
+// SUPABASE
+// =============================
+
+const SUPABASE_URL = "https://oflkibeaesvwzdzyvdfy.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9mbGtpYmVhZXN2d3pkenl2ZGZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4NDIyOTQsImV4cCI6MjA3MDQxODI5NH0.MMcdx7g54R9kqFdfkDPP57gNPCnxGLKWHhexTAcJ2io";
+
+const supabaseClient = supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+// =============================
+// BULAN
+// =============================
+
+const bulanAbsensi = [
+  "Syawal",
+  "Dzulqo'dah",
+  "Dzulhijjah",
+  "Muharam",
+  "Shofar",
+  "Robi'ul Awal",
+  "Robi'ul Akhir",
+  "Jumadal Ula",
+  "Jumadal Tsaniyah",
+  "Rajab",
+  "Sya'ban"
+];
+
+// =============================
+// GLOBAL
+// =============================
+
+let excelRows = [];
+let allExcelRows = [];
+
+let previewData = [];
+let uploadData = [];
+let existingData = [];
+
+let currentPage = 1;
+const perPage = 20;
+
+let supabasePage = 1;
+const supabasePerPage = 20;
+
+// =============================
+// INIT BULAN
+// =============================
+
+function initBulan(){
+
+  const select =
+    document.getElementById('bulan');
+
+  bulanAbsensi.forEach(bulan => {
+
+    select.innerHTML += `
+      <option value="${bulan}">
+        ${bulan}
+      </option>
+    `;
+
+  });
+
+}
+
+initBulan();
+
+// =============================
+// STATUS
+// =============================
+
+function setStatus(text){
+
+  document.getElementById('status').innerHTML =
+    text;
+
+}
+
+// =============================
+// LOAD SUPABASE
+// =============================
+
+async function loadSupabaseData(){
+
+  setStatus('Mengambil data Supabase...');
+
+  let allData = [];
+  let from = 0;
+  const limit = 1000;
+
+  while(true){
+
+    const { data, error } = await supabaseClient
+      .from('absensi1')
+      .select('*')
+      .range(from, from + limit - 1)
+      .order('id', { ascending:false });
+
+    if(error){
+
+      console.error(error);
+
+      alert(error.message);
+
+      return;
+
+    }
+
+    if(!data || data.length === 0){
+
+      break;
+
+    }
+
+    allData = allData.concat(data);
+
+    if(data.length < limit){
+
+      break;
+
+    }
+
+    from += limit;
+
+  }
+
+  existingData = allData;
+
+  supabasePage = 1;
+
+  renderSupabaseTable();
+
+  setStatus(
+    `Data Supabase berhasil dimuat (${existingData.length})`
+  );
+
+}
+
+loadSupabaseData();
+
+// =============================
+// RENDER SUPABASE
+// =============================
+
+function renderSupabaseTable(){
+
+  const tbody =
+    document.getElementById('supabaseBody');
+
+  tbody.innerHTML = '';
+
+  const start =
+    (supabasePage - 1) * supabasePerPage;
+
+  const end =
+    start + supabasePerPage;
+
+  const paginated =
+    existingData.slice(start,end);
+
+  paginated.forEach(item => {
+
+    tbody.innerHTML += `
+      <tr>
+
+        <td>${item.stambuk || '-'}</td>
+        <td>${item.bulan || '-'}</td>
+        <td>${item.sakit || 0}</td>
+        <td>${item.izin || 0}</td>
+        <td>${item.tanpa_izin || 0}</td>
+
+      </tr>
+    `;
+
+  });
+
+  const totalPage =
+    Math.ceil(existingData.length / supabasePerPage);
+
+  document.getElementById('supabasePageInfo').innerHTML =
+    `Halaman ${supabasePage} / ${totalPage || 1}`;
+
+}
+
+// =============================
+// PAGINATION SUPABASE
+// =============================
+
+document
+.getElementById('prevSupabase')
+.addEventListener('click', function(){
+
+  if(supabasePage > 1){
+
+    supabasePage--;
+
+    renderSupabaseTable();
+
+  }
+
+});
+
+document
+.getElementById('nextSupabase')
+.addEventListener('click', function(){
+
+  const totalPage =
+    Math.ceil(existingData.length / supabasePerPage);
+
+  if(supabasePage < totalPage){
+
+    supabasePage++;
+
+    renderSupabaseTable();
+
+  }
+
+});
+
+// =============================
+// BACA FILE EXCEL
+// =============================
+
+document
+.getElementById('excelFile')
+.addEventListener('change', async function(e){
+
+  const files = [...e.target.files];
+
+  if(files.length === 0) return;
+
+  document.getElementById('fileInfo').innerHTML =
+    `${files.length} file dipilih`;
+
+  setStatus(
+    `Membaca ${files.length} file Excel...`
+  );
+
+  allExcelRows = [];
+
+  for(const file of files){
+
+    try{
+
+      const data = await file.arrayBuffer();
+
+      const workbook = XLSX.read(data,{
+        type:'array'
+      });
+
+      const sheetName =
+        workbook.SheetNames[0];
+
+      const worksheet =
+        workbook.Sheets[sheetName];
+
+      // =============================
+      // HANDLE MERGED CELL
+      // =============================
+
+      const merges =
+        worksheet['!merges'] || [];
+
+      merges.forEach(range => {
+
+        const startCell =
+          XLSX.utils.encode_cell({
+            r: range.s.r,
+            c: range.s.c
+          });
+
+        const value =
+          worksheet[startCell]?.v;
+
+        for(let R = range.s.r; R <= range.e.r; ++R){
+
+          for(let C = range.s.c; C <= range.e.c; ++C){
+
+            const cell =
+              XLSX.utils.encode_cell({
+                r:R,
+                c:C
+              });
+
+            if(!worksheet[cell]){
+
+              worksheet[cell] = {
+                t:'s',
+                v:value
+              };
+
+            }
+
+          }
+
+        }
+
+      });
+
+      const rows =
+        XLSX.utils.sheet_to_json(
+          worksheet,
+          {
+            header:1,
+            defval:''
+          }
+        );
+
+      // =============================
+      // AUTO DETECT HEADER
+      // =============================
+
+      const headerIndex =
+        rows.findIndex(row =>
+
+          row.some(cell =>
+
+            String(cell)
+            .toLowerCase()
+            .includes('stambuk')
+
+          )
+
+        );
+
+      if(headerIndex === -1){
+
+        console.warn(
+          `Header tidak ditemukan: ${file.name}`
+        );
+
+        continue;
+
+      }
+
+      const header =
+        rows[headerIndex];
+
+      // simpan header sekali
+      if(allExcelRows.length === 0){
+
+        allExcelRows.push(header);
+
+      }
+
+      const dataRows =
+        rows.slice(headerIndex + 1);
+
+      allExcelRows =
+        allExcelRows.concat(dataRows);
+
+      setStatus(
+        `File ${file.name} berhasil dibaca`
+      );
+
+    }catch(err){
+
+      console.error(err);
+
+      alert(`Gagal membaca ${file.name}`);
+
+    }
+
+  }
+
+  excelRows = allExcelRows;
+
+  console.log(excelRows);
+
+  generateColumnOptions();
+
+  setStatus(
+    `${files.length} file berhasil dibaca`
+  );
+
+});
+
+// =============================
+// GENERATE COLUMN OPTIONS
+// =============================
+
+function generateColumnOptions(){
+
+  const header = excelRows[0] || [];
+
+  const mapping = [
+    {
+      id:'colStambuk',
+      keyword:'stambuk'
+    },
+    {
+      id:'colSakit',
+      keyword:'sakit'
+    },
+    {
+      id:'colIzin',
+      keyword:'izin'
+    },
+    {
+      id:'colTanpaIzin',
+      keyword:'tp'
+    }
+  ];
+
+  mapping.forEach(item => {
+
+    const select =
+      document.getElementById(item.id);
+
+    select.innerHTML = '';
+
+    header.forEach((col,index) => {
+
+      select.innerHTML += `
+        <option value="${index}">
+          ${index} - ${col}
+        </option>
+      `;
+
+      if(
+        String(col)
+        .toLowerCase()
+        .includes(item.keyword)
+      ){
+
+        select.value = index;
+
+      }
+
+    });
+
+  });
+
+}
+
+// =============================
+// PREVIEW EXCEL
+// =============================
+
+async function previewExcel(){
+
+  setStatus('Membuat preview...');
+
+  const bulan =
+    document.getElementById('bulan').value;
+
+  const colStambuk =
+    parseInt(
+      document.getElementById('colStambuk').value
+    );
+
+  const colSakit =
+    parseInt(
+      document.getElementById('colSakit').value
+    );
+
+  const colIzin =
+    parseInt(
+      document.getElementById('colIzin').value
+    );
+
+  const colTanpaIzin =
+    parseInt(
+      document.getElementById('colTanpaIzin').value
+    );
+
+  const dataRows =
+    excelRows.slice(1);
+
+  previewData = [];
+  uploadData = [];
+
+  const excelDuplicateSet =
+    new Set();
+
+  dataRows.forEach(row => {
+
+    const stambuk =
+      row[colStambuk]
+      ?.toString()
+      .trim();
+
+    if(!stambuk) return;
+
+    const duplicateKey =
+      `${stambuk}_${bulan}`;
+
+    // duplicate antar excel
+    if(
+      excelDuplicateSet.has(
+        duplicateKey
+      )
+    ){
+
+      return;
+
+    }
+
+    excelDuplicateSet.add(
+      duplicateKey
+    );
+
+    const sakit =
+      parseInt(row[colSakit]) || 0;
+
+    const izin =
+      parseInt(row[colIzin]) || 0;
+
+    const tanpa_izin =
+      parseInt(row[colTanpaIzin]) || 0;
+
+    // duplicate supabase
+    const exists =
+      existingData.find(item =>
+
+        item.stambuk === stambuk &&
+        item.bulan === bulan
+
+      );
+
+    const item = {
+      stambuk,
+      bulan,
+      sakit,
+      izin,
+      tanpa_izin,
+      exists:!!exists
+    };
+
+    previewData.push(item);
+
+    if(!exists){
+
+      uploadData.push(item);
+
+    }
+
+  });
+
+  currentPage = 1;
+
+  renderPreview();
+
+  document
+  .getElementById('btnUpload')
+  .disabled = false;
+
+  setStatus(
+    `Preview selesai (${previewData.length} data)`
+  );
+
+}
+
+// =============================
+// RENDER PREVIEW
+// =============================
+
+function renderPreview(){
+
+  const tbody =
+    document.getElementById('previewBody');
+
+  tbody.innerHTML = '';
+
+  const start =
+    (currentPage - 1) * perPage;
+
+  const end =
+    start + perPage;
+
+  const paginated =
+    previewData.slice(start,end);
+
+  paginated.forEach(item => {
+
+    tbody.innerHTML += `
+      <tr class="${
+        item.exists
+        ? 'row-ada'
+        : 'row-baru'
+      }">
+
+        <td>
+          ${
+            item.exists
+            ? '<span class="status-ada">SUDAH ADA</span>'
+            : '<span class="status-baru">BARU</span>'
+          }
+        </td>
+
+        <td>${item.stambuk}</td>
+        <td>${item.sakit}</td>
+        <td>${item.izin}</td>
+        <td>${item.tanpa_izin}</td>
+
+      </tr>
+    `;
+
+  });
+
+  document.getElementById('totalExcel').innerHTML =
+    previewData.length;
+
+  document.getElementById('dataBaru').innerHTML =
+    uploadData.length;
+
+  document.getElementById('dataSudahAda').innerHTML =
+    previewData.length - uploadData.length;
+
+  const totalPage =
+    Math.ceil(previewData.length / perPage);
+
+  document.getElementById('pageInfo').innerHTML =
+    `Halaman ${currentPage} / ${totalPage || 1}`;
+
+}
+
+// =============================
+// PAGINATION PREVIEW
+// =============================
+
+document
+.getElementById('prevPage')
+.addEventListener('click', function(){
+
+  if(currentPage > 1){
+
+    currentPage--;
+
+    renderPreview();
+
+  }
+
+});
+
+document
+.getElementById('nextPage')
+.addEventListener('click', function(){
+
+  const totalPage =
+    Math.ceil(previewData.length / perPage);
+
+  if(currentPage < totalPage){
+
+    currentPage++;
+
+    renderPreview();
+
+  }
+
+});
+
+// =============================
+// UPLOAD SUPABASE
+// =============================
+
+async function uploadDataToSupabase(){
+
+  if(uploadData.length === 0){
+
+    alert('Tidak ada data baru');
+
+    return;
+
+  }
+
+  const batchSize = 200;
+
+  for(
+    let i = 0;
+    i < uploadData.length;
+    i += batchSize
+  ){
+
+    const batch =
+      uploadData.slice(
+        i,
+        i + batchSize
+      );
+
+    const cleanData =
+      batch.map(item => ({
+        stambuk:item.stambuk,
+        bulan:item.bulan,
+        sakit:item.sakit,
+        izin:item.izin,
+        tanpa_izin:item.tanpa_izin
+      }));
+
+    const uploaded =
+      Math.min(
+        i + batch.length,
+        uploadData.length
+      );
+
+    const percent =
+      Math.floor(
+        (uploaded / uploadData.length) * 100
+      );
+
+    setStatus(
+      `Upload ${uploaded}/${uploadData.length} (${percent}%)`
+    );
+
+    const { error } =
+      await supabaseClient
+      .from('absensi1')
+      .insert(cleanData);
+
+    if(error){
+
+      console.error(error);
+
+      alert(error.message);
+
+      setStatus('Gagal upload');
+
+      return;
+
+    }
+
+  }
+
+  alert('Upload berhasil');
+
+  setStatus('Upload berhasil');
+
+  await loadSupabaseData();
+
+}
+
+// =============================
+// EVENT
+// =============================
+
+document
+.getElementById('btnPreview')
+.addEventListener('click', previewExcel);
+
+document
+.getElementById('btnUpload')
+.addEventListener('click', uploadDataToSupabase);
+
+document
+.getElementById('btnRefresh')
+.addEventListener('click', loadSupabaseData);
+
+</script>
+
+</body>
+</html>
