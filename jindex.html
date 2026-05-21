@@ -3870,21 +3870,19 @@ and (max-width:1024px){
     
     <h2>Data Absensi</h2>
     
-    <div class="admin-tools">
-	  <button class="admin-only" onclick="openAddAbsensi()">➕ Tambah</button>
+    <div class="admin-tools">	 
 	  <button class="admin-only" onclick="window.location.href='import_excel.html'">📥 Import Excel</button>
 	  <button onclick="showAbsensiMerahTrendModule()">🔎 Detail Absen Merah</button>
 
 
-	  <!-- Dropdown Download -->
-	  <div class="admin-only" style="display:inline-block; position:relative;">
-		<button onclick="toggleAbsensiDownloadMenu()">⬇️ Download ▼</button>
-		<div id="absensiDownloadMenu" style="display:none; position:absolute; background:white; border:1px solid #ccc; border-radius:6px; min-width:180px; z-index:1000; padding:5px;">		  
-		  <a href="#" onclick="downloadAbsensiPDF(); hideAbsensiDownloadMenu()">📑 Download PDF</a><br>
-		  <a href="#" onclick="downloadAbsensiPNG(); hideAbsensiDownloadMenu()">📸 Download PNG</a>
-		</div>
-	  </div>
-	</div>	
+	 
+  <button
+    id="btnDownloadAbsensiPDF"
+   
+    onclick="handleDownloadAbsensiPDF()">
+    ⬇️ Download PDF
+  </button>
+</div>
     
     <div class="filter-row">
       <div class="filter-group">
@@ -6378,152 +6376,6 @@ function getAbsensiFilters() {
 }
 
 
-function wrapAbsensiContent(innerHTML) {
-  // ✅ ambil semua filter termasuk bulan
-  let { kelas, unit, merah, bulan } = getAbsensiFilters();
-  const now = new Date().toLocaleString("id-ID");
-
-  if (!kelas || kelas.toLowerCase() === "semua") kelas = "";
-  if (!unit  || unit.toLowerCase() === "semua")  unit  = "";
-  if (!merah || merah.toLowerCase() === "semua") merah = "";
-  if (!bulan || bulan.toLowerCase() === "semua") bulan = "";
-
-  const wrappedContent = innerHTML.replace(
-    /<div class="santri-box">/g,
-    '<div class="santri-box laporan-box">'
-  );
-
-  // ✅ bikin blok filterHTML secara berurutan
-  let filterHTML = "";
-  if (kelas || unit || merah || bulan) {
-    filterHTML = `<div class="filters">`;
-    if (kelas) filterHTML += `<p><b>Kelas:</b> ${kelas}</p>`;
-    if (unit)  filterHTML += `<p><b>Unit:</b> ${unit}</p>`;
-    if (bulan) filterHTML += `<p><b>Bulan:</b> ${bulan}</p>`;
-    if (merah) filterHTML += `<p><b>Status:</b> ${merah}</p>`;
-    filterHTML += `</div>`;
-  }
-
-  return `
-  <!DOCTYPE html>
-  <html lang="id">
-  <head>
-    <meta charset="UTF-8">
-    <title>Laporan Absensi</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        background: #f9f9f9;
-        font-size: 10px;
-      }
-
-      .container {
-        width: 148mm;
-        margin: 0 auto;
-        padding: 10mm;
-        background: #fff;
-        box-sizing: border-box;
-      }
-
-      .kop { position: relative; margin-bottom:10px; }
-      .kop img {
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width:50px;
-        height:auto;
-      }
-      .identitas { text-align:center; }
-      .identitas h1 { margin:0; font-size:16px; color:#003366; }
-      .identitas h2 { margin:0; font-size:12px; }
-      .identitas p { margin:0; font-size:9px; font-style:italic; }
-      hr { border:0; border-top:2px solid #000; margin:10px 0; }
-
-      .header { text-align:center; margin:5px 0; }
-      .header h1 { font-size:13px; margin:4px 0; }
-
-      .filters { margin:8px 0; font-size:9px; }
-
-      .laporan-box {
-        border:1px solid #1a73e8;
-        border-radius:6px;
-        padding:6px;
-        margin:8px 0;
-        background:#fff;
-      }
-
-      table, .laporan-table {
-        border-collapse: collapse;
-        width: 100% !important;
-        font-size: 10px;
-        margin-top: 5px;
-        margin-bottom: 5px;
-      }
-
-      thead th {
-        background: #1a73e8;
-        color: #fff;
-        padding: 6px 8px;
-        text-align: center;
-        border: 1px solid #cce0ff;
-      }
-
-      td {
-        border: 1px solid #cce0ff;
-        padding: 4px;
-        text-align: center;
-      }
-
-      td img {
-        display: block;
-        margin: auto;
-        width: 26px;
-        height: 34px;
-        object-fit: cover;
-        border: 1px solid #1a73e8;
-      }
-
-      .footer {
-        text-align:right;
-        margin-top:8px;
-        font-size:8px;
-        color:#555;
-        font-style:italic;
-      }
-
-      .merah {
-        background:#ffcccc !important;
-        color:#b30000 !important;
-        font-weight:bold !important;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <div class="kop">
-        <img src="https://i.imgur.com/Irgu32G.png" alt="Logo">
-        <div class="identitas">
-          <h1>KHUDAMA' KHARISMA</h1>
-          <h2>Pondok Pesantren Lirboyo Kota Kediri Jawa Timur</h2>
-          <p>Sekretariat: Kantor KHARISMA Gedung Nafis Lt. 02 Lirboyo Kota Kediri</p>
-        </div>
-      </div>
-      <hr>
-
-      <div class="header"><h1>LAPORAN ABSENSI</h1></div>
-      ${filterHTML}
-
-      ${wrappedContent}
-      
-	  <div class="footer">Admin – Simponi Kharisma – ${now}</div>
-    </div>
-  </body>
-  </html>`;
-}
-
-
 
 // === Timestamp sesuai perangkat ===
 function filterDateTimestamp() {
@@ -6601,99 +6453,6 @@ function renderLaporanTable(laporan = [], stambuk = '', isExport = false) {
   `;
 }
 
-
-// ===============================
-// Fungsi utama render absensi HTML
-// ===============================
-async function renderAllAbsensiHTML() {
-  const santriList = getAllFilteredAbsensiSantri();
-
-  // Urutkan dari kelas terendah ke tertinggi
-  santriList.sort((a, b) => {
-    const ia = kelasOrder.indexOf(a.Kelas);
-    const ib = kelasOrder.indexOf(b.Kelas);
-    if (ia === -1 && ib === -1) return (a.Kelas || '').localeCompare(b.Kelas || '');
-    if (ia === -1) return 1;
-    if (ib === -1) return -1;
-    return ia - ib;
-  });
-
-  // Ambil absensiDict untuk semua stambuk
-  let absensiDict = {};
-  const stambukList = santriList.map(s => normStambuk(s["Stambuk"])).filter(x => x);
-  const filterMerah = !!document.getElementById('filterMerahCheckbox')?.checked;
-  if (filterMerah && window.absensiDictMerah) {
-    absensiDict = window.absensiDictMerah || {};
-  } else {
-    absensiDict = await fetchAbsensiForStambuks(stambukList);
-  }
-
-  let html = '';
-  for (let i = 0; i < santriList.length; i++) {
-    const santri = santriList[i];
-    const stambuk = normStambuk(santri["Stambuk"]); // casing disamakan
-    const absensi = absensiDict[stambuk] || [];
-    const absensiMap = {};
-    absensi.forEach(a => absensiMap[a.bulan] = a);
-
-    const bulanAktif = bulanAbsensi.filter(b => Object.keys(absensiMap).includes(b));
-    const absensiHtml = bulanAktif.length
-      ? bulanAktif.map(bulan => {
-          const a = absensiMap[bulan] || { sakit: 0, izin: 0, tanpaIzin: 0 };
-          return `
-            <tr>
-              <td style="text-align:left; border:1px solid #cce0ff; padding:6px;">${bulan}</td>
-              <td style="border:1px solid #cce0ff; padding:6px;">${a.sakit}</td>
-              <td style="border:1px solid #cce0ff; padding:6px;">${a.izin}</td>
-              <td style="border:1px solid #cce0ff; padding:6px;" class="${a.tanpaIzin >= 3 ? 'merah' : ''}">${a.tanpaIzin}</td>
-            </tr>
-          `;
-        }).join('')
-      : '<tr><td colspan="4" style="border:1px solid #cce0ff; padding:6px;">Belum ada data absensi</td></tr>';
-
-    const realImg = santri.Foto || "https://i.imgur.com/WyCoOTv.png";
-
-    // === Laporan Merah ===
-    let laporanHtml = '';
-    const laporan = await fetchLaporanMerah(stambuk);
-    if (laporan && laporan.length) {
-      laporanHtml = renderLaporanTable(laporan, stambuk, true); // true = mode export, sembunyikan kolom aksi
-    }
-
-    html += `
-      <div class="santri-box laporan-box" style="margin:0 auto 20px;">
-        <table style="width:100%; margin-bottom:5px; border-collapse:collapse; text-align:center; border:1px solid #cce0ff;">
-          <thead style="background:#e3f0ff;">
-            <tr>
-              <th>No</th><th>Foto</th><th>Nama</th><th>Kls</th><th>Bag</th><th>Unit</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>${i + 1}</td>
-              <td><img src="${realImg}" style="width:55px; height:70px; object-fit:cover; border:1px solid #cce0ff; border-radius:4px; display:block; margin:auto;"></td>
-              <td style="text-align:left;">${santri.Nama_Lengkap ?? '-'}</td>
-              <td>${santri.Kelas ?? '-'}</td>
-              <td>${santri.Bagian ?? '-'}</td>
-              <td>${santri.Unit_Ndalem ?? '-'}</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <table style="width:100%; border-collapse:collapse; text-align:center; border:1px solid #cce0ff;">
-          <thead style="background:#e3f0ff;">
-            <tr><th>Bulan</th><th>Sakit</th><th>Izin</th><th>Tanpa Izin</th></tr>
-          </thead>
-          <tbody>${absensiHtml}</tbody>
-        </table>
-
-        ${laporanHtml}
-      </div>
-    `;
-  }
-
-  return html;
-}
 
 // ===============================
 // Modal edit laporan
@@ -6841,83 +6600,503 @@ function getAllFilteredAbsensiSantri() {
 }
 
 async function downloadAbsensiPDF() {
-  try {  	
-    const content = await renderAllAbsensiHTML();
-    let html = wrapAbsensiContent(content);
+  const { jsPDF } = window.jspdf;
 
-    const container = document.createElement("div");
-    container.innerHTML = html;
-    document.body.appendChild(container);
+  // ==========================================
+  // SETUP PDF A5 PORTRAIT
+  // ==========================================
+  const doc = new jsPDF({
+    orientation: "portrait",
+    unit: "mm",
+    format: "a5"
+  });
 
-    container.style.background = "#fff";
-    container.style.display = "block";
-    container.style.margin = "0 auto";
-    container.style.width = "148mm";   // lebar fix A5
-    container.style.maxWidth = "148mm";
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
 
-    // Tunggu semua gambar selesai load
-    await Promise.all(
-      Array.from(container.querySelectorAll("img")).map(
-        img =>
-          new Promise(res => {
-            if (img.complete && img.naturalHeight > 0) return res();
-            img.onload = res;
-            img.onerror = res;
-          })
-      )
+  const marginX = 8;
+  const topMargin = 8;
+  const bottomMargin = 10;
+  const contentWidth = pageWidth - (marginX * 2);
+
+  let currentY = topMargin;
+
+  const placeholderImg = "https://i.imgur.com/WyCoOTv.png";
+
+  // ==========================================
+  // HELPER: TAMBAH HEADER KOP SURAT (HALAMAN 1 SAJA)
+  // ==========================================
+  async function drawFirstPageHeader() {
+    const logoUrl = "https://i.imgur.com/Irgu32G.png";
+
+    // Logo
+    try {
+      const logoData = await loadImageToBase64(logoUrl);
+      if (logoData?.base64) {
+        const fmt = logoData.base64.includes("image/jpeg") ? "JPEG" : "PNG";
+        doc.addImage(logoData.base64, fmt, marginX, 8, 16, 16);
+      }
+    } catch (e) {
+      console.warn("Logo gagal dimuat:", e);
+    }
+
+    // ==========================================
+    // KOP SURAT (DIRAPATKAN)
+    // ==========================================
+    let yPos = 8;
+    
+    // Nama Lembaga
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.text("KHUDAMA' KHARISMA", pageWidth / 2, yPos + 4, { align: "center" });
+
+    // Alamat Lembaga
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.text("Pondok Pesantren Lirboyo Kota Kediri Jawa Timur", pageWidth / 2, yPos + 10, { align: "center" });
+
+    // Sekretariat
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(7);
+    doc.text("Sekretariat: Kantor KHARISMA Gedung Nafis Lt. 02", pageWidth / 2, yPos + 15, { align: "center" });
+
+    // ==========================================
+    // GARIS PEMBATAS (SATU KALI SETELAH KOP)
+    // ==========================================
+    const garisY = yPos + 19;
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.5);
+    doc.line(marginX, garisY, pageWidth - marginX, garisY);
+
+    return garisY + 5;
+  }
+
+  // ==========================================
+  // HELPER: JUDUL LAPORAN (TANPA TANGGAL CETAK)
+  // ==========================================
+  function drawReportTitle() {
+    // Judul Laporan
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.text("LAPORAN ABSENSI SANTRI", pageWidth / 2, currentY, {
+      align: "center"
+    });
+    currentY += 6;
+
+    // Filter
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+
+    const filters = getAbsensiFilters();
+    const filterText = [];
+
+    if (filters.kelas && filters.kelas !== "semua") {
+      filterText.push(`Kelas: ${filters.kelas}`);
+    }
+
+    if (filters.unit && filters.unit !== "semua") {
+      filterText.push(`Unit: ${filters.unit}`);
+    }
+
+    if (filters.bulan && filters.bulan !== "semua") {
+      filterText.push(`Bulan: ${filters.bulan}`);
+    }
+
+    if (filters.merah === "Absen Merah") {
+      filterText.push("Status: Absen Merah");
+    }
+
+    if (filterText.length) {
+      doc.text(filterText.join(" | "), pageWidth / 2, currentY, {
+        align: "center"
+      });
+      currentY += 5;
+    }
+  }
+
+  // ==========================================
+  // HELPER: FOOTER UNTUK SEMUA HALAMAN
+  // ==========================================
+  function drawFooterAllPages() {
+    const totalPages = doc.internal.getNumberOfPages();
+
+    for (let p = 1; p <= totalPages; p++) {
+      doc.setPage(p);
+
+      // Footer Kiri (Nomor Halaman)
+      doc.setFont("helvetica", "italic");
+      doc.setFontSize(7);
+      doc.setTextColor(100, 100, 100);
+      doc.text(
+        `Halaman ${p} dari ${totalPages}`,
+        marginX,
+        pageHeight - 4,
+        { align: "left" }
+      );
+
+      // Footer Kanan (Admin & Waktu Cetak - TANGGAL ADA DI SINI)
+      const footerText = `Admin – Simponi Kharisma – ${new Date().toLocaleString("id-ID")}`;
+      doc.setFont("helvetica", "italic");
+      doc.setFontSize(7);
+      doc.setTextColor(120, 120, 120);
+      doc.text(footerText, pageWidth - marginX, pageHeight - 4, { 
+        align: "right" 
+      });
+    }
+  }
+
+  // ==========================================
+  // HELPER: CEK SPACE HALAMAN
+  // ==========================================
+  function ensureSpace(requiredHeight) {
+    if (currentY + requiredHeight > pageHeight - bottomMargin - 6) {
+      doc.addPage();
+      currentY = topMargin + 4;
+    }
+  }
+
+  // ==========================================
+  // AMBIL DATA SANTRI
+  // ==========================================
+  let santriList = getAllFilteredAbsensiSantri();
+
+  santriList.sort((a, b) => {
+    const ia = kelasOrder.indexOf(a.Kelas);
+    const ib = kelasOrder.indexOf(b.Kelas);
+
+    if (ia === -1 && ib === -1) {
+      return (a.Kelas || "").localeCompare(b.Kelas || "");
+    }
+    if (ia === -1) return 1;
+    if (ib === -1) return -1;
+    return ia - ib;
+  });
+
+  const stambukList = santriList
+    .map(s => normStambuk(s.Stambuk))
+    .filter(Boolean);
+
+  // ==========================================
+  // AMBIL DATA ABSENSI
+  // ==========================================
+  let absensiDict = {};
+
+  const filterMerah =
+    !!document.getElementById("filterMerahCheckbox")?.checked;
+
+  if (filterMerah && window.absensiDictMerah) {
+    absensiDict = window.absensiDictMerah;
+  } else {
+    absensiDict = await fetchAbsensiForStambuks(stambukList);
+  }
+
+  // Filter bulan
+  const selectedBulan =
+    document.getElementById("absensiSearchBulan")?.value || "semua";
+
+  if (selectedBulan !== "semua") {
+    Object.keys(absensiDict).forEach(key => {
+      absensiDict[key] = (absensiDict[key] || []).filter(
+        r => r.bulan === selectedBulan
+      );
+
+      if (!absensiDict[key].length) {
+        delete absensiDict[key];
+      }
+    });
+  }
+
+  // Jika mode merah
+  if (filterMerah) {
+    const redStambuks = new Set(
+      Object.keys(absensiDict || {}).map(normStambuk)
     );
 
-    // Render ke canvas dulu
-    const canvas = await html2canvas(container, { scale: 2, useCORS: true });
-    const imgData = canvas.toDataURL("image/jpeg", 1.0);
+    santriList = santriList.filter(s =>
+      redStambuks.has(normStambuk(s.Stambuk))
+    );
+  }
 
-    // hitung ukuran gambar biar full A5 width
-    const pdfWidth = 148; // mm
-    const pdfHeight = (canvas.height * pdfWidth) / canvas.width; // proporsional
+  // ==========================================
+  // HEADER HALAMAN PERTAMA (KOP SURAT)
+  // ==========================================
+  currentY = await drawFirstPageHeader();
+  
+  // ==========================================
+  // JUDUL LAPORAN (TANPA TANGGAL CETAK)
+  // ==========================================
+  drawReportTitle();
 
-    // buat PDF dengan ukuran custom: lebarnya 148mm, tingginya sesuai konten
-    const pdf = new jspdf.jsPDF("p", "mm", [pdfWidth, pdfHeight]);
-    pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
+  // ==========================================
+  // LOOP SANTRI
+  // ==========================================
+  for (let i = 0; i < santriList.length; i++) {
+    const santri = santriList[i];
+    const stambuk = normStambuk(santri.Stambuk);
 
-    pdf.save(getExportFileName("Absensi", "pdf", getAbsensiFilters()));
-    container.remove();
+    const absensi = absensiDict[stambuk] || [];
+    const laporan = await fetchLaporanMerah(stambuk);
+
+    // ======================================
+    // ESTIMASI TINGGI TOTAL SATU BLOK SANTRI
+    // ======================================
+    const identitasHeight = 28;
+    const absensiHeight =
+      10 + Math.max(absensi.length, 1) * 5;
+    const laporanHeight =
+      laporan && laporan.length
+        ? 10 + laporan.length * 7
+        : 0;
+
+    const totalEstimatedHeight =
+      identitasHeight +
+      absensiHeight +
+      laporanHeight +
+      5;
+
+    // Jika tidak muat, pindah halaman dulu
+    ensureSpace(totalEstimatedHeight);
+
+    // ======================================
+    // LOAD FOTO
+    // ======================================
+    let fotoData = null;
+
+    try {
+      const fotoUrl = santri.Foto || placeholderImg;
+      fotoData = await loadImageToBase64(fotoUrl);
+    } catch {
+      fotoData = null;
+    }
+
+    // ======================================
+    // TABEL IDENTITAS (FOTO DIPERKECIL)
+    // ======================================
+    const identitasBody = [[
+      i + 1,
+      "",
+      santri.Nama_Lengkap || "-",
+      santri.Kelas || "-",
+      santri.Bagian || "-",
+      santri.Unit_Ndalem || "-"
+    ]];
+
+    doc.autoTable({
+      startY: currentY,
+      margin: { left: marginX, right: marginX },
+      tableWidth: contentWidth,
+      pageBreak: "avoid",
+
+      head: [[
+        "No",
+        "Foto",
+        "Nama",
+        "Kls",
+        "Bag",
+        "Unit"
+      ]],
+
+      body: identitasBody,
+
+      styles: {
+        fontSize: 7,
+        cellPadding: 1.2,
+        valign: "middle",
+        halign: "center",
+        lineWidth: 0.1,
+        minCellHeight: 18 // Diperkecil dari 22 menjadi 18
+      },
+
+      headStyles: {
+        fillColor: [26, 115, 232],
+        textColor: 255,
+        fontStyle: "bold",
+        minCellHeight: 6
+      },
+
+      columnStyles: {
+        0: { cellWidth: 6 },
+        1: { cellWidth: 14 }, // Diperkecil dari 18 menjadi 14
+        2: { halign: "left" },
+        5: { halign: "left" }
+      },
+
+      didDrawCell(data) {
+        if (
+          data.section === "body" &&
+          data.column.index === 1 &&
+          fotoData?.base64
+        ) {
+          const fmt = fotoData.base64.includes("image/jpeg")
+            ? "JPEG"
+            : "PNG";
+
+          const pad = 1.5;
+          // Membuat foto lebih kecil dengan padding lebih besar
+          const x = data.cell.x + pad;
+          const y = data.cell.y + pad;
+          const w = data.cell.width - (pad * 2);
+          const h = data.cell.height - (pad * 2);
+
+          try {
+            doc.addImage(fotoData.base64, fmt, x, y, w, h);
+          } catch {}
+        }
+      }
+    });
+
+    currentY = doc.lastAutoTable.finalY + 1;
+
+    // ======================================
+    // TABEL ABSENSI
+    // ======================================
+    const absensiBody = absensi.length
+      ? absensi.map(r => [
+          r.bulan || "-",
+          r.sakit || 0,
+          r.izin || 0,
+          r.tanpaIzin || 0
+        ])
+      : [["Belum ada data absensi", "", "", ""]];
+
+    doc.autoTable({
+      startY: currentY,
+      margin: { left: marginX, right: marginX },
+      tableWidth: contentWidth,
+      pageBreak: "avoid",
+
+      head: [[
+        "Bulan",
+        "Sakit",
+        "Izin",
+        "Tanpa Izin"
+      ]],
+
+      body: absensiBody,
+
+      styles: {
+        fontSize: 7,
+        cellPadding: 1.5,
+        halign: "center",
+        lineWidth: 0.1
+      },
+
+      headStyles: {
+        fillColor: [227, 240, 255],
+        textColor: 0,
+        fontStyle: "bold"
+      },
+
+      didParseCell(data) {
+        if (
+          data.section === "body" &&
+          data.column.index === 3 &&
+          Number(data.cell.raw) >= 3
+        ) {
+          data.cell.styles.fillColor = [255, 204, 204];
+          data.cell.styles.textColor = [179, 0, 0];
+          data.cell.styles.fontStyle = "bold";
+        }
+      }
+    });
+
+    currentY = doc.lastAutoTable.finalY + 1;
+
+    // ======================================
+    // TABEL LAPORAN MERAH
+    // ======================================
+    if (laporan && laporan.length) {
+      const laporanBody = laporan.map(r => [
+        r.bulan || "-",
+        r.alasan || "-",
+        r.penanganan || "-"
+      ]);
+
+      doc.autoTable({
+        startY: currentY,
+        margin: { left: marginX, right: marginX },
+        tableWidth: contentWidth,
+        pageBreak: "avoid",
+
+        head: [[
+          "Bulan",
+          "Alasan",
+          "Penanganan"
+        ]],
+
+        body: laporanBody,
+
+        styles: {
+          fontSize: 7,
+          cellPadding: 1.5,
+          lineWidth: 0.1,
+          valign: "top"
+        },
+
+        headStyles: {
+          fillColor: [227, 240, 255],
+          textColor: 0,
+          fontStyle: "bold"
+        },
+
+        columnStyles: {
+          1: { halign: "left" },
+          2: { halign: "left" }
+        }
+      });
+
+      currentY = doc.lastAutoTable.finalY + 3;
+    } else {
+      currentY += 3;
+    }
+  }
+
+  // ==========================================
+  // FOOTER UNTUK SEMUA HALAMAN
+  // ==========================================
+  drawFooterAllPages();
+
+  // ==========================================
+  // SIMPAN PDF
+  // ==========================================
+  doc.save(
+    getExportFileName(
+      "Absensi",
+      "pdf",
+      getAbsensiFilters()
+    )
+  );
+}
+
+
+async function handleDownloadAbsensiPDF() {
+  const btn = document.getElementById("btnDownloadAbsensiPDF");
+  if (!btn) return;
+
+  const originalHTML = btn.innerHTML;
+
+  // Aktifkan loading
+  btn.disabled = true;
+  btn.classList.add("loading");
+  btn.innerHTML = `
+    <span class="spinner"></span>
+    Sedang mengunduh...
+  `;
+
+  try {
+    // Jalankan fungsi PDF yang sudah ada
+    await downloadAbsensiPDF();
   } catch (err) {
-    console.error("downloadAbsensiPDF error:", err);
-    alert("❌ Gagal membuat PDF, cek console log.");
+    console.error("Gagal download PDF:", err);
+    alert("Gagal download PDF.");
+  } finally {
+    // Kembalikan tombol seperti semula
+    btn.disabled = false;
+    btn.classList.remove("loading");
+    btn.innerHTML = originalHTML;
   }
 }
 
-
-async function downloadAbsensiPNG() { 
-  const content = await renderAllAbsensiHTML();
-  let html = `<div class="absensi-print-container">${content}</div>`;
-  html = wrapAbsensiContent(html);
-
-  const container = document.createElement("div");
-  container.innerHTML = html;
-  document.body.appendChild(container);
-  container.style.position = "absolute";
-  container.style.left = "-9999px";
-  container.style.background = "#fff";
-  container.style.width = "100%";
-
-  await Promise.all(
-    Array.from(container.querySelectorAll("img")).map(img =>
-      new Promise(res => {
-        if (img.complete && img.naturalHeight > 0) return res();
-        img.onload = res;
-        img.onerror = res;
-      })
-    )
-  );
-
-  const canvas = await html2canvas(container, { scale: 3, useCORS: true });
-  canvas.toBlob(blob => {
-    // 🔹 pakai getExportFileName
-    saveAs(blob, getExportFileName("Absensi", "png", getAbsensiFilters()));
-    container.remove();
-  }, "image/png");
-}
 
 
 
@@ -12170,15 +12349,17 @@ async function handleDownloadAbsensiMerahPDF() {
   const originalHTML = btn.innerHTML;
 
   btn.disabled = true;
+  btn.classList.add('loading');
   btn.innerHTML = `<span class="spinner"></span> Sedang mengunduh...`;
 
   try {
-    await downloadAbsensiMerahTrendPDF(); // 🔹 fungsi asli milikmu
+    await downloadAbsensiMerahTrendPDF();
   } catch (err) {
     console.error("Download error:", err);
     alert("Gagal download: " + err.message);
   } finally {
     btn.disabled = false;
+    btn.classList.remove('loading');
     btn.innerHTML = originalHTML;
   }
 }
@@ -14190,23 +14371,7 @@ async function downloadAbsensiMerahTrendPDF() {
   const marginX = 40;
   let currentY = 130;
   
-  // ==== STATUS TOMBOL ====
-  const btn = document.getElementById('btnDownloadAbsensiTrendPDF') || document.querySelector('.btn-download-trend');
-  let originalHTML = '';
-  if (btn) {
-    originalHTML = btn.innerHTML;
-    btn.disabled = true;
-    btn.classList.add('downloading');
-    btn.innerHTML = `<span class="spinner" style="
-      display:inline-block;
-      width:16px; height:16px;
-      border:2px solid #fff;
-      border-top-color:transparent;
-      border-radius:50%;
-      margin-right:6px;
-      animation:spin 0.8s linear infinite;
-    "></span> Sedang mengunduh...`;
-  }
+  
 
   // ==== HEADER ====
   try {
@@ -14444,13 +14609,7 @@ async function downloadAbsensiMerahTrendPDF() {
 
   // ==== SIMPAN ====
   doc.save(`Rekap_Absensi_Merah_${new Date().toISOString().slice(0, 10)}.pdf`);
-
-  // ==== KEMBALIKAN TOMBOL ====
-  if (btn) {
-    btn.disabled = false;
-    btn.classList.remove('downloading');
-    btn.innerHTML = originalHTML;
-  }
+  
 }
 
 // ===== Inventaris: Tab switching =====
