@@ -15197,38 +15197,130 @@ async function insertSantri(row) {
   btn.disabled = true;
   btn.textContent = 'Menyimpan...';
 
-  const { error } = await supabaseClient
-    .from('santri_kharisma')
-    .insert([
-      {
-        "Stambuk": row.stambuk
-      }
-    ]);
+  try {
 
-  if (error) {
-    console.error(error);
-    showToast('Gagal / kemungkinan sudah ada', 'error');
+    // =========================
+    // VALIDASI STAMBUK
+    // =========================
+    if (!row.stambuk || row.stambuk.trim() === '') {
+      showToast('Stambuk kosong!', 'error');
+
+      btn.disabled = false;
+      btn.textContent = 'Masukkan ke Santri';
+      return;
+    }
+
+    // =========================
+    // CEK DATA PONDOK
+    // =========================
+    const { data: pondok, error: pondokError } = await supabaseClient
+      .from('pondok_induk')
+      .select('stambuk, kelas, kelas_id')
+      .eq('stambuk', row.stambuk)
+      .maybeSingle();
+
+    if (pondokError) {
+      console.error(pondokError);
+
+      showToast('Gagal cek data pondok', 'error');
+
+      btn.disabled = false;
+      btn.textContent = 'Masukkan ke Santri';
+      return;
+    }
+
+    if (!pondok) {
+      showToast('Data pondok tidak ditemukan', 'error');
+
+      btn.disabled = false;
+      btn.textContent = 'Masukkan ke Santri';
+      return;
+    }
+
+    // =========================
+    // VALIDASI KELAS
+    // =========================
+    if (!pondok.kelas || pondok.kelas.trim() === '') {
+      showToast('Kelas pondok kosong!', 'error');
+
+      btn.disabled = false;
+      btn.textContent = 'Masukkan ke Santri';
+      return;
+    }
+
+    // =========================
+    // VALIDASI KELAS ID
+    // =========================
+    if (!pondok.kelas_id) {
+      showToast('Kelas ID pondok kosong!', 'error');
+
+      btn.disabled = false;
+      btn.textContent = 'Masukkan ke Santri';
+      return;
+    }
+
+    // =========================
+    // INSERT
+    // =========================
+    const { error } = await supabaseClient
+  .from('santri_kharisma')
+  .insert([
+  {
+    "Stambuk": row.stambuk.trim()
+  }
+]);
+
+    // =========================
+    // ERROR INSERT
+    // =========================
+    if (error) {
+      console.error(error);
+
+      let pesan = error.message || 'Gagal menyimpan';
+
+      // duplicate
+      if (error.code === '23505') {
+        pesan = 'Santri sudah ada';
+      }
+
+      // null
+      if (error.code === '23502') {
+        pesan = 'Data pondok belum lengkap';
+      }
+
+      showToast(pesan, 'error');
+
+      btn.disabled = false;
+      btn.textContent = 'Masukkan ke Santri';
+
+      return;
+    }
+
+    // =========================
+    // SUCCESS
+    // =========================
+    showToast('Berhasil masuk ke KHARISMA');
+
+    const statusEl = document.getElementById('pondokStatus');
+
+    statusEl.textContent = '✔ Santri SUDAH ada di Kharisma';
+    statusEl.className = 'status-ada';
+
+    btn.style.display = 'none';
+
+    setTimeout(() => {
+      closePondokModal();
+    }, 1500);
+
+  } catch (err) {
+
+    console.error(err);
+
+    showToast('Terjadi error sistem', 'error');
 
     btn.disabled = false;
     btn.textContent = 'Masukkan ke Santri';
-    return;
   }
-
-  // ✅ sukses
-  showToast('Berhasil masuk ke Kharisma');
-
-  // 🔥 UPDATE STATUS TANPA RELOAD MODAL
-  const statusEl = document.getElementById('pondokStatus');
-
-  statusEl.textContent = '✔ Santri SUDAH ada di Kharisma';
-  statusEl.className = 'status-ada';
-
-  btn.style.display = 'none';
-
-  // ⏱️ tutup otomatis
-  setTimeout(() => {
-    closePondokModal();
-  }, 1500);
 }
 
 function closePondokModal() {
@@ -15367,7 +15459,7 @@ function showPopupUpdate(msg) {
 
 </script>
 <div class="app-footer">
-  <img src="https://img.shields.io/badge/version-v2.2.2-orange" alt="Version">
+  <img src="https://img.shields.io/badge/version-v2.3-orange" alt="Version">
   <img src="https://img.shields.io/badge/license-Proprietary-red" alt="License">
   <img src="https://img.shields.io/badge/status-Internal%20Use-blue" alt="Status">
   <img src="https://img.shields.io/badge/%C2%A9%202026%20Ndalem%20Kharisma-Semua%20hak%20dilindungi%20undang%E2%80%90undang-red" 
