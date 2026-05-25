@@ -1139,9 +1139,42 @@ select.arabic option {
   display: block;
 }
 
+.tab-btn {
+  padding: 10px 18px;
+  margin-bottom: 12px; /* jarak ke bawah */
+  border: 1px solid #dbe3ee;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #475569;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
+}
+
+.tab-btn:hover {
+  background: #f8fafc;
+  border-color: #b6c6db;
+  color: #1e293b;
+  transform: translateY(-1px);
+}
+
 .tab-btn.active {
-  background-color: #1a73e8;
-  color: white;
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.35);
+  transform: translateY(-2px);
+}
+
+.tab-btn.active::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(255,255,255,0.08);
 }
 
 .checklist {
@@ -2610,7 +2643,92 @@ table tbody tr:hover {
     white-space: normal;
     word-break: break-word;
   }
+.app-header {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
 
+.header-container {
+  width: 100%;
+  max-width: 900px;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  border: 1px solid #e2e8f0;
+}
+
+.app-header {
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.header-container {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  border: 1px solid #e2e8f0;
+}
+
+.header-logo {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.header-text {
+  flex: 1;
+}
+
+.header-text h1 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.header-text p {
+  margin-top: 8px;
+  font-size: 15px;
+  color: #64748b;
+  text-align: center;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .header-container {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .header-logo {
+    width: 64px;
+    height: 64px;
+  }
+
+  .header-text h1 {
+    font-size: 24px;
+  }
+
+  .header-text p {
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
   </style>  
 </head>
 <body>
@@ -2623,10 +2741,22 @@ table tbody tr:hover {
       </a>
     </div>
 
-    <header>
-      <h1>📖 Khudama' Kharisma</h1>
-      <p>Pencatatan Setoran Al-Qur'an - Nadhom - Hadis Harian</p>
-    </header>
+    <header class="app-header">
+  <div class="header-container">
+    
+    <img 
+      src="https://i.imgur.com/Irgu32G.png" 
+      alt="Logo Khudama Kharisma" 
+      class="header-logo"
+    >
+
+    <div class="header-text">
+      <h1>Khudama' KHARISMA</h1>
+      <p>Pencatatan Setoran Al-Qur'an - Hadis - Nadhom - Sorogan Harian</p>
+    </div>
+
+  </div>
+</header>
 
     <!-- LOADING -->
     <div id="loadingScreen" class="loading-screen">
@@ -2638,9 +2768,9 @@ table tbody tr:hover {
 
       <!-- =================== TAB NAVIGATION =================== -->
       <div class="tab-buttons">
-        <button class="tab-btn active" data-tab="rekapTab">📖 Setoran Nadhom & Hadis</button>
-		<button class="tab-btn" data-tab="soroganTab">📖 Sorogan Kitab</button>
-        <button class="tab-btn" data-tab="laporanTab">📈 Rekap Laporan</button>
+        <button class="tab-btn active" data-tab="rekapTab">Qur'an-Hadis-Nadhom</button>
+		<button class="tab-btn" data-tab="soroganTab">Sorogan Kitab</button>
+        <button class="tab-btn" data-tab="laporanTab">Rekap</button>
       </div>
 
       <!-- =================== TAB 1: REKAP HARIAN =================== -->
@@ -3099,7 +3229,7 @@ table tbody tr:hover {
 
 <div class="laporan-download-all"> <button class="btn-download-all" id="btnDownloadAll" type="button"> <span class="btn-icon">⬇️</span> <span class="btn-label">Download Laporan</span> <span class="btn-spinner" aria-hidden="true"></span> </button> </div>
 
-<!-- ================= MODAL DOWNLOAD LAPORAN ================= -->
+
 <div id="downloadModal" class="download-modal">
   <div class="download-modal-content">
 
@@ -3125,11 +3255,7 @@ table tbody tr:hover {
         Status Khatam & Lancar (Santri)
       </label>
 
-      <label class="download-check-item">
-        <input type="checkbox" value="tblBelum" checked>
-        Santri Belum Setoran
-      </label>
-
+      
       <label class="download-check-item">
         <input type="checkbox" value="tblRekapUnit" checked>
         Rekap Unit Aktif Setoran
@@ -3137,14 +3263,31 @@ table tbody tr:hover {
 
       <label class="download-check-item">
         <input type="checkbox" value="tblAktivitasUnit" checked>
-        Rekap Aktivitas Unit (Detail Santri per Kitab)
+        Setoran Nadhom Siswa
       </label>
 	  
-<!-- Tambahkan di dalam modal download -->
+      <!-- Tambahkan di dalam modal download -->
+      <label class="download-check-item">
+        <input type="checkbox" value="tblFrekuensiSetoran" checked>
+        Setoran Nadhom Unit
+      </label>
+
+      <!-- TAMBAHKAN: Tabel Laporan Quran Santri -->
+      <label class="download-check-item">
+        <input type="checkbox" value="tblLaporanQuranSantri" checked>
+        Setoran Qur'an Siswa
+      </label>
+	  
+	  <!-- Tambahkan di dalam modal download -->
 <label class="download-check-item">
-  <input type="checkbox" value="tblFrekuensiSetoran" checked>
-  Rekap Frekuensi Setoran per Minggu
+  <input type="checkbox" value="tblLaporanQuranUnit" checked>
+  Setoran Qur'an Unit
 </label>
+
+<label class="download-check-item">
+        <input type="checkbox" value="tblBelum" checked>
+        Santri Belum Setoran
+      </label>
 
     </div>
 
@@ -3291,41 +3434,7 @@ table tbody tr:hover {
     </div>
   </div>
 
-  <!-- Accordion Section 4: Santri Belum Setoran -->
-  <div class="accordion-section">
-    <div class="accordion-header" onclick="toggleAccordion(this)">
-      <span class="toggle-icon">▶</span>
-      <span>🔸 Santri Belum Setoran</span>
-    </div>
-    <div class="accordion-content">
-      <div class="laporan-info">
-        <div class="laporan-info-title">
-          ⚠️ Keterangan Santri Belum Setoran
-        </div>
-        <div class="laporan-info-body">
-          Tabel ini menyajikan daftar santri dengan status aktif yang belum memiliki riwayat setoran sama sekali.
-        </div>
-        <ul class="laporan-info-list">
-          <li><strong>Sumber Data</strong> : Santri dengan status aktif yang tidak terdaftar dalam tabel catatan setoran.</li>
-          <li><strong>Tujuan Laporan</strong> : Sebagai alat monitoring untuk mengetahui santri yang belum memulai aktivitas setoran.</li>
-          <li><strong>Rekomendasi</strong> : Perlu dilakukan konfirmasi penyebab dan pembinaan lebih lanjut.</li>
-        </ul>
-      </div>
-      <div style="overflow-x: auto;">
-        <table id="tblBelum" class="laporan-table">
-          <thead>
-            <tr>
-              <th>No</th>
-              <th>Nama</th>
-              <th>Kelas</th>
-              <th>Unit</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
+  
 
   <!-- Accordion Section 5: Rekap Unit Aktif Setoran -->
   <div class="accordion-section">
@@ -3368,39 +3477,153 @@ table tbody tr:hover {
     </div>
   </div>
 
-  <!-- Accordion Section 6: Rekap Aktivitas Unit (Detail Santri per Kitab) -->
+ <!-- Accordion Section 6: Rekap Aktivitas Setoran Santri per Kitab -->
+<div class="accordion-section">
+  <div class="accordion-header" onclick="toggleAccordion(this)">
+    <span class="toggle-icon">▶</span>
+    <span>🔸 Setoran Nadhom Siswa</span>
+  </div>
+
+  <div class="accordion-content">
+
+    <div class="laporan-info">
+      <div class="laporan-info-title">
+        📚 Keterangan Setoran Nadhom Siswa
+      </div>
+
+      <div class="laporan-info-body">
+        Tabel aktivitas setoran santri per Nadhom wajib sesuai kelas aktif. Data: progres, kelancaran, frekuensi, capaian khatam.
+      </div>
+
+      <ul class="laporan-info-list">        
+        <li><strong>Kitab</strong> : Target setoran berdasarkan kelas.</li>
+        <li><strong>Jumlah Setoran</strong> : Frekuensi input setoran.</li>
+        <li><strong>Tanggal Terakhir</strong> : Terakhir aktivitas setoran.</li>
+        <li><strong>Total Setoran</strong> : Akumulasi ayat/nadhom disetor.</li>
+        <li><strong>Total Batas Khatam</strong> : Target minimal khatam.</li>
+        <li><strong>% Khatam</strong> : (Total Setoran ÷ Batas Khatam) × 100% (maks 100%).</li>
+        <li><strong>Kelancaran</strong> : <strong>Lancar</strong> (pernah) / <strong>Belum Lancar</strong>.</li>
+        <li><strong>Frekuensi Setoran</strong> : Rata-rata hari aktif setoran/minggu.</li>
+      </ul>
+    </div>
+
+    <div style="overflow-x: auto;">
+      <table id="tblAktivitasUnit" class="laporan-table">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Nama Santri</th>
+            <th>Kelas</th>
+            <th>Unit</th>
+            <th>Nadhom/Kitab</th>
+            <th>Jumlah Setoran</th>
+            <th>Total Setoran</th>
+            <th>Batas Khatam</th>
+            <th>% Khatam</th>   
+            <th>Kelancaran</th>
+            <th>Tanggal Terakhir</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+  
+  <!-- Accordion Section 7: Rekap Frekuensi Setoran per Minggu -->
   <div class="accordion-section">
     <div class="accordion-header" onclick="toggleAccordion(this)">
       <span class="toggle-icon">▶</span>
-      <span>🔸 Rekap Aktivitas Unit (Detail Santri per Kitab)</span>
+      <span>🔸 Setoran Nadhom Unit</span>
     </div>
     <div class="accordion-content">
       <div class="laporan-info">
         <div class="laporan-info-title">
-          📚 Keterangan Aktivitas Setoran Santri per Kitab
+          📈 Keterangan Setoran Nadhom Unit
         </div>
         <div class="laporan-info-body">
-          Tabel ini menyajikan detail aktivitas setoran setiap santri berdasarkan kitab yang dipelajari.
+          Tabel ini menampilkan ringkasan aktivitas setoran setiap Unit Ndalem berdasarkan santri aktif, kitab yang dipelajari, frekuensi setoran, serta progres menuju target khatam.
         </div>
-        <ul class="laporan-info-list">
-          <li><strong>Jumlah Setoran</strong> : Frekuensi transaksi setoran yang dilakukan santri untuk kitab tertentu.</li>
-          <li><strong>Total Setoran (Ayat)</strong> : Akumulasi ayat atau nadhom yang telah disetorkan.</li>
-          <li><strong>Batas Khatam</strong> : Target minimal yang harus dicapai untuk menyelesaikan kitab.</li>
-          <li><strong>Prosentase</strong> : (Total Setoran ÷ Batas Khatam) × 100%</li>
-          <li><strong>Catatan</strong> : Nilai 100% mengindikasikan bahwa kitab telah selesai (khatam).</li>
-        </ul>
+        <ul class="laporan-info-list">		 
+		  <li><strong>Total Kitab</strong> : Jumlah kitab target setoran di unit tersebut.</li>
+		  <li><strong>Jumlah Setoran</strong> : Total seluruh input setoran yang pernah dicatat.</li>
+		  <li><strong>Tanggal Setoran Terakhir</strong> : Tanggal terakhir aktivitas setoran tercatat.</li>
+		  <li><strong>Total Setoran</strong> : Akumulasi seluruh ayat/nadhom yang disetorkan.</li>
+		  <li><strong>Total Batas Khatam</strong> : Akumulasi target minimal khatam per santri & kitab aktif.</li>
+		  <li><strong>% Khatam</strong> : (Total Setoran ÷ Total Batas Khatam) × 100% (maks 100%).</li>
+		  <li><strong>% Lancar</strong> : Persentase santri dengan status setoran lancar.</li>
+		  <li><strong>Frekuensi Setoran</strong> : Rata-rata intensitas setoran aktif per minggu.</li>
+		</ul>
       </div>
-      <div style="overflow-x: auto;">
-        <table id="tblAktivitasUnit" class="laporan-table">
+      <div style="overflow-x:auto;">
+        <table id="tblFrekuensiSetoran" class="laporan-table">
           <thead>
             <tr>
               <th>No</th>
-              <th>Nama Siswa</th>
-              <th>Kitab</th>
+              <th>Unit Ndalem</th>
+              <th>Kelas</th>
+              <th>Daftar Kitab</th>
+              <th>Total Santri</th>
+              <th>Total Kitab</th>
               <th>Jumlah Setoran</th>
-              <th>Total Setoran (Ayat)</th>
-              <th>Batas Khatam</th>
-              <th>Prosentase</th>
+              <th>Tanggal Terakhir</th>
+              <th>Total Setoran</th>
+              <th>Total Batas Khatam</th>
+              <th>% Khatam</th>
+              <th>% Lancar</th>
+              <th>Frekuensi Setoran</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= ACCORDION SECTION 8: LAPORAN QURAN SANTRI ================= -->
+  <div class="accordion-section">
+    <div class="accordion-header" onclick="toggleAccordion(this)">
+      <span class="toggle-icon">▶</span>
+      <span>🔸 Setoran Qur'an Siswa</span>
+    </div>
+    <div class="accordion-content">
+      <div class="laporan-info">
+        <div class="laporan-info-title">
+          📖 Keterangan Setoran Qur'an Siswa
+        </div>
+        <div class="laporan-info-body">
+          Tabel ini menyajikan detail setoran siswa untuk Al-Qur'an per juz.
+        </div>
+        <ul class="laporan-info-list">          
+          <li><strong>Juz Quran</strong> : Nama kitab/juz Al-Qur'an yang menjadi target setoran.</li>
+          <li><strong>Jumlah Setoran</strong> : Frekuensi setoran yang dilakukan santri pada kitab tersebut.</li>
+          <li><strong>Tanggal Terakhir</strong> : Tanggal terakhir santri melakukan setoran.</li>
+          <li><strong>Total Setoran</strong> : Akumulasi jumlah ayat yang telah disetorkan.</li>
+          <li><strong>Total Batas Khatam</strong> : Target minimal ayat yang harus dicapai untuk khatam.</li>
+          <li><strong>% Khatam</strong> : Persentase pencapaian setoran terhadap batas khatam (maksimal 100%).</li>
+          <li><strong>% Lancar</strong> : Bernilai 100 jika ada catatan setoran lancar, selain itu 0.</li>
+          <li><strong>Frekuensi Setoran</strong> : Rata-rata intensitas setoran per minggu (format: "nilai x / minggu").</li>
+		  <li><strong>Kesimpulan</strong> : Satu juz adalah 20 kaca, ketika setoran qur'an setiap hari satu kaca, maka siswa mampu mengkhatamkan qur'an ± 2 tahun.</li>
+        </ul>
+      </div>
+      <div style="overflow-x:auto;">
+        <table id="tblLaporanQuranSantri" class="laporan-table">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Unit Ndalem</th>
+              <th>Nama</th>
+              <th>Stambuk</th>
+              <th>Kelas</th>
+              <th>Juz Quran</th>
+              <th>Jumlah Setoran</th>
+              <th>Tanggal Terakhir</th>
+              <th>Total Setoran</th>
+              <th>Total Batas Khatam</th>
+              <th>% Khatam</th>
+              <th>% Lancar</th>
+              <th>Frekuensi Setoran</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -3409,115 +3632,93 @@ table tbody tr:hover {
     </div>
   </div>
   
-  <!-- Accordion Section 7: Rekap Frekuensi Setoran per Minggu -->
+  <!-- ================= ACCORDION SECTION 9: LAPORAN QURAN UNIT ================= -->
+<div class="accordion-section">
+  <div class="accordion-header" onclick="toggleAccordion(this)">
+    <span class="toggle-icon">▶</span>
+    <span>🔸 Setoran Qur'an Unit</span>
+  </div>
+  <div class="accordion-content">
+    <div class="laporan-info">
+      <div class="laporan-info-title">
+        📊 Keterangan Setoran Qur'an Unit
+      </div>
+      <div class="laporan-info-body">
+        Tabel ini menyajikan rekapitulasi setoran Al-Qur'an per Unit Ndalem.
+      </div>
+      <ul class="laporan-info-list">       
+        <li><strong>Total Kitab</strong> : Jumlah kitab Al-Qur'an berbeda yang disetorkan.</li>
+        <li><strong>Jumlah Setoran</strong> : Total frekuensi setoran di unit tersebut.</li>
+        <li><strong>Tanggal Terakhir</strong> : Tanggal terakhir aktivitas setoran Al-Qur'an.</li>
+        <li><strong>Total Setoran</strong> : Akumulasi seluruh ayat yang telah disetorkan.</li>
+        <li><strong>Total Batas Khatam</strong> : Akumulasi target minimal khatam seluruh santri.</li>
+        <li><strong>% Khatam</strong> : Persentase progres setoran terhadap total target khatam.</li>
+        <li><strong>% Lancar</strong> : Persentase santri yang memiliki status setoran lancar.</li>
+        <li><strong>Frekuensi Setoran</strong> : Rata-rata intensitas setoran per minggu.</li>
+      </ul>
+    </div>
+    <div style="overflow-x:auto;">
+      <table id="tblLaporanQuranUnit" class="laporan-table" style="width:100%; border-collapse:collapse;">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Unit Ndalem</th>
+            <th>Kelas</th>
+            <th>Daftar Juz quran</th>
+            <th>Total Santri</th>
+            <th>Total Kitab</th>
+            <th>Jumlah Setoran</th>
+            <th>Tanggal Terakhir</th>
+            <th>Total Setoran</th>
+            <th>Total Batas Khatam</th>
+            <th>% Khatam</th>
+            <th>% Lancar</th>
+            <th>Frekuensi Setoran</th>
+           </tr>
+        </thead>
+        <tbody></tbody>
+       </table>
+    </div>
+  </div>
+</div>
+
+<!-- Accordion Section 4: Santri Belum Setoran -->
   <div class="accordion-section">
     <div class="accordion-header" onclick="toggleAccordion(this)">
       <span class="toggle-icon">▶</span>
-      <span>🔸 Rekap Frekuensi Setoran per Minggu</span>
+      <span>🔸 Siswa Belum Setoran</span>
     </div>
     <div class="accordion-content">
       <div class="laporan-info">
         <div class="laporan-info-title">
-          📈 Keterangan Frekuensi Setoran per Minggu
+          ⚠️ Keterangan Siswa Belum Setoran
         </div>
         <div class="laporan-info-body">
-  Tabel ini menampilkan ringkasan aktivitas setoran setiap Unit Ndalem berdasarkan santri aktif, kitab yang dipelajari, frekuensi setoran, serta progres menuju target khatam.
-</div>
-
-<ul class="laporan-info-list">
-
-  <li>
-    <strong>Unit Ndalem</strong> :
-    Nama kelompok/asrama santri yang menjadi pusat rekap aktivitas setoran.
-  </li>
-
-  <li>
-    <strong>Kelas</strong> :
-    Daftar kelas aktif yang tergabung dalam Unit Ndalem tersebut sesuai filter yang dipilih.
-  </li>
-
-  <li>
-    <strong>Daftar Kitab</strong> :
-    Seluruh kitab wajib yang dipelajari oleh santri pada unit tersebut berdasarkan kelas yang aktif.
-  </li>
-
-  <li>
-    <strong>Total Santri</strong> :
-    Jumlah santri aktif yang termasuk dalam Unit Ndalem sesuai filter laporan.
-  </li>
-
-  <li>
-    <strong>Total Kitab</strong> :
-    Jumlah kitab berbeda yang menjadi target setoran pada Unit Ndalem tersebut.
-  </li>
-
-  <li>
-    <strong>Jumlah Transaksi Setoran</strong> :
-    Total seluruh transaksi/input setoran yang pernah dicatat pada unit tersebut.
-  </li>
-
-  <li>
-    <strong>Tanggal Setoran Terakhir</strong> :
-    Tanggal terakhir aktivitas setoran tercatat pada Unit Ndalem.
-  </li>
-
-  <li>
-    <strong>Total Setoran</strong> :
-    Akumulasi seluruh ayat/nadhom yang berhasil disetorkan oleh santri pada unit tersebut.
-  </li>
-
-  <li>
-    <strong>Total Batas Khatam</strong> :
-    Akumulasi seluruh target minimal khatam kitab berdasarkan santri dan kitab aktif pada filter yang dipilih.
-  </li>
-
-  <li>
-    <strong>% Khatam</strong> :
-    Persentase progres setoran dibanding total target khatam.
-    Dihitung dengan rumus:
-    (Total Setoran ÷ Total Batas Khatam) × 100%.
-    Nilai maksimal dibatasi sampai 100%.
-  </li>
-
-  <li>
-    <strong>% Lancar</strong> :
-    Persentase santri yang sudah memiliki status setoran lancar dibanding total santri aktif pada unit tersebut.
-  </li>
-
-  <li>
-    <strong>Frekuensi Setoran</strong> :
-    Rata-rata intensitas hari setoran aktif setiap minggu.
-    Semakin tinggi frekuensinya maka semakin konsisten aktivitas belajar dan setoran santri pada unit tersebut.
-  </li>
-
-</ul>
+          Tabel ini menyajikan daftar santri dengan status aktif yang belum memiliki riwayat setoran sama sekali.
+        </div>
+        <ul class="laporan-info-list">
+          <li><strong>Sumber Data</strong> : Santri dengan status aktif yang tidak terdaftar dalam tabel catatan setoran.</li>
+          <li><strong>Tujuan Laporan</strong> : Sebagai alat monitoring untuk mengetahui santri yang belum memulai aktivitas setoran.</li>
+          <li><strong>Rekomendasi</strong> : Perlu dilakukan konfirmasi penyebab dan pembinaan lebih lanjut.</li>
+        </ul>
       </div>
-      <div style="overflow-x:auto;">
-        <table id="tblFrekuensiSetoran" class="laporan-table">
+      <div style="overflow-x: auto;">
+        <table id="tblBelum" class="laporan-table">
           <thead>
-			  <tr>
-				<th>No</th>
-				<th>Unit Ndalem</th>
-				<th>Kelas</th>
-				<th>Daftar Kitab</th>
-				<th>Total Santri</th>
-				<th>Total Kitab</th>
-				<th>Jumlah Transaksi</th>
-				<th>Tanggal Terakhir</th>
-				<th>Total Setoran</th>
-				<th>Total Batas Khatam</th>
-				<th>% Khatam</th>
-				<th>% Lancar</th>
-				
-				<th>Frekuensi Setoran</th>
-			  </tr>
-			</thead>
+            <tr>
+              <th>No</th>
+              <th>Nama</th>
+              <th>Kelas</th>
+              <th>Unit</th>
+            </tr>
+          </thead>
           <tbody></tbody>
         </table>
       </div>
     </div>
   </div>
-</div>    
+
+</div>  
 
   <!-- POPUP EDIT -->
   <div id="editPopup" class="popup-container" style="display:none;">
@@ -5380,7 +5581,9 @@ async function loadLaporan() {
       statusRes,
       detailRes,
       belumRes,
-      ngajiRes
+      ngajiRes,
+      laporanQuranRes,
+      laporanQuranUnitRes
     ] = await Promise.all([
 
       client
@@ -5398,6 +5601,7 @@ async function loadLaporan() {
       client
         .from("santri_kharisma")
         .select(`
+		  Stambuk,
           Kelas,
           Kelas_id,
           Unit_Ndalem,
@@ -5406,7 +5610,25 @@ async function loadLaporan() {
           ngaji:Ngaji (
             tempat_ngaji
           )
-        `)
+        `),
+
+      client
+        .from("v_laporan_quran_santri")
+        .select("*"),
+
+      // RPC
+	  client.rpc(
+		"get_laporan_quran_unit",
+		{
+		  p_kelas: kelasDipilih.length
+			? kelasDipilih
+			: null,
+
+		  p_unit: unitDipilih.length
+			? unitDipilih
+			: null
+		}
+	  )
 
     ]);
 
@@ -5414,9 +5636,10 @@ async function loadLaporan() {
     const detailData = detailRes.data || [];
     const belumData  = belumRes.data || [];
     const santriNgajiRaw = ngajiRes.data || [];
+    const laporanQuranData = laporanQuranRes.data || [];
+    const laporanQuranUnitData = laporanQuranUnitRes.data || [];
 
-    // normalisasi: pastikan setiap record punya properti `Kelas` (pakai Kelas jika ada,
-    // kalau tidak gunakan hasil join nadhom_kelas.nama_kelas)
+    // normalisasi: pastikan setiap record punya properti `Kelas`
     const santriNgaji = santriNgajiRaw.map(s => ({
       ...s,
       Kelas: (s.Kelas && s.Kelas.toString().trim()) || (s.nadhom_kelas && s.nadhom_kelas.nama_kelas && s.nadhom_kelas.nama_kelas.toString().trim()) || null
@@ -5426,14 +5649,18 @@ async function loadLaporan() {
       statusRes.error ||
       detailRes.error ||
       belumRes.error ||
-      ngajiRes.error
+      ngajiRes.error ||
+      laporanQuranRes.error ||
+      laporanQuranUnitRes.error
     ) {
       console.error(
         "Error ambil data:",
         statusRes.error,
         detailRes.error,
         belumRes.error,
-        ngajiRes.error
+        ngajiRes.error,
+        laporanQuranRes.error,
+        laporanQuranUnitRes.error
       );
       return;
     }
@@ -5490,6 +5717,29 @@ async function loadLaporan() {
 
     const filteredBelum =
       (belumData || []).filter(filterLogicNoKitab);
+
+    // Filter data laporan quran santri
+    const filteredLaporanQuran = (laporanQuranData || []).filter(item => {
+      const matchKelas = kelasDipilih.length > 0 ? kelasDipilih.includes(item.Kelas) : true;
+      const matchUnit = unitDipilih.length > 0 ? unitDipilih.includes(item["Unit Ndalem"]) : true;
+      const matchKitab = kitabDipilih.length > 0 ? kitabDipilih.includes(item["Juz Quran"]) : true;
+      return matchKelas && matchUnit && matchKitab;
+    });
+
+    // Filter data laporan quran unit
+    const filteredLaporanQuranUnit =
+  (laporanQuranUnitData || []).filter(item => {
+
+    const matchKitab =
+      kitabDipilih.length > 0
+        ? kitabDipilih.some(k =>
+            item["Daftar Juz Quran"]?.includes(k)
+          )
+        : true;
+
+    return matchKitab;
+
+  });
 
     // ==================== UNIT VALID ====================
     const unitValid = [
@@ -5556,23 +5806,19 @@ async function loadLaporan() {
             const tr = document.createElement("tr");
 
             tr.innerHTML = `
-              <td style="text-align:center;">
+              <td style="text-align:center; padding:8px; border:1px solid #ddd;">
                 ${i + 1}
-              </td>
-
-              <td>
+               </td>
+               <td style="text-align:left; padding:8px; border:1px solid #ddd;">
                 ${row.Unit_Ndalem ?? "-"}
-              </td>
-
-              <td style="text-align:center;">
+               </td>
+               <td style="text-align:center; padding:8px; border:1px solid #ddd;">
                 ${row.total_hari_aktif ?? 0}
-              </td>
-
-              <td>
+               </td>
+               <td style="text-align:left; padding:8px; border:1px solid #ddd;">
                 ${row.daftar_kitab ?? "-"}
-              </td>
-
-              <td style="text-align:center;">
+               </td>
+               <td style="text-align:center; padding:8px; border:1px solid #ddd;">
                 ${
                   row.tanggal_terakhir_setoran
                     ? new Date(
@@ -5580,15 +5826,13 @@ async function loadLaporan() {
                       ).toLocaleDateString("id-ID")
                     : "-"
                 }
-              </td>
-
-              <td style="text-align:center;">
+               </td>
+               <td style="text-align:center; padding:8px; border:1px solid #ddd;">
                 ${row.persen_kontribusi ?? 0}%
-              </td>
-
-              <td style="text-align:center;">
+               </td>
+               <td style="text-align:center; padding:8px; border:1px solid #ddd;">
                 ${row.peringkat ?? "-"}
-              </td>
+               </td>
             `;
 
             tblRekapUnit.appendChild(tr);
@@ -5608,165 +5852,67 @@ async function loadLaporan() {
 
     }
 
-    // ==================== 2. AKTIVITAS UNIT ====================
-    try {
-
-      let queryAktivitas = client
-        .from("v_rekap_aktivitas_unit")
-        .select("*");
-
-      if (unitDipilih.length > 0) {
-        queryAktivitas =
-          queryAktivitas.in(
-            "Unit_Ndalem",
-            unitDipilih
-          );
-      }
-
-      if (kitabDipilih.length > 0) {
-        queryAktivitas =
-          queryAktivitas.in(
-            "nama_kitab",
-            kitabDipilih
-          );
-      }
-
-      const {
-        data: aktivitasData = [],
-        error: aktivitasErr
-      } = await queryAktivitas
-        .order("Unit_Ndalem", {
-          ascending: true
-        })
-        .order("Nama_Lengkap", {
-          ascending: true
-        });
-
-      if (aktivitasErr) {
-        console.error(
-          "Gagal ambil v_rekap_aktivitas_unit:",
-          aktivitasErr
-        );
-      }
-
-      const aktivitasFiltered =
-        (aktivitasData || []).filter(filterLogic);
-
-      const tblAktivitas =
-        document.querySelector("#tblAktivitasUnit tbody");
-
-      if (tblAktivitas) {
-
-        tblAktivitas.innerHTML = "";
-
-        if (aktivitasFiltered.length === 0) {
-
-          tblAktivitas.innerHTML = `
-            <tr>
-              <td colspan="7" style="text-align:center;">
-                (tidak ada data)
-              </td>
-            </tr>
-          `;
-
-        } else {
-
-          aktivitasFiltered.forEach((row, i) => {
-
-            const tr = document.createElement("tr");
-
-            tr.innerHTML = `
-              <td style="text-align:center;">
-                ${i + 1}
-              </td>
-
-              <td>
-                ${row.Nama_Lengkap ?? "-"}
-              </td>
-
-              <td>
-                ${row.nama_kitab ?? "-"}
-              </td>
-
-              <td style="text-align:center;">
-                ${row.jumlah_setoran ?? 0}
-              </td>
-
-              <td style="text-align:center;">
-                ${row.total_ayat_setor ?? 0}
-              </td>
-
-              <td style="text-align:center;">
-                ${row.batas_khatam ?? 0}
-              </td>
-
-              <td style="text-align:center;">
-                ${row.prosentase ?? 0}%
-              </td>
-            `;
-
-            tblAktivitas.appendChild(tr);
-
-          });
-
-        }
-
-      }
-
-    } catch (err) {
-
-      console.error(
-        "Gagal memuat Rekap Aktivitas Unit:",
-        err
-      );
-
-    }
-
-    // ==================== 3. FREKUENSI SETORAN ====================
+   // ==================== 2. AKTIVITAS UNIT ====================
 try {
 
-  const {
-    data: frekuensiData = [],
-    error: frekuensiErr
-  } = await client.rpc(
-    "get_frekuensi_setoran_unit",
-    {
-      p_kelas: kelasDipilih.length
-        ? kelasDipilih
-        : null,
+  let queryAktivitas = client
+    .from("v_rekap_aktivitas_unit")
+    .select("*");
 
-      p_unit: unitDipilih.length
-        ? unitDipilih
-        : null
-    }
-  );
-
-  if (frekuensiErr) {
-
-    console.error(
-      "Gagal ambil get_frekuensi_setoran_unit:",
-      frekuensiErr
-    );
-
+  if (unitDipilih.length > 0) {
+    queryAktivitas =
+      queryAktivitas.in(
+        "Unit_Ndalem",
+        unitDipilih
+      );
   }
 
-  const tbody =
-    document.querySelector(
-      "#tblFrekuensiSetoran tbody"
+  if (kitabDipilih.length > 0) {
+    queryAktivitas =
+      queryAktivitas.in(
+        "nama_kitab",
+        kitabDipilih
+      );
+  }
+
+  const {
+    data: aktivitasData = [],
+    error: aktivitasErr
+  } = await queryAktivitas
+    .order("Unit_Ndalem", { ascending: true })
+    .order("Nama_Lengkap", { ascending: true })
+    .order("tanggal_setoran_terakhir", {
+      ascending: false,
+      nullsFirst: false
+    });
+
+  if (aktivitasErr) {
+    console.error(
+      "Gagal ambil v_rekap_aktivitas_unit:",
+      aktivitasErr
     );
+  }
 
-  if (tbody) {
+  // ==================== SORT TERBANYAK SETORAN ====================
+  const aktivitasFiltered =
+    (aktivitasData || [])
+      .filter(filterLogic)
+      .sort((a, b) => {
+        return (b.total_ayat_setor || 0) - (a.total_ayat_setor || 0);
+      });
 
-    tbody.innerHTML = "";
+  const tblAktivitas =
+    document.querySelector("#tblAktivitasUnit tbody");
 
-    if (
-      !frekuensiData ||
-      frekuensiData.length === 0
-    ) {
+  if (tblAktivitas) {
 
-      tbody.innerHTML = `
+    tblAktivitas.innerHTML = "";
+
+    if (aktivitasFiltered.length === 0) {
+
+      tblAktivitas.innerHTML = `
         <tr>
-          <td colspan="12" style="text-align:center;">
+          <td colspan="11" style="text-align:center;">
             (tidak ada data)
           </td>
         </tr>
@@ -5774,75 +5920,71 @@ try {
 
     } else {
 
-      frekuensiData.forEach((row, i) => {
+      aktivitasFiltered.forEach((row, i) => {
 
-        const tr =
-          document.createElement("tr");
+        let tanggalTerakhir = "-";
+
+        if (row.tanggal_setoran_terakhir) {
+          try {
+            tanggalTerakhir = new Date(
+              row.tanggal_setoran_terakhir
+            ).toLocaleDateString("id-ID");
+          } catch (e) {
+            tanggalTerakhir = "-";
+          }
+        }
+
+        const tr = document.createElement("tr");
 
         tr.innerHTML = `
-
-          <td style="text-align:center;">
+          <td style="text-align:center; padding:8px; border:1px solid #ddd;">
             ${i + 1}
           </td>
 
-          <td>
+          <td style="text-align:left; padding:8px; border:1px solid #ddd;">
+            ${row.Nama_Lengkap ?? "-"}
+          </td>
+
+          <td style="text-align:left; padding:8px; border:1px solid #ddd;">
+            ${row.Kelas ?? "-"}
+          </td>
+
+          <td style="text-align:left; padding:8px; border:1px solid #ddd;">
             ${row.Unit_Ndalem ?? "-"}
           </td>
 
-          <td>
-            ${row.daftar_kelas ?? "-"}
+          <td style="text-align:left; padding:8px; border:1px solid #ddd;">
+            ${row.nama_kitab ?? "-"}
           </td>
 
-          <td>
-            ${row.daftar_kitab ?? "-"}
+          <td style="text-align:center; padding:8px; border:1px solid #ddd;">
+            ${row.jumlah_setoran ?? 0}
           </td>
 
-          <td style="text-align:center;">
-            ${row.total_santri ?? 0}
+          <td style="text-align:center; padding:8px; border:1px solid #ddd;">
+            ${row.total_ayat_setor ?? 0}
           </td>
 
-          <td style="text-align:center;">
-            ${row.total_kitab ?? 0}
+          <td style="text-align:center; padding:8px; border:1px solid #ddd;">
+            ${row.batas_khatam ?? 0}
           </td>
 
-          <td style="text-align:center;">
-            ${row.jumlah_transaksi_setoran ?? 0}
+          <td style="text-align:center; padding:8px; border:1px solid #ddd;">
+            ${row.prosentase ?? 0}%
           </td>
 
-          <td style="text-align:center;">
-            ${
-              row.tanggal_terakhir_setoran
-                ? new Date(
-                    row.tanggal_terakhir_setoran
-                  ).toLocaleDateString("id-ID")
-                : "-"
-            }
+        
+
+          <td style="text-align:center; padding:8px; border:1px solid #ddd;">
+            ${row.kelancaran ?? "-"}
           </td>
 
-          <td style="text-align:center;">
-            ${row.total_setoran ?? 0}
+          <td style="text-align:center; padding:8px; border:1px solid #ddd;">
+            ${tanggalTerakhir}
           </td>
-
-          <td style="text-align:center;">
-            ${row.total_batas_khatam ?? 0}
-          </td>
-
-          <td style="text-align:center;">
-            ${row.persen_menuju_khatam ?? 0}%
-          </td>	  
-		  
-
-			<td style="text-align:center;">
-			  ${row.persen_lancar ?? 0}%
-			</td>
-
-          <td style="text-align:center;">
-            ${row.frekuensi_setoran_label ?? "-"}
-          </td>
-
         `;
 
-        tbody.appendChild(tr);
+        tblAktivitas.appendChild(tr);
 
       });
 
@@ -5853,11 +5995,133 @@ try {
 } catch (err) {
 
   console.error(
-    "Gagal memuat Rekap Frekuensi Setoran:",
+    "Gagal memuat Rekap Aktivitas Unit:",
     err
   );
 
 }
+
+    // ==================== 3. FREKUENSI SETORAN ====================
+    try {
+
+      const {
+        data: frekuensiData = [],
+        error: frekuensiErr
+      } = await client.rpc(
+        "get_frekuensi_setoran_unit",
+        {
+          p_kelas: kelasDipilih.length
+            ? kelasDipilih
+            : null,
+
+          p_unit: unitDipilih.length
+            ? unitDipilih
+            : null
+        }
+      );
+
+      if (frekuensiErr) {
+
+        console.error(
+          "Gagal ambil get_frekuensi_setoran_unit:",
+          frekuensiErr
+        );
+
+      }
+
+      const tbody =
+        document.querySelector(
+          "#tblFrekuensiSetoran tbody"
+        );
+
+      if (tbody) {
+
+        tbody.innerHTML = "";
+
+        if (
+          !frekuensiData ||
+          frekuensiData.length === 0
+        ) {
+
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="13" style="text-align:center;">
+                (tidak ada data)
+               </td>
+             </tr>
+          `;
+
+        } else {
+
+          frekuensiData.forEach((row, i) => {
+
+            const tr =
+              document.createElement("tr");
+
+            tr.innerHTML = `
+              <td style="text-align:center; padding:8px; border:1px solid #ddd;">
+                ${i + 1}
+              </td>
+              <td style="text-align:left; padding:8px; border:1px solid #ddd;">
+                ${row.Unit_Ndalem ?? "-"}
+              </td>
+              <td style="text-align:left; padding:8px; border:1px solid #ddd;">
+                ${row.daftar_kelas ?? "-"}
+              </td>
+              <td style="text-align:left; padding:8px; border:1px solid #ddd;">
+                ${row.daftar_kitab ?? "-"}
+              </td>
+              <td style="text-align:center; padding:8px; border:1px solid #ddd;">
+                ${row.total_santri ?? 0}
+              </td>
+              <td style="text-align:center; padding:8px; border:1px solid #ddd;">
+                ${row.total_kitab ?? 0}
+              </td>
+              <td style="text-align:center; padding:8px; border:1px solid #ddd;">
+                ${row.jumlah_transaksi_setoran ?? 0}
+              </td>
+              <td style="text-align:center; padding:8px; border:1px solid #ddd;">
+                ${
+                  row.tanggal_terakhir_setoran
+                    ? new Date(
+                        row.tanggal_terakhir_setoran
+                      ).toLocaleDateString("id-ID")
+                    : "-"
+                }
+              </td>
+              <td style="text-align:center; padding:8px; border:1px solid #ddd;">
+                ${row.total_setoran ?? 0}
+              </td>
+              <td style="text-align:center; padding:8px; border:1px solid #ddd;">
+                ${row.total_batas_khatam ?? 0}
+              </td>
+              <td style="text-align:center; padding:8px; border:1px solid #ddd;">
+                ${row.persen_menuju_khatam ?? 0}%
+              </td>
+              <td style="text-align:center; padding:8px; border:1px solid #ddd;">
+                ${row.persen_lancar ?? 0}%
+              </td>
+              <td style="text-align:center; padding:8px; border:1px solid #ddd;">
+                ${row.frekuensi_setoran_label ?? "-"}
+              </td>
+            `;
+
+            tbody.appendChild(tr);
+
+          });
+
+        }
+
+      }
+
+    } catch (err) {
+
+      console.error(
+        "Gagal memuat Rekap Frekuensi Setoran:",
+        err
+      );
+
+    }
 
     // ==================== SANTRI AKTIF ====================
     const santriAktif =
@@ -5883,62 +6147,143 @@ try {
 
     }
 
-    // ==================== SUMMARY GLOBAL (RESPONSIF TERHADAP KELAS, UNIT, KITAB) ====================
-// Gunakan variabel santriAktif yang sudah didefinisikan sebelumnya (aktif secara status)
-// Kemudian filter ulang berdasarkan Kelas dan Unit (tanpa Kitab)
+   // ==================== SUMMARY GLOBAL ====================
+
+// santri aktif sesuai filter
 const santriFilteredByKelasUnit = santriAktif.filter(s =>
   (kelasDipilih.length === 0 || kelasDipilih.includes(s.Kelas)) &&
   (unitDipilih.length === 0 || unitDipilih.includes(s.Unit_Ndalem))
 );
+
 const totalSantri = santriFilteredByKelasUnit.length;
 
-// Dari filteredDetail (sudah terfilter Kelas, Unit, Kitab)
-// Kumpulkan stambuk unik dan status terbaik per santri
-const santriSet = new Map(); // key: stambuk, value: { punyaSetoran, pernahKhatam, pernahLancar }
+// semua stambuk santri aktif hasil filter
+const semuaStambuk = new Set(
+  santriFilteredByKelasUnit
+    .map(s => String(s.Stambuk).trim())
+    .filter(Boolean)
+);
+
+// ==================== SANTRI KHATAM & LANCAR ====================
+
+const santriKhatam = new Set();
+const santriLancar = new Set();
+
 filteredDetail.forEach(item => {
-  const stambuk = item.Stambuk || item.santri_kharisma?.Stambuk;
+
+  const stambuk = String(
+    item.Stambuk ||
+    item.santri_kharisma?.Stambuk ||
+    ""
+  ).trim();
+
   if (!stambuk) return;
-  if (!santriSet.has(stambuk)) {
-    santriSet.set(stambuk, {
-      punyaSetoran: false,
-      pernahKhatam: false,
-      pernahLancar: false
-    });
+
+  // hanya santri aktif hasil filter
+  if (!semuaStambuk.has(stambuk)) return;
+
+  // ==================== KHATAM ====================
+
+  if (
+    String(item.status_khatam || "")
+      .trim()
+      .toLowerCase() === "khatam"
+  ) {
+    santriKhatam.add(stambuk);
   }
-  const rec = santriSet.get(stambuk);
-  rec.punyaSetoran = true;
-  if (item.status_khatam === "Khatam") rec.pernahKhatam = true;
-  if (item.status_lancar === "Lancar") rec.pernahLancar = true;
+
+  // ==================== LANCAR ====================
+
+  if (
+    String(item.status_lancar || "")
+      .trim()
+      .toLowerCase() === "lancar"
+  ) {
+    santriLancar.add(stambuk);
+  }
+
 });
 
-const sudahSetoranCount = Array.from(santriSet.values()).filter(s => s.punyaSetoran).length;
-const sudahKhatamCount = Array.from(santriSet.values()).filter(s => s.pernahKhatam).length;
-const sudahLancarCount = Array.from(santriSet.values()).filter(s => s.pernahLancar).length;
+// ==================== SUDAH / BELUM SETOR ====================
 
-const belumSetoranCount = totalSantri - sudahSetoranCount;
-const belumKhatamCount = totalSantri - sudahKhatamCount;
-const belumLancarCount = totalSantri - sudahLancarCount;
+// filteredBelum = data santri yang BELUM setor
+// jadi tinggal dihitung langsung
 
-const pct = (n) => totalSantri ? ((n / totalSantri) * 100).toFixed(1) + "%" : "0%";
+const belumSetoranCount = filteredBelum.length;
+
+const sudahSetoranCount =
+  Math.max(0, totalSantri - belumSetoranCount);
+
+// ==================== KHATAM & LANCAR ====================
+
+const sudahKhatamCount = santriKhatam.size;
+const sudahLancarCount = santriLancar.size;
+
+const belumKhatamCount =
+  Math.max(0, totalSantri - sudahKhatamCount);
+
+const belumLancarCount =
+  Math.max(0, totalSantri - sudahLancarCount);
+
+// ==================== PERSENTASE ====================
+
+const pct = (n) =>
+  totalSantri
+    ? ((n / totalSantri) * 100).toFixed(1) + "%"
+    : "0%";
+
+// ==================== RENDER SUMMARY ====================
 
 const summary = document.getElementById("laporanSummary");
+
 if (summary) {
+
   summary.innerHTML = `
     <div>
       📊 <b>Total Santri Aktif:</b>
       <span id="totalSantri">${totalSantri}</span>
     </div>
+
     <div>
-      <b>Khatam:</b> <span id="persenKhatam">${pct(sudahKhatamCount)}</span>
-      | <b>Lancar:</b> <span id="persenLancar">${pct(sudahLancarCount)}</span>
+      <b>Khatam:</b>
+      <span id="persenKhatam">
+        ${pct(sudahKhatamCount)}
+      </span>
+
+      |
+     
+      <b>Belum Khatam:</b>
+      <span id="belumKhatam">
+        ${pct(belumKhatamCount)}
+      </span>
     </div>
+
     <div>
-      <b>Belum Khatam:</b> <span id="belumKhatam">${pct(belumKhatamCount)}</span>
-      | <b>Belum Lancar:</b> <span id="belumLancar">${pct(belumLancarCount)}</span>
+     <b>Lancar:</b>
+      <span id="persenLancar">
+        ${pct(sudahLancarCount)}
+      </span>
+
+      |
+
+      <b>Belum Lancar:</b>
+      <span id="belumLancar">
+        ${pct(belumLancarCount)}
+      </span>
     </div>
+
     <div>
-      <b>Sudah Setoran:</b> <span id="sudahSetoran">${pct(sudahSetoranCount)}</span>
-      | <b>Belum Setoran:</b> <span id="belumSetoran">${pct(belumSetoranCount)}</span>
+      <b>Setoran:</b>
+      <span id="sudahSetoran">
+        ${pct(sudahSetoranCount)}
+      </span>
+
+      |
+
+      <b>Belum Setoran:</b>
+      <span id="belumSetoran">
+        ${pct(belumSetoranCount)}
+      </span>
     </div>
   `;
 }
@@ -6094,61 +6439,67 @@ if (summary) {
 
     });
 
-    // ==================== RENDER TABLE ====================
-    renderTable(
+    // ==================== RENDER TABLES DENGAN CSS INLINE ====================
+    renderTableWithAlignment(
       "tblKelas",
       kelas,
       [
-        "No",
-        "Kelas",
-        "total_santri",
-        "belum_khatam",
-        "belum_lancar",
-        "persen_khatam",
-        "persen_lancar"
+        { key: "No", type: "number", align: "center" },
+        { key: "Kelas", type: "text", align: "left" },
+        { key: "total_santri", type: "number", align: "center" },
+        { key: "belum_khatam", type: "number", align: "center" },
+        { key: "belum_lancar", type: "number", align: "center" },
+        { key: "persen_khatam", type: "text", align: "center" },
+        { key: "persen_lancar", type: "text", align: "center" }
       ]
     );
 
-    renderTable(
+    renderTableWithAlignment(
       "tblUnit",
       unit,
       [
-        "No",
-        "Unit_Ndalem",
-        "total_santri",
-        "belum_khatam",
-        "belum_lancar",
-        "persen_khatam",
-        "persen_lancar"
+        { key: "No", type: "number", align: "center" },
+        { key: "Unit_Ndalem", type: "text", align: "left" },
+        { key: "total_santri", type: "number", align: "center" },
+        { key: "belum_khatam", type: "number", align: "center" },
+        { key: "belum_lancar", type: "number", align: "center" },
+        { key: "persen_khatam", type: "text", align: "center" },
+        { key: "persen_lancar", type: "text", align: "center" }
       ]
     );
 
-    renderTable(
+    renderTableWithAlignment(
       "tblStatus",
       filteredDetail,
       [
-        "No",
-        "Nama_Lengkap",
-        "Kelas",
-        "Unit_Ndalem",
-        "nama_kitab",
-        "total_ayat_setor",
-        "batas_khatam",
-        "status_khatam",
-        "status_lancar"
+        { key: "No", type: "number", align: "center" },
+        { key: "Nama_Lengkap", type: "text", align: "left" },
+        { key: "Kelas", type: "text", align: "left" },
+        { key: "Unit_Ndalem", type: "text", align: "left" },
+        { key: "nama_kitab", type: "text", align: "left" },
+        { key: "total_ayat_setor", type: "number", align: "center" },
+        { key: "batas_khatam", type: "number", align: "center" },
+        { key: "status_khatam", type: "text", align: "center" },
+        { key: "status_lancar", type: "text", align: "center" }
       ]
     );
 
-    renderTable(
+    renderTableWithAlignment(
       "tblBelum",
       filteredBelum,
       [
-        "No",
-        "Nama_Lengkap",
-        "Kelas",
-        "Unit_Ndalem"
+        { key: "No", type: "number", align: "center" },
+        { key: "Nama_Lengkap", type: "text", align: "left" },
+        { key: "Kelas", type: "text", align: "left" },
+        { key: "Unit_Ndalem", type: "text", align: "left" }
       ]
     );
+
+    // ==================== RENDER LAPORAN QURAN SANTRI ====================
+    renderLaporanQuranSantri(filteredLaporanQuran);
+
+    // ==================== RENDER LAPORAN QURAN UNIT ====================
+    renderLaporanQuranUnit(filteredLaporanQuranUnit);
 
   } catch (err) {
 
@@ -6160,43 +6511,209 @@ if (summary) {
   }
 }
 
-// ==================== RENDER TABLE ====================
-function renderTable(id, data, cols) {
-
-  const tbody =
-    document.querySelector(`#${id} tbody`);
-
+// ==================== RENDER TABLE DENGAN ALIGNMENT ====================
+function renderTableWithAlignment(id, data, columns) {
+  const tbody = document.querySelector(`#${id} tbody`);
   if (!tbody) return;
 
-  tbody.innerHTML =
-    data && data.length
+  // Set header style (semua center)
+  const thead = document.querySelector(`#${id} thead`);
+  if (thead) {
+    const headerCells = thead.querySelectorAll('th');
+    headerCells.forEach(cell => {
+      cell.style.textAlign = 'center';
+      cell.style.padding = '8px';
+      cell.style.border = '1px solid #ddd';
+      cell.style.backgroundColor = '#f2f2f2';
+    });
+  }
 
-      ? data.map((r, idx) => {
+  if (!data || data.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="${columns.length}" style="text-align:center; padding:8px;">
+          (tidak ada data)
+        </td>
+      </tr>
+    `;
+    return;
+  }
 
-          return `
-            <tr>
-              ${cols.map(c => {
+  tbody.innerHTML = data.map((row, idx) => {
+    return `
+      <tr>
+        ${columns.map(col => {
+          let value = col.key === "No" ? idx + 1 : (row[col.key] ?? "-");
+          
+          // Tentukan alignment berdasarkan kolom
+          let textAlign = col.align || (col.type === "number" ? "center" : "left");
+          
+          return `<td style="text-align:${textAlign}; padding:8px; border:1px solid #ddd;">${value}</td>`;
+        }).join("")}
+      </tr>
+    `;
+  }).join('');
+}
 
-                const value =
-                  c === "No"
-                    ? idx + 1
-                    : (r[c] ?? "");
+// ==================== RENDER LAPORAN QURAN SANTRI ====================
+function renderLaporanQuranSantri(data) {
+  const tbody = document.querySelector("#tblLaporanQuranSantri tbody");
+  if (!tbody) return;
 
-                return `<td>${value}</td>`;
+  // Set header style
+  const thead = document.querySelector("#tblLaporanQuranSantri thead");
+  if (thead) {
+    const headerCells = thead.querySelectorAll('th');
+    headerCells.forEach(cell => {
+      cell.style.textAlign = 'center';
+      cell.style.padding = '8px';
+      cell.style.border = '1px solid #ddd';
+      cell.style.backgroundColor = '#f2f2f2';
+    });
+  }
 
-              }).join("")}
-            </tr>
-          `;
+  if (!data || data.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="13" style="text-align:center; padding:8px;">
+          (tidak ada data)
+        </td>
+      </tr>
+    `;
+    return;
+  }
 
-        }).join("")
+  tbody.innerHTML = data.map((row, idx) => {
 
-      : `
-        <tr>
-          <td colspan="${cols.length}" style="text-align:center;">
-            (tidak ada data)
-          </td>
-        </tr>
-      `;
+    let tanggalTerakhir = '-';
+    if (row['Tanggal Terakhir']) {
+      try {
+        tanggalTerakhir = new Date(row['Tanggal Terakhir'])
+          .toLocaleDateString('id-ID');
+      } catch (e) {
+        tanggalTerakhir = '-';
+      }
+    }
+
+    return `
+      <tr>
+        <td style="text-align:center; padding:8px; border:1px solid #ddd;">${idx + 1}</td>
+
+        <td style="text-align:left; padding:8px; border:1px solid #ddd;">
+          ${escapeHtml(row['Unit Ndalem'] || '-')}
+        </td>
+
+        <td style="text-align:left; padding:8px; border:1px solid #ddd;">
+          ${escapeHtml(row['Nama'] || '-')}
+        </td>
+
+        <td style="text-align:left; padding:8px; border:1px solid #ddd;">
+          ${escapeHtml(row['Stambuk'] || '-')}
+        </td>
+
+        <td style="text-align:left; padding:8px; border:1px solid #ddd;">
+          ${escapeHtml(row['Kelas'] || '-')}
+        </td>
+
+        <td style="text-align:left; padding:8px; border:1px solid #ddd;">
+          ${escapeHtml(row['Juz Quran'] || '-')}
+        </td>
+
+        <td style="text-align:center; padding:8px; border:1px solid #ddd;">
+          ${row['Jumlah Transaksi'] ?? 0}
+        </td>
+
+        <td style="text-align:center; padding:8px; border:1px solid #ddd;">
+          ${tanggalTerakhir}
+        </td>
+
+        <td style="text-align:center; padding:8px; border:1px solid #ddd;">
+          ${row['Total Setoran'] ?? 0}
+        </td>
+
+        <td style="text-align:center; padding:8px; border:1px solid #ddd;">
+          ${row['Total Batas Khatam'] ?? 0}
+        </td>
+
+        <td style="text-align:center; padding:8px; border:1px solid #ddd;">
+          ${row['% Khatam'] ?? 0}%
+        </td>
+
+        <!-- 🔥 FIX: KELANCARAN TEXT -->
+        <td style="text-align:center; padding:8px; border:1px solid #ddd;">
+          ${escapeHtml(row['Kelancaran'] || '-')}
+        </td>
+
+        <td style="text-align:center; padding:8px; border:1px solid #ddd;">
+          ${escapeHtml(row['Frekuensi Setoran'] || '-')}
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+// ==================== RENDER LAPORAN QURAN UNIT ====================
+function renderLaporanQuranUnit(data) {
+  const tbody = document.querySelector("#tblLaporanQuranUnit tbody");
+  if (!tbody) return;
+
+  // Set header style (semua center)
+  const thead = document.querySelector("#tblLaporanQuranUnit thead");
+  if (thead) {
+    const headerCells = thead.querySelectorAll('th');
+    headerCells.forEach(cell => {
+      cell.style.textAlign = 'center';
+      cell.style.padding = '8px';
+      cell.style.border = '1px solid #ddd';
+      cell.style.backgroundColor = '#f2f2f2';
+    });
+  }
+
+  if (!data || data.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="13" style="text-align:center; padding:8px;">(tidak ada data)</td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = data.map((row, idx) => {
+    let tanggalTerakhir = '-';
+    if (row['Tanggal Terakhir']) {
+      try {
+        tanggalTerakhir = new Date(row['Tanggal Terakhir']).toLocaleDateString('id-ID');
+      } catch(e) { tanggalTerakhir = '-'; }
+    }
+
+    return `
+      <tr>
+        <td style="text-align:center; padding:8px; border:1px solid #ddd;">${idx + 1}</td>
+        <td style="text-align:left; padding:8px; border:1px solid #ddd;">${escapeHtml(row['Unit Ndalem'] || '-')}</td>
+        <td style="text-align:left; padding:8px; border:1px solid #ddd;">${escapeHtml(row['Kelas'] || '-')}</td>
+        <td style="text-align:left; padding:8px; border:1px solid #ddd;">${escapeHtml(row['Daftar Kitab'] || '-')}</td>
+        <td style="text-align:center; padding:8px; border:1px solid #ddd;">${row['Total Santri'] ?? 0}</td>
+        <td style="text-align:center; padding:8px; border:1px solid #ddd;">${row['Total Kitab'] ?? 0}</td>
+        <td style="text-align:center; padding:8px; border:1px solid #ddd;">${row['Jumlah Transaksi'] ?? 0}</td>
+        <td style="text-align:center; padding:8px; border:1px solid #ddd;">${tanggalTerakhir}</td>
+        <td style="text-align:center; padding:8px; border:1px solid #ddd;">${row['Total Setoran'] ?? 0}</td>
+        <td style="text-align:center; padding:8px; border:1px solid #ddd;">${row['Total Batas Khatam'] ?? 0}</td>
+        <td style="text-align:center; padding:8px; border:1px solid #ddd;">${row['% Khatam'] ?? 0}%</td>
+        <td style="text-align:center; padding:8px; border:1px solid #ddd;">${row['% Lancar'] ?? 0}%</td>
+        <td style="text-align:center; padding:8px; border:1px solid #ddd;">${escapeHtml(row['Frekuensi Setoran'] || '-')}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// ==================== HELPER ESCAPE HTML ====================
+function escapeHtml(str) {
+  if (!str) return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 // ==================== EVENT TAB ====================
@@ -6270,1357 +6787,686 @@ async function downloadPDFAll(selectedIds = []) {
   const btn = document.getElementById('btnDownloadAll') || document.querySelector('.btn-download-all');
 
   if (btn) {
-
     btn.classList.add('downloading');
-
     btn.setAttribute('aria-disabled', 'true');
-
   }
 
-
-
   try {
-
     const { jsPDF } = window.jspdf;
-
     const marginX = 36;
-
-    // Tambahkan properti orientation: "landscape" di sini
-
-const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4", compress: true });
-
+    const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4", compress: true });
     const pageWidth = doc.internal.pageSize.getWidth();
-
     const pageHeight = doc.internal.pageSize.getHeight();
 
-
-
     const allTables = [
-
       { id: "tblKelas", title: "Rekap Prosentase Kelas" },
-
       { id: "tblUnit", title: "Rekap Prosentase Unit Ndalem" },
-
-      { id: "tblStatus", title: "Status Khatam & Lancar (Santri)" },
-
-      { id: "tblBelum", title: "Santri Belum Setoran" },
-
+      { id: "tblStatus", title: "Status Khatam & Lancar (Santri)" },      
       { id: "tblRekapUnit", title: "Rekap Unit Aktif Setoran" },
-
-      { id: "tblAktivitasUnit", title: "Rekap Aktivitas Unit (Detail Santri per Kitab)" },
-
-      { id: "tblFrekuensiSetoran", title: "Rekap Frekuensi Setoran Unit" }
-
+      { id: "tblAktivitasUnit", title: "Setoran Nadhom Siswa" },
+      { id: "tblFrekuensiSetoran", title: "Setoran Nadhom Unit" },
+      { id: "tblLaporanQuranSantri", title: "Setoran Qur'an Siswa" },
+      { id: "tblLaporanQuranUnit", title: "Setoran Qur'an Unit" },
+	  { id: "tblBelum", title: "Siswa Belum Setoran" }
     ];
-
-    
 
     const tables = allTables.filter(t => selectedIds.includes(t.id));
 
-
-
     let cursorY = 25;
 
-
-
     // ===== HEADER DOKUMEN =====
-
     try {
-
       const logoUrl = "https://i.imgur.com/Irgu32G.png";
-
       const resp = await fetch(logoUrl);
-
       if (resp.ok) {
-
         const blob = await resp.blob();
-
         const base64 = await new Promise((resolve) => {
-
           const reader = new FileReader();
-
           reader.onloadend = () => resolve(reader.result);
-
           reader.readAsDataURL(blob);
-
         });
-
         doc.addImage(base64, "PNG", marginX, 12, 34, 34);
-
       }
-
     } catch (e) {
-
       console.warn("Logo gagal dimuat:", e);
-
     }
 
-
-
     doc.setFont("helvetica", "bold");
-
     doc.setFontSize(14);
-
     doc.setTextColor(0, 0, 0);
-
     doc.text("KHUDAMA' KHARISMA", pageWidth / 2, 30, { align: "center" });
 
-
-
     doc.setFont("helvetica", "normal");
-
     doc.setFontSize(10);
-
     doc.text("Pondok Pesantren Lirboyo Kota Kediri Jawa Timur", pageWidth / 2, 44, { align: "center" });
 
-
-
     doc.setFont("helvetica", "italic");
-
     doc.setFontSize(9);
-
     doc.text("Sekretariat: Kantor KHARISMA Gedung Nafis Lt. 02 Lirboyo Kota Kediri", pageWidth / 2, 56, { align: "center" });
 
-
-
     doc.setLineWidth(0.7);
-
     doc.line(marginX, 64, pageWidth - marginX, 64);
 
-
-
     doc.setFont("helvetica", "bold");
-
     doc.setFontSize(12);
-
     doc.setTextColor(0, 0, 0);
-
     doc.text("LAPORAN SETORAN NADHOM", pageWidth / 2, 82, { align: "center" });
-
-
 
     cursorY = 130;
 
-    
-
     // ===== CETAK FILTER =====
-
     let filterPrinted = false;
 
-
-
     const sekolahRadio = document.querySelector('#shiftFilter input[type="radio"]:checked');
-
     const kelasCeklis = document.querySelectorAll('#kelasChecklist input[type="checkbox"]:checked');
 
-
-
     if (sekolahRadio) {
-
       const sekolahUtama = sekolahRadio.closest("label")?.innerText.trim() || sekolahRadio.value;
-
       const kelasList = Array.from(kelasCeklis)
-
         .map(el => el.closest("label")?.innerText.trim())
-
         .filter(Boolean);
-
-
 
       let sekolahText = sekolahUtama;
-
       if (kelasList.length > 0) {
-
         sekolahText += ` (${kelasList.join(", ")})`;
-
       }
 
-
-
       doc.setFont("helvetica", "bold");
-
       doc.setFontSize(10);
-
       doc.setTextColor(26, 115, 232);
-
       doc.text("Sekolah:", marginX, cursorY);
 
-
-
       doc.setFont("helvetica", "normal");
-
       doc.setFontSize(9.5);
-
       doc.setTextColor(0, 0, 0);
-
       const lines = doc.splitTextToSize(sekolahText, pageWidth - marginX * 2 - 70);
-
       doc.text(lines, marginX + 50, cursorY);
-
       cursorY += lines.length * 10 + 4;
-
-
-
       filterPrinted = true;
-
     }
-
-
 
     const unitChecked = document.querySelectorAll('#unitChecklist input[type="checkbox"]:checked');
-
     if (unitChecked.length > 0) {
-
       const unitList = Array.from(unitChecked)
-
         .map(el => el.closest("label")?.innerText.trim())
-
         .filter(Boolean);
 
-
-
       doc.setFont("helvetica", "bold");
-
       doc.setFontSize(10);
-
       doc.setTextColor(26, 115, 232);
-
       doc.text("Unit:", marginX, cursorY);
 
-
-
       doc.setFont("helvetica", "normal");
-
       doc.setFontSize(9.5);
-
       doc.setTextColor(0, 0, 0);
-
       const unitLines = doc.splitTextToSize(unitList.join(", "), pageWidth - marginX * 2 - 70);
-
       doc.text(unitLines, marginX + 50, cursorY);
-
       cursorY += unitLines.length * 10 + 4;
-
-
-
       filterPrinted = true;
-
     }
-
-
 
     const kitabChecked = document.querySelectorAll('#kitabChecklist input[type="checkbox"]:checked');
-
     if (kitabChecked.length > 0) {
-
       const kitabList = Array.from(kitabChecked)
-
         .map(el => el.closest("label")?.innerText.trim())
-
         .filter(Boolean);
 
-
-
       doc.setFont("helvetica", "bold");
-
       doc.setFontSize(10);
-
       doc.setTextColor(26, 115, 232);
-
       doc.text("Kitab:", marginX, cursorY);
 
-
-
       doc.setFont("helvetica", "normal");
-
       doc.setFontSize(9.5);
-
       doc.setTextColor(0, 0, 0);
-
       const kitabLines = doc.splitTextToSize(kitabList.join(", "), pageWidth - marginX * 2 - 70);
-
       doc.text(kitabLines, marginX + 50, cursorY);
-
       cursorY += kitabLines.length * 10 + 4;
-
-
-
       filterPrinted = true;
-
     }
-
-
 
     if (filterPrinted) cursorY += 6;
 
-
-
     // ===== CETAK SUMMARY =====
-
     const summaryEl = document.getElementById("laporanSummary");
-
     if (summaryEl) {
-
       const labelEl = summaryEl.querySelector("b");
-
       const angkaEl = summaryEl.querySelector("#totalSantri");
-
       const otherLineEls = Array.from(summaryEl.querySelectorAll("div")).slice(1);
 
-
-
       const labelText = labelEl ? (labelEl.innerText.trim() + " ") : "Total Santri: ";
-
       const angkaText = angkaEl ? (angkaEl.innerText.trim()) : "";
-
       const otherLines = otherLineEls.map(d => d.innerText.trim()).filter(Boolean);
 
-
-
       const boxWidth = pageWidth - marginX * 2;
-
       const boxHeight = 90;
-
       const boxY = cursorY + 4;
 
-
-
       const gradientSteps = 25;
-
       for (let i = 0; i < gradientSteps; i++) {
-
         const ratio = i / gradientSteps;
-
         const r = 225 + (245 - 225) * ratio;
-
         const g = 235 + (250 - 235) * ratio;
-
         const b = 255;
-
         doc.setFillColor(r, g, b);
-
         doc.rect(marginX, boxY + (i * (boxHeight / gradientSteps)), boxWidth, boxHeight / gradientSteps, "F");
-
       }
-
-
 
       const isFullKhatam = (summaryEl.innerText || "").includes("100%");
-
       const accentColor = isFullKhatam ? [56, 142, 60] : [25, 118, 210];
-
       doc.setTextColor(...accentColor);
 
-
-
       let iconBase64 = null;
-
       const iconWidth = 18, iconHeight = 18;
-
       try {
-
         const iconUrl = "https://i.imgur.com/huVGgA2.png";
-
         const resp = await fetch(iconUrl);
-
         if (resp.ok) {
-
           const blob = await resp.blob();
-
           iconBase64 = await new Promise((resolve) => {
-
             const reader = new FileReader();
-
             reader.onloadend = () => resolve(reader.result);
-
             reader.readAsDataURL(blob);
-
           });
-
         }
-
       } catch (e) {
-
         console.warn("Ikon summary gagal dimuat:", e);
-
       }
-
-
 
       const centerY = boxY + boxHeight / 2;
-
       const lineSpacing = 14;
-
       const totalLines = 1 + otherLines.length;
-
       const startY = centerY - ((totalLines - 1) * lineSpacing) / 2 + 3;
 
-
-
       let fontSizeMain = 10;
-
       doc.setFont("helvetica", "bold");
-
       doc.setFontSize(fontSizeMain);
 
-
-
       let labelWidth = doc.getTextWidth(labelText);
-
       let angkaWidth = doc.getTextWidth(angkaText);
-
       let totalWidth = iconWidth + 6 + labelWidth + angkaWidth;
-
       const maxAllowed = boxWidth - 20;
 
-
-
       while (fontSizeMain > 7 && totalWidth > maxAllowed) {
-
         fontSizeMain -= 0.5;
-
         doc.setFontSize(fontSizeMain);
-
         labelWidth = doc.getTextWidth(labelText);
-
         angkaWidth = doc.getTextWidth(angkaText);
-
         totalWidth = iconWidth + 6 + labelWidth + angkaWidth;
-
       }
-
-
 
       const startX = Math.max(marginX + 4, (pageWidth - totalWidth) / 2);
-
       const iconYOffset = 7;
-
       if (iconBase64) {
-
         doc.addImage(iconBase64, "PNG", startX, startY - iconHeight + iconYOffset, iconWidth, iconHeight);
-
       }
-
-
 
       const textBaseY = startY + (fontSizeMain / 2) + 2;
-
       let xPos = startX + iconWidth + 6;
-
       doc.text(labelText, xPos, textBaseY, { baseline: "alphabetic" });
-
       xPos += labelWidth;
-
       doc.text(angkaText, xPos, textBaseY, { baseline: "alphabetic" });
 
-
-
       doc.setFont("helvetica", "bold");
-
       doc.setFontSize(10);
-
       otherLines.forEach((line, i) => {
-
         const y = startY + (i + 1) * lineSpacing + 6;
-
         doc.text(line, pageWidth / 2, y, { align: "center" });
-
       });
 
-
-
       cursorY = boxY + boxHeight + 20;
-
     }
 
-
-
     // ===== FUNGSI CETAK TABEL DENGAN KONTROL HALAMAN =====
-
     function printTableTitleLeft(title, yPos) {
-
-  // ===== SEGITIGA =====
-
-  doc.setFillColor(26, 115, 232);
-
-
-
-  doc.triangle(
-
-    marginX,
-
-    yPos - 5,
-
-    marginX,
-
-    yPos + 5,
-
-    marginX + 8,
-
-    yPos,
-
-    "F"
-
-  );
-
-
-
-  // ===== JUDUL =====
-
-  doc.setFont("helvetica", "bold");
-
-  doc.setFontSize(11);
-
-  doc.setTextColor(31, 41, 55);
-
-
-
-  // naikkan sedikit agar center dengan segitiga
-
-  doc.text(title.toUpperCase(), marginX + 16, yPos + 4);
-
-}
-
-    
+      doc.setFillColor(26, 115, 232);
+      doc.triangle(
+        marginX,
+        yPos - 5,
+        marginX,
+        yPos + 5,
+        marginX + 8,
+        yPos,
+        "F"
+      );
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.setTextColor(31, 41, 55);
+      doc.text(title.toUpperCase(), marginX + 16, yPos + 4);
+    }
 
     function printDescriptionBox(lines, yPos) {
-
       if (!lines || !lines.length) return yPos;
 
-
-
       const boxWidth = pageWidth - (marginX * 2);
-
       const paddingX = 16;
-
       const paddingY = 12;
 
-
-
       const bgColor = [240, 248, 255];
-
       const borderColor = [191, 219, 254];
-
       const titleColor = [30, 64, 175];
-
       const textColor = [51, 65, 85];
 
-
-
       const fontSize = 8.5;
-
       const titleFontSize = 9.5;
 
-
-
       let titleText = "";
-
       const tableId = getTableIdFromDescription(lines);
-
       if (tableId) {
-
         const tableEl = document.getElementById(tableId);
-
         if (tableEl) {
-
           const accordion = tableEl.closest(".accordion-content");
-
           if (accordion) {
-
             const infoBox = accordion.querySelector(".laporan-info");
-
             if (infoBox) {
-
               const titleEl = infoBox.querySelector(".laporan-info-title");
-
               if (titleEl) {
-
                 titleText = titleEl.innerText.trim();
-
               }
-
             }
-
           }
-
         }
-
       }
-
-
 
       let currentY = yPos + paddingY;
-
       let totalHeight = paddingY * 2;
 
-
-
-      // Hitung tinggi judul
-
       if (titleText) {
-
         totalHeight += 18;
-
       }
-
-
-
-      // Hitung tinggi teks
 
       doc.setFont("helvetica", "normal");
-
       doc.setFontSize(fontSize);
-
       const textWidth = boxWidth - (paddingX * 2);
 
-      
-
       for (let i = 0; i < lines.length; i++) {
-
         const line = lines[i];
-
         const prefix = i === 0 ? "" : "• ";
-
         const fullLine = prefix + line;
-
         const splitLines = doc.splitTextToSize(fullLine, textWidth);
-
         totalHeight += (splitLines.length * 12);
-
         if (i === 0 && lines.length > 1) {
-
           totalHeight += 2;
-
         }
-
       }
-
-
 
       const boxHeight = totalHeight;
 
-
-
-      // Gambar box
-
       doc.setFillColor(...bgColor);
-
       doc.roundedRect(marginX, yPos, boxWidth, boxHeight, 8, 8, "F");
-
       doc.setDrawColor(...borderColor);
-
       doc.roundedRect(marginX, yPos, boxWidth, boxHeight, 8, 8);
-
-
-
-      // Cetak teks
 
       currentY = yPos + paddingY;
 
-      
-
       if (titleText) {
-
         doc.setFont("helvetica", "bold");
-
         doc.setFontSize(titleFontSize);
-
         doc.setTextColor(...titleColor);
-
         doc.text(titleText, marginX + paddingX, currentY);
-
         currentY += 18;
-
       }
-
-      
 
       doc.setFont("helvetica", "normal");
-
       doc.setFontSize(fontSize);
-
       doc.setTextColor(...textColor);
 
-      
-
       for (let i = 0; i < lines.length; i++) {
-
         const line = lines[i];
-
         const prefix = i === 0 ? "" : "• ";
-
         const fullLine = prefix + line;
-
         const splitLines = doc.splitTextToSize(fullLine, textWidth);
 
-        
-
         splitLines.forEach((sl) => {
-
           doc.text(sl, marginX + paddingX, currentY);
-
           currentY += 12;
-
         });
 
-        
-
         if (i === 0 && lines.length > 1) {
-
           currentY += 2;
-
         }
-
       }
-
-
 
       return yPos + boxHeight + 16;
-
     }
-
-
 
     function getTableIdFromDescription(lines) {
-
       const tableMapping = {
-
         "Rekap Prosentase Kelas": "tblKelas",
-
         "Rekap Prosentase Unit Ndalem": "tblUnit",
-
-        "Status Khatam & Lancar": "tblStatus",
-
-        "Santri Belum Setoran": "tblBelum",
-
+        "Status Khatam & Lancar": "tblStatus",        
         "Rekap Unit Aktif Setoran": "tblRekapUnit",
-
-        "Rekap Aktivitas Unit": "tblAktivitasUnit",
-
-        "Rekap Frekuensi Setoran": "tblFrekuensiSetoran"
-
+        "Setoran Nadhom Siswa": "tblAktivitasUnit",
+        "Setoran Nadhom Unit": "tblFrekuensiSetoran",
+        "Setoran Qur'an Siswa": "tblLaporanQuranSantri",
+        "Setoran Qur'an Unit": "tblLaporanQuranUnit",
+		"Siswa Belum Setoran": "tblBelum"
       };
 
-      
-
       for (const [key, value] of Object.entries(tableMapping)) {
-
         if (lines.some(line => line.includes(key))) {
-
           return value;
-
         }
-
       }
-
       return null;
-
     }
 
-
-
     function getDescriptionFromWeb(tableId) {
-
       const table = document.getElementById(tableId);
-
       if (!table) return [];
 
-
-
       const accordion = table.closest(".accordion-content");
-
       if (!accordion) return [];
 
-
-
       const infoBox = accordion.querySelector(".laporan-info");
-
       if (!infoBox) return [];
-
-
 
       const lines = [];
 
-
-
       const body = infoBox.querySelector(".laporan-info-body");
-
       if (body?.innerText?.trim()) {
-
         lines.push(body.innerText.trim());
-
       }
 
-
-
       infoBox.querySelectorAll(".laporan-info-list li").forEach(li => {
-
         const text = li.innerText.trim();
-
         if (text) {
-
           lines.push(text);
-
         }
-
       });
 
-
-
       return lines;
-
     }
-
-
 
     function cleanPdfText(text) {
-
       if (!text) return "";
-
       return text
-
         .replace(/[^\x20-\x7E\n\r\t]/g, '')
-
         .replace(/\s+/g, ' ')
-
         .trim();
-
     }
 
-
-
     // ===== CETAK TABEL DENGAN KONTROL PAGE BREAK =====
-
     for (let t = 0; t < tables.length; t++) {
-
       const { id, title } = tables[t];
-
       const description = getDescriptionFromWeb(id);
-
       const tableEl = document.getElementById(id);
-
       if (!tableEl) continue;
 
-
-
       const headers = Array.from(tableEl.querySelectorAll("thead th")).map(th => cleanPdfText(th.innerText));
-
       const rows = Array.from(tableEl.querySelectorAll("tbody tr")).map(tr =>
-
         Array.from(tr.querySelectorAll("td")).map(td => cleanPdfText(td.innerText))
-
       );
-
-      
 
       if (!rows.length) continue;
 
-
-
       // ===== HITUNG TINGGI YANG DIPERLUKAN =====
-
-      const titleHeight = 20;      // Judul tabel
-
-      const titleToInfoGap = 8;    // Jarak judul ke info box
-
+      const titleHeight = 20;
+      const titleToInfoGap = 8;
       
-
-      // Hitung tinggi info box
-
       let infoHeight = 0;
-
       if (description.length > 0) {
-
         infoHeight = calculateDescriptionBoxHeight(description, marginX, pageWidth, doc);
-
       }
-
       
-
-      const infoToHeaderGap = 12;   // Jarak info ke header tabel
-
-      
-
-      // Hitung tinggi header tabel (perkiraan)
-
+      const infoToHeaderGap = 12;
       const headerHeight = 20;
-
-      
-
-      // Hitung tinggi minimal 1 baris data
-
       const minRowHeight = 18;
-
-      
-
-      // Total tinggi minimal yang dibutuhkan
-
       const requiredHeight = titleHeight + titleToInfoGap + infoHeight + infoToHeaderGap + headerHeight + minRowHeight + 20;
-
       
-
-      // Cek apakah sisa halaman cukup
-
-      const remainingSpace = pageHeight - cursorY - 40; // 40 untuk margin bawah
-
+      const remainingSpace = pageHeight - cursorY - 40;
       
-
       if (remainingSpace < requiredHeight) {
-
-        // Tidak cukup, pindah ke halaman baru
-
         doc.addPage();
-
         cursorY = 40;
-
       }
-
       
-
-      // Cetak judul tabel
-
-      // ===== JARAK ATAS SECTION TABEL =====
-
-const sectionTopGap = 20;
-
-
-
-// Cetak judul tabel
-
-printTableTitleLeft(title, cursorY + sectionTopGap);
-
-
-
-// Posisi mulai info box / tabel
-
-let startY = cursorY + sectionTopGap + 15;
-
-
-
-      // Cetak keterangan
-
+      const sectionTopGap = 20;
+      printTableTitleLeft(title, cursorY + sectionTopGap);
+      let startY = cursorY + sectionTopGap + 15;
+      
       if (description.length > 0) {
-
         startY = printDescriptionBox(description, startY);
-
       }
 
-
-
-      const isRekapKelas = title.toLowerCase().includes("rekap prosentase kelas");
-
-
-
-      // Cetak tabel dengan kontrol page break
+      // Tentukan kolom mana yang harus rata kiri (kolom teks)
+      // Kolom index 0 biasanya No (rata tengah)
+      // Kolom yang berisi teks (Nama, Unit, Kelas, Kitab, dll) rata kiri
+      const leftAlignColumns = new Set();
+      
+      if (id === "tblLaporanQuranSantri") {
+        // Kolom Unit Ndalem (index 1), Nama (2), Stambuk (3), Kelas (4), Juz Quran (5) rata kiri
+        leftAlignColumns.add(1);
+        leftAlignColumns.add(2);
+        leftAlignColumns.add(3);
+        leftAlignColumns.add(4);
+        leftAlignColumns.add(5);
+      } else if (id === "tblLaporanQuranUnit") {
+        // Kolom Unit Ndalem (1), Kelas (2), Daftar Kitab (3) rata kiri
+        leftAlignColumns.add(1);
+        leftAlignColumns.add(2);
+        leftAlignColumns.add(3);
+      } else if (id === "tblStatus") {
+        // Kolom Nama (1), Kelas (2), Unit (3), Kitab (4) rata kiri
+        leftAlignColumns.add(1);
+        leftAlignColumns.add(2);
+        leftAlignColumns.add(3);
+        leftAlignColumns.add(4);
+      } else if (id === "tblBelum") {
+        // Kolom Nama (1), Kelas (2), Unit (3) rata kiri
+        leftAlignColumns.add(1);
+        leftAlignColumns.add(2);
+        leftAlignColumns.add(3);
+      } else if (id === "tblAktivitasUnit") {
+        // Kolom Nama Siswa (1), Kitab (2) rata kiri
+        leftAlignColumns.add(1);
+        leftAlignColumns.add(2);
+      } else if (id === "tblRekapUnit") {
+        // Kolom Nama Unit (1), Daftar Kitab (3) rata kiri
+        leftAlignColumns.add(1);
+        leftAlignColumns.add(3);
+      } else if (id === "tblFrekuensiSetoran") {
+        // Kolom Unit Ndalem (1), Kelas (2), Daftar Kitab (3) rata kiri
+        leftAlignColumns.add(1);
+        leftAlignColumns.add(2);
+        leftAlignColumns.add(3);
+      } else if (id === "tblKelas") {
+        // Kolom Kelas (1) rata kiri
+        leftAlignColumns.add(1);
+      } else if (id === "tblUnit") {
+        // Kolom Unit (1) rata kiri
+        leftAlignColumns.add(1);
+      }
 
       doc.autoTable({
-
         startY: startY,
-
         head: [headers],
-
         body: rows,
-
         theme: "grid",
-
         styles: {
-
           fontSize: 8.5,
-
           cellPadding: 4,
-
           halign: "center",
-
           valign: "middle",
-
           overflow: "linebreak",
-
           lineWidth: 0.1
-
         },
-
         headStyles: {
-
           fillColor: [26, 115, 232],
-
           textColor: 255,
-
           fontStyle: "bold",
-
           halign: "center",
-
           valign: "middle"
-
         },
-
         margin: {
-
           left: marginX,
-
           right: marginX
-
         },
-
         showHead: "firstPage",
-
         pageBreak: "auto",
-
         rowPageBreak: "avoid",
-
         bodyStyles: {
-
           minCellHeight: 16
-
         },
-
         didParseCell: function (data) {
-
           if (data.cell.text) {
-
             data.cell.text = data.cell.text.map(t => cleanPdfText(t));
-
           }
-
-          if (title === "Rekap Aktivitas Unit (Detail Santri per Kitab)" && data.section === "body" && (data.column.index === 1 || data.column.index === 2)) {
-
+          // Set halign berdasarkan kolom index
+          if (leftAlignColumns.has(data.column.index)) {
             data.cell.styles.halign = "left";
-
-          } else if (!isRekapKelas && data.section === "body" && data.column.index === 1) {
-
-            data.cell.styles.halign = "left";
-
+          } else {
+            data.cell.styles.halign = "center";
           }
-
         }
-
       });
 
-
-
       const finalY = doc.lastAutoTable ? doc.lastAutoTable.finalY : startY + 10;
-
       cursorY = finalY + 16;
 
-
-
       if (cursorY > pageHeight - 80) {
-
         doc.addPage();
-
         cursorY = 40;
-
       }
-
     }
 
-
-
     // ===== FUNGSI HITUNG TINGGI DESCRIPTION BOX =====
-
     function calculateDescriptionBoxHeight(lines, marginX, pageWidth, doc) {
-
       if (!lines || !lines.length) return 0;
 
-
-
       const boxWidth = pageWidth - (marginX * 2);
-
       const paddingX = 16;
-
       const paddingY = 12;
 
-
-
       const fontSize = 8.5;
-
       const titleFontSize = 9.5;
 
-
-
       let titleText = "";
-
       const tableId = getTableIdFromDescription(lines);
-
       if (tableId) {
-
         const tableEl = document.getElementById(tableId);
-
         if (tableEl) {
-
           const accordion = tableEl.closest(".accordion-content");
-
           if (accordion) {
-
             const infoBox = accordion.querySelector(".laporan-info");
-
             if (infoBox) {
-
               const titleEl = infoBox.querySelector(".laporan-info-title");
-
               if (titleEl) {
-
                 titleText = titleEl.innerText.trim();
-
               }
-
             }
-
           }
-
         }
-
       }
-
-
 
       let totalHeight = paddingY * 2;
 
-
-
       if (titleText) {
-
         totalHeight += 18;
-
       }
-
-
 
       doc.setFont("helvetica", "normal");
-
       doc.setFontSize(fontSize);
-
       const textWidth = boxWidth - (paddingX * 2);
 
-      
-
       for (let i = 0; i < lines.length; i++) {
-
         const line = lines[i];
-
         const prefix = i === 0 ? "" : "• ";
-
         const fullLine = prefix + line;
-
         const splitLines = doc.splitTextToSize(fullLine, textWidth);
-
         totalHeight += (splitLines.length * 12);
-
         if (i === 0 && lines.length > 1) {
-
           totalHeight += 2;
-
         }
-
       }
 
-
-
       return totalHeight;
-
     }
-
-
 
     let totalPages = doc.internal.getNumberOfPages();
-
     if (totalPages > 1 && cursorY < 100) {
-
       doc.deletePage(totalPages);
-
       totalPages--;
-
     }
 
-
-
     const footerText = `Admin – Simponi Kharisma – ${new Date().toLocaleString("id-ID")}`;
-
     doc.setPage(totalPages);
-
     doc.setFont("helvetica", "italic");
-
     doc.setFontSize(9);
-
     doc.setTextColor(120);
-
     doc.text(footerText, pageWidth - marginX, pageHeight - 30, { align: "right" });
-
-
 
     doc.save(`Laporan_Sorogan_${new Date().toISOString().slice(0, 10)}.pdf`);
 
-
-
     if (btn) {
-
       btn.classList.remove('downloading');
-
       btn.classList.add('complete');
-
       setTimeout(() => btn.classList.remove('complete'), 700);
-
       btn.removeAttribute('aria-disabled');
-
     }
-
-
 
   } catch (err) {
-
     console.error("Error downloadPDFAll:", err);
-
     if (btn) {
-
       btn.classList.remove('downloading');
-
       btn.removeAttribute('aria-disabled');
-
     }
-
     alert("Gagal membuat PDF: " + (err.message || err));
-
   }
-
 }
 
 // ========================== MODAL DOWNLOAD ==========================
 
-
-
 const btnDownloadAll = document.getElementById('btnDownloadAll');
-
-
-
 const downloadModal = document.getElementById('downloadModal');
-
 const closeDownloadModal = document.getElementById('closeDownloadModal');
-
 const cancelDownloadBtn = document.getElementById('cancelDownloadBtn');
-
 const confirmDownloadBtn = document.getElementById('confirmDownloadBtn');
 
-
-
 // ===== BUKA MODAL =====
-
 if (btnDownloadAll) {
-
-
-
-  // hapus event lama
-
   btnDownloadAll.onclick = null;
-
-
-
   btnDownloadAll.addEventListener('click', function (e) {
-
-
-
     e.preventDefault();
-
     e.stopPropagation();
-
-
-
-    // cegah double klik
-
     if (btnDownloadAll.classList.contains('downloading')) return;
-
-
-
     downloadModal.classList.add('show');
-
   });
-
 }
-
-
 
 // ===== TUTUP MODAL =====
-
 function closeModalDownload() {
-
   downloadModal.classList.remove('show');
-
 }
 
-
-
 closeDownloadModal?.addEventListener('click', closeModalDownload);
-
-
-
 cancelDownloadBtn?.addEventListener('click', closeModalDownload);
 
-
-
-// klik luar modal
-
 downloadModal?.addEventListener('click', function (e) {
-
-
-
   if (e.target === downloadModal) {
-
     closeModalDownload();
-
   }
-
-
-
 });
 
-
-
 // ===== TOMBOL DOWNLOAD PDF =====
-
 confirmDownloadBtn?.addEventListener('click', async function (e) {
-
-
-
   e.preventDefault();
-
   e.stopPropagation();
 
-
-
-  // ambil checkbox terpilih
-
   let checked = Array.from(
-
     document.querySelectorAll('#downloadModal input[type="checkbox"]:checked')
-
   ).map(el => el.value.trim());
-
-
 
   console.log("CHECKED:", checked);
 
-
-
   if (!checked.length) {
-
     alert("Pilih minimal satu tabel.");
-
     return;
-
   }
 
-
-
   closeModalDownload();
-
-
-
-  // download sesuai pilihan
-
   await downloadPDFAll(checked);
-
-
-
-}); 
-
+});
 
 
 async function loadAmiriFont() {
