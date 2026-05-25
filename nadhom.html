@@ -951,15 +951,22 @@ td.lafadz-col {
   direction: rtl;
   text-align: right;
   vertical-align: middle;
-  line-height: 1.5;
+  line-height: 1.8;
   white-space: nowrap;         /* teks tetap 1 baris, tidak turun */
   overflow: hidden;
   text-overflow: ellipsis;     /* jika terlalu panjang, beri tanda ... */
   padding: 10px 12px;
+  font-size: 1em !important;
 }
 
 /* Samakan ukuran lafadz dan kitab agar seimbang */
 td.lafadz-colkitab {  
+  width: auto;
+  min-width: 100px;
+  max-width: 100%;
+  white-space: normal;
+  word-break: break-word;
+
   font-size: 1.2em !important;
   line-height: 1.8 !important;
   direction: rtl !important;
@@ -2642,6 +2649,8 @@ table tbody tr:hover {
     text-align: right !important;
     white-space: normal;
     word-break: break-word;
+	font-size: 1.2em !important;
+  
   }
 .app-header {
   width: 100%;
@@ -8330,6 +8339,7 @@ tables.forEach((table) => {
   }
 })();
 
+
 const setButtonLoading = window.setButtonLoading || function(btn, loading) {
     const text = btn?.querySelector(".btn-text");
     const load = btn?.querySelector(".btn-loading");
@@ -8393,6 +8403,7 @@ function renderSoroganPaginatedUnits() {
   if (selectedUnit !== "Semua") {
     const filtered = soroganCurrentRows.filter(d => d.santri_kharisma?.Unit_Ndalem === selectedUnit);
     container.innerHTML = renderSoroganTable(selectedUnit, filtered);
+    setTimeout(() => attachSoroganEditEvents(), 100);
     return;
   }
 
@@ -8413,6 +8424,8 @@ function renderSoroganPaginatedUnits() {
       renderSoroganPaginatedUnits();
     });
   }
+  
+  setTimeout(() => attachSoroganEditEvents(), 100);
 }
 
 function renderSoroganTable(unitName, rows) {
@@ -8436,7 +8449,8 @@ function renderSoroganTable(unitName, rows) {
               <th>Tanggal</th>
               <th>Penyimak</th>
               <th>Status</th>
-              <th>Ket</th>              
+              <th>Ket</th>
+              <th>Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -8458,19 +8472,46 @@ function renderSoroganTable(unitName, rows) {
         <td>${r.santri_kharisma?.Nama_Lengkap || "-"}</td>
         <td>${r.santri_kharisma?.Kelas || "-"}</td>
         <td class="arabic lafadz-colkitab">${r.nadhom_kitab?.judul_arab || "-"}</td>
-        <td class="lafadz-sorogan-col">${r.dari_ayat || "-"}</td>
-        <td class="lafadz-sorogan-col">${r.sampai_ayat || "-"}</td>
+        <td class="arabic lafadz-col">${r.dari_ayat || "-"}</td>
+        <td class="arabic lafadz-col">${r.sampai_ayat || "-"}</td>
         <td>${waktuRapi}</td>
         <td>${r.nama_penyimak || "-"}</td>
         <td>${r.status_lancar || "-"}</td>
         <td>${r.keterangan || "-"}</td>
-       
+        <td>
+          <button class="btn-edit-sorogan" data-id="${r.id}" style="background: #4CAF50; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 5px;">
+            ✏️ Edit
+          </button>         
+        </td>
       </tr>
     `;
   });
 
-  html += `</tbody></table></div></div>`;
+  html += `</tbody>${'</table>'}</div></div>`;
   return html;
+}
+
+// Attach event listeners untuk tombol edit dan delete
+function attachSoroganEditEvents() {
+  document.querySelectorAll('.btn-edit-sorogan').forEach(btn => {
+    btn.removeEventListener('click', handleSoroganEditClick);
+    btn.addEventListener('click', handleSoroganEditClick);
+  });
+  
+  document.querySelectorAll('.btn-delete-sorogan').forEach(btn => {
+    btn.removeEventListener('click', handleSoroganDeleteClick);
+    btn.addEventListener('click', handleSoroganDeleteClick);
+  });
+}
+
+function handleSoroganEditClick(e) {
+  const id = e.currentTarget.getAttribute('data-id');
+  openSoroganEditPopup(id);
+}
+
+function handleSoroganDeleteClick(e) {
+  const id = e.currentTarget.getAttribute('data-id');
+  deleteSoroganData(id);
 }
 
 // Delete sorogan data
@@ -8517,14 +8558,51 @@ async function openSoroganEditPopup(id) {
 async function loadSoroganKitabToEdit(selectedId) {
   const select = document.getElementById("soroganEditKitab");
   select.innerHTML = '<option value="">Pilih Kitab</option>';
-  const { data } = await client.from("nadhom_kitab").select("id, judul_arab").order("id");
-  data.forEach(k => {
-    const opt = document.createElement("option");
-    opt.value = k.id;
-    opt.textContent = k.judul_arab;
-    if (k.id === selectedId) opt.selected = true;
-    select.appendChild(opt);
-  });
+  
+  const { data, error } = await client
+    .from("nadhom_kitab")
+    .select("id, judul_arab, nama_kitab")
+    .order("id");
+  
+  if (error) {
+    console.error("Error load kitab edit:", error);
+    return;
+  }
+  
+  const kitabMap = new Map();
+  data.forEach(k => kitabMap.set(k.id, k));
+  
+  let hasOption = false;
+  
+  for (const [groupName, idList] of Object.entries(SOROGAN_KITAB_GROUPS_BY_ID)) {
+    const availableIds = idList.filter(id => kitabMap.has(id));
+    if (availableIds.length === 0) continue;
+    
+    const groupLabel = document.createElement("option");
+    groupLabel.textContent = `——— ${groupName} ———`;
+    groupLabel.disabled = true;
+    groupLabel.style.backgroundColor = "#f0f0f0";
+    groupLabel.style.fontWeight = "bold";
+    groupLabel.style.color = "#1a73e8";
+    select.appendChild(groupLabel);
+    
+    availableIds.forEach(id => {
+      const kitab = kitabMap.get(id);
+      const opt = document.createElement("option");
+      opt.value = kitab.id;
+      opt.textContent = kitab.judul_arab;
+      opt.style.fontFamily = "'Scheherazade New', 'Amiri', 'Traditional Arabic', serif";
+      opt.style.fontSize = "18px";
+      opt.style.direction = "rtl";
+      if (kitab.id === parseInt(selectedId)) opt.selected = true;
+      select.appendChild(opt);
+      hasOption = true;
+    });
+  }
+  
+  if (!hasOption) {
+    select.innerHTML = `<option value="">(Tidak ada kitab)</option>`;
+  }
 }
 
 async function loadSoroganPenyimakToEdit(selectedId) {
@@ -8647,12 +8725,11 @@ document.getElementById("soroganUnit")?.addEventListener("change", async () => {
 
 const SOROGAN_KITAB_GROUPS_BY_ID = {
     "Aqidah": [2,7,37,38,39,40,41,42,43,44],
-	"Fiqh": [29,25,22,20,30],
-	"Nahwu - Shorof": [26,3,4,27,28,8,9,10],
-	"Akhlak": [31,32,33,34,36,35],
-	"Usul & Qoidah Fiqh": [45,46,47,49,48,50],
+    "Fiqh": [29,25,22,20,30],
+    "Nahwu - Shorof": [26,3,4,27,28,8,9,10],
+    "Akhlak": [31,32,33,34,36,35],
+    "Usul & Qoidah Fiqh": [45,46,47,49,48,50],
     "Balaghoh": [11]
-    // Hanya kitab dengan ID di atas yang tampil
 };
 
 async function loadSoroganKitab() {
@@ -8671,12 +8748,6 @@ async function loadSoroganKitab() {
     
     const select = document.getElementById("soroganKitab");
     select.innerHTML = `<option value="">Pilih Kitab</option>`;
-    
-    // Kumpulkan semua ID yang diizinkan
-    const allowedIds = new Set();
-    for (const idList of Object.values(SOROGAN_KITAB_GROUPS_BY_ID)) {
-        idList.forEach(id => allowedIds.add(id));
-    }
     
     let hasOption = false;
     
@@ -8697,14 +8768,13 @@ async function loadSoroganKitab() {
             const opt = document.createElement("option");
             opt.value = kitab.id;
             opt.textContent = kitab.judul_arab;
-            opt.style.fontFamily = "'Scheherazade New', serif";
+            opt.style.fontFamily = "'Scheherazade New', 'Amiri', 'Traditional Arabic', serif";
+            opt.style.fontSize = "18px";
             opt.style.direction = "rtl";
             select.appendChild(opt);
             hasOption = true;
         });
     }
-    
-    // ⚠️ KITAB LAIN TIDAK DITAMPILKAN
     
     if (!hasOption) {
         select.innerHTML = `<option value="">(Tidak ada kitab)</option>`;
@@ -8749,6 +8819,7 @@ function filterSoroganByShift() {
   units.forEach(unit => {
     container.innerHTML += renderSoroganTable(unit, filtered.filter(d => d.santri_kharisma?.Unit_Ndalem === unit));
   });
+  setTimeout(() => attachSoroganEditEvents(), 100);
 }
 
 function searchSoroganNama() {
@@ -8761,6 +8832,7 @@ function searchSoroganNama() {
   units.forEach(unit => {
     container.innerHTML += renderSoroganTable(unit, filtered.filter(d => d.santri_kharisma?.Unit_Ndalem === unit));
   });
+  setTimeout(() => attachSoroganEditEvents(), 100);
 }
 
 // Sorting sorogan
@@ -8788,6 +8860,7 @@ function soroganSortTable(column) {
   units.forEach(unit => {
     container.innerHTML += renderSoroganTable(unit, sorted.filter(d => d.santri_kharisma?.Unit_Ndalem === unit));
   });
+  setTimeout(() => attachSoroganEditEvents(), 100);
 }
 
 document.getElementById("soroganBtnAsc")?.addEventListener("click", () => {
@@ -8808,8 +8881,6 @@ document.querySelector('[data-tab="soroganTab"]')?.addEventListener("click", asy
   await loadSoroganData();
   setupSoroganFilters();
 });
-
-
 </script>
 </script>
 <div class="app-footer">
