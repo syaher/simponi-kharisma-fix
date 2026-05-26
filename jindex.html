@@ -3947,18 +3947,53 @@ and (max-width:1024px){
   ⬇️ Download
 </button>
 
-  </div>
+ </div>
 
-  <div style="margin:8px 0;">
-    <input id="trendSearch" placeholder="Cari Nama / Unit Ndalem ..." oninput="renderAbsensiMerahTrend(1)" style="padding:6px; min-width:260px;" />
-    <label style="margin-left:12px;">
-      <input type="checkbox" id="trendOnlyMasihMerah" onchange="renderAbsensiMerahTrend(1)"> Masih merah terakhir
+<div style="margin:8px 0; display:flex; flex-wrap:wrap; gap:12px; align-items:center;">
+
+  <input
+    id="trendSearch"
+    placeholder="Cari Nama / Unit Ndalem ..."
+    oninput="renderAbsensiMerahTrend(1)"
+    style="padding:6px; min-width:260px;"
+  />
+
+  <div class="trend-filter-group" style="display:flex; gap:14px; flex-wrap:wrap;">
+
+    <label>
+      <input
+        type="checkbox"
+        id="filterBaruMerah"
+        onchange="renderAbsensiMerahTrend(1)"
+      >
+      Baru Merah
     </label>
+
+    <label>
+      <input
+        type="checkbox"
+        id="filterMasihMerah"
+        onchange="renderAbsensiMerahTrend(1)"
+      >
+      Masih Merah
+    </label>
+
+    <label>
+      <input
+        type="checkbox"
+        id="filterMembaik"
+        onchange="renderAbsensiMerahTrend(1)"
+      >
+      Membaik
+    </label>
+
   </div>
 
-  <div id="absensiMerahTrendContainer" style="margin-top:12px; overflow:auto;"></div>
+</div>
 
-  <div id="absensiMerahTrendPagination" style="margin-top:14px; text-align:center;"></div>
+<div id="absensiMerahTrendContainer" style="margin-top:12px; overflow:auto;"></div>
+
+<div id="absensiMerahTrendPagination" style="margin-top:14px; text-align:center;"></div>
 </div>
 
 
@@ -5889,9 +5924,8 @@ async function fetchAbsensiForStambuks(stambukList = []) {
   try {
     const { data, error } = await supabaseClient
       .from('absensi1')
-      .select('stambuk, bulan, tahun_ajaran, sakit, izin, tanpa_izin')
-      .in('stambuk', stambukList)
-      .order('tahun_ajaran', { ascending: true })
+      .select('stambuk, bulan, sakit, izin, tanpa_izin')
+      .in('stambuk', stambukList)      
       .order('bulan', { ascending: true });
 
     if (error) {
@@ -5906,8 +5940,7 @@ async function fetchAbsensiForStambuks(stambukList = []) {
       if (!key) continue;
       if (!dict[key]) dict[key] = [];
       dict[key].push({
-        bulan: rec.bulan ?? '-',
-        tahun_ajaran: rec.tahun_ajaran ?? '-',
+        bulan: rec.bulan ?? '-',        
         sakit: Number(rec.sakit ?? 0),
         izin: Number(rec.izin ?? 0),
         tanpaIzin: Number(rec.tanpa_izin ?? 0)
@@ -5959,64 +5992,106 @@ function bulanOrderIndex(bulan) {
   return 999;
 }
 
-async function fetchAbsensiMerahRpc({ nama = null, kelas = null, unit = null, tahun_ajaran = null, limit_rows = 2000, offset_rows = 0 } = {}) {
+async function fetchAbsensiMerahRpc({
+  nama = null,
+  kelas = null,
+  unit = null,
+  limit_rows = 2000,
+  offset_rows = 0
+} = {}) {
+
   try {
+
     const params = {
       nama_filter: nama || null,
       kelas_filter: kelas || null,
       unit_filter: unit || null,
-      tahun_ajaran_filter: tahun_ajaran || null,
       limit_rows,
       offset_rows
     };
 
-    const { data, error } = await supabaseClient.rpc('get_absensi_merah', params);
+    const { data, error } = await supabaseClient.rpc(
+      'get_absensi_merah',
+      params
+    );
 
     if (error) {
       console.error('fetchAbsensiMerahRpc RPC error', error);
       return {};
     }
 
+    console.log('DATA MERAH RPC:', data);
+
     const dict = {};
     const bulanSet = new Set();
+
     for (const rec of (data || [])) {
-      const rawStambuk = rec.stambuk ?? rec.Stambuk ?? '';
+
+      const rawStambuk =
+        rec.stambuk ??
+        rec.Stambuk ??
+        '';
+
       const key = normStambuk(String(rawStambuk));
+
       if (!key) continue;
 
-      if (!dict[key]) dict[key] = [];
+      if (!dict[key]) {
+        dict[key] = [];
+      }
 
-      const bulanVal = rec.bulan ?? rec.Bulan ?? '-';
-      const tahunVal = rec.tahun_ajaran ?? rec.tahunAjaran ?? rec.Tahun_Ajaran ?? '-';
-      const tanpa = Number(rec.tanpa_izin ?? rec.tanpaIzin ?? 0);
+      const bulanVal =
+        rec.bulan ??
+        rec.Bulan ??
+        '-';
+
+      const tanpa =
+        Number(
+          rec.tanpa_izin ??
+          rec.tanpaIzin ??
+          0
+        );
 
       dict[key].push({
         bulan: bulanVal,
-        tahun_ajaran: tahunVal,
         sakit: Number(rec.sakit ?? 0),
         izin: Number(rec.izin ?? 0),
         tanpaIzin: tanpa,
-        bulan_index: Number(rec.bulan_index ?? bulanOrderIndex(bulanVal))
+        bulan_index: Number(
+          rec.bulan_index ??
+          bulanOrderIndex(bulanVal)
+        )
       });
 
-      if (bulanVal) bulanSet.add(bulanVal);
+      if (bulanVal) {
+        bulanSet.add(bulanVal);
+      }
     }
 
-    // sort setiap list: tahun_ajaran asc, bulan_index asc
     Object.keys(dict).forEach(k => {
-      dict[k].sort((a,b) => {
-        if ((a.tahun_ajaran||'') !== (b.tahun_ajaran||'')) return (a.tahun_ajaran||'').localeCompare(b.tahun_ajaran||'');
-        return (a.bulan_index || 999) - (b.bulan_index || 999);
+      dict[k].sort((a, b) => {
+        return (a.bulan_index || 999)
+          - (b.bulan_index || 999);
       });
     });
 
-    // update bulan master (union) — jangan mengganti dropdown langsung
-    window.absensiBulanMaster = Array.from(new Set([...(window.absensiBulanMaster || []), ...Array.from(bulanSet)]));
+    window.absensiBulanMaster =
+      Array.from(
+        new Set([
+          ...(window.absensiBulanMaster || []),
+          ...Array.from(bulanSet)
+        ])
+      );
 
-    // jangan kurangi bulan aktif global di sini — opsi bulan tetap lengkap
     return dict;
+
   } catch (err) {
-    console.error('fetchAbsensiMerahRpc caught', err);
+
+    console.error(
+      'fetchAbsensiMerahRpc caught',
+      err
+    );
+
     return {};
   }
 }
@@ -6063,8 +6138,7 @@ async function loadAbsensiData(page = 1) {
       absensiDict = await fetchAbsensiMerahRpc({
         nama: searchRaw || null,
         kelas: selectedKelas === 'semua' ? null : selectedKelas,
-        unit: selectedUnit === 'semua' ? null : selectedUnit,
-        tahun_ajaran: null,
+        unit: selectedUnit === 'semua' ? null : selectedUnit,       
         limit_rows: 5000,
         offset_rows: 0
       });
@@ -13514,20 +13588,22 @@ async function loadDropdownOptions() {
   tahunDropdown.innerHTML = '<option value="">Semua Tahun Ajaran</option>';
 
   try {
-    // Ambil data tahun_ajaran dari nilai1 dan absensi1
-    const [{ data: d1, error: e1 }, { data: d2, error: e2 }] = await Promise.all([
-      supabaseClient.from("nilai1").select("tahun_ajaran").not("tahun_ajaran", "is", null),
-      supabaseClient.from("absensi1").select("tahun_ajaran").not("tahun_ajaran", "is", null),
-    ]);
+    // Ambil data tahun_ajaran hanya dari nilai1
+    const { data, error } = await supabaseClient
+      .from("nilai1")
+      .select("tahun_ajaran")
+      .not("tahun_ajaran", "is", null);
 
-    if (e1) console.warn("warn load nilai1 tahun_ajaran:", e1);
-    if (e2) console.warn("warn load absensi1 tahun_ajaran:", e2);
+    if (error) {
+      console.warn("warn load nilai1 tahun_ajaran:", error);
+      return;
+    }
 
-    const arrAll = [...(d1 || []), ...(d2 || [])]
+    const arrAll = (data || [])
       .map((r) => r.tahun_ajaran)
       .filter(Boolean);
 
-    // Normalisasi format (hapus spasi di sekitar "-")
+    // Normalisasi format
     function normalize(s) {
       return s
         .replace(/\s*-\s*/g, " - ")
@@ -13536,19 +13612,30 @@ async function loadDropdownOptions() {
     }
 
     const normalizedMap = new Map();
+
     for (const raw of arrAll) {
       const norm = normalize(raw);
-      if (!normalizedMap.has(norm)) normalizedMap.set(norm, raw);
+      if (!normalizedMap.has(norm)) {
+        normalizedMap.set(norm, raw);
+      }
     }
 
     const tahunArr = Array.from(normalizedMap.keys());
 
-    // Sort berdasarkan akhir tahun (desc)
+    // Sort terbaru dulu
     function parseYearKey(s) {
       const m = s.match(/(20\d{2})(?:[^\d]+(20\d{2}))?/);
-      if (m) return Number(m[2] || m[1]);
+
+      if (m) {
+        return Number(m[2] || m[1]);
+      }
+
       const h = s.match(/(14\d{2})(?:[^\d]+(14\d{2}))?/);
-      if (h) return Number(h[2] || h[1]) - 500;
+
+      if (h) {
+        return Number(h[2] || h[1]) - 500;
+      }
+
       return 0;
     }
 
@@ -13556,16 +13643,18 @@ async function loadDropdownOptions() {
 
     tahunArr.forEach((norm) => {
       const orig = normalizedMap.get(norm);
+
       const opt = document.createElement("option");
       opt.value = orig;
       opt.textContent = norm;
+
       tahunDropdown.appendChild(opt);
     });
+
   } catch (err) {
     console.error("Gagal load dropdown tahun ajaran:", err);
   }
 }
-
 
 async function renderAbsensiChart() {
   console.log("📊 Memuat data tren absen merah gabungan...");
@@ -13639,14 +13728,17 @@ async function renderAbsensiChart() {
       };
 
   // === RENDER CHART MODERN ===
-  const chartDom = document.getElementById("absensiChartCanvas");
-  
-  // Hapus chart lama jika ada
-  if (window.absensiChartInstance) {
-    window.absensiChartInstance.dispose();
-  }
-  
-  const chart = echarts.init(chartDom);
+const chartDom = document.getElementById("absensiChartCanvas");
+
+if (window.absensiChartInstance) {
+  window.absensiChartInstance.dispose();
+}
+
+const chart = echarts.init(chartDom, null, {
+  renderer: 'svg'
+});
+
+window.absensiChartInstance = chart;
   // 🔁 Deteksi orientasi (portrait/landscape)
 	function isPortraitMode() {
 	  return window.innerWidth < 700 && window.innerHeight > window.innerWidth;
@@ -13698,7 +13790,7 @@ async function renderAbsensiChart() {
 	  }, 1200);
 	}
 
-  window.absensiChartInstance = chart;
+  
 
   // Warna sesuai permintaan
   const colors = {
@@ -14247,10 +14339,29 @@ async function renderAbsensiMerahTrend(page = 1) {
     let items = Object.values(groups).filter(g => g.anyMerah);
 
     // filter tambahan (masih merah)
-    const onlyStill = document.getElementById('trendOnlyMasihMerah')?.checked;
-    if (onlyStill) {
-      items = items.filter(g => ['Baru Merah', 'Masih Merah'].includes(g.lastStatus));
-    }
+    // ===== FILTER STATUS =====
+const showBaru = document.getElementById('filterBaruMerah')?.checked;
+const showMasih = document.getElementById('filterMasihMerah')?.checked;
+const showMembaik = document.getElementById('filterMembaik')?.checked;
+
+// apakah ada filter aktif?
+const hasFilter =
+  showBaru ||
+  showMasih ||
+  showMembaik;
+
+// hanya filter jika ada yg dicentang
+if (hasFilter) {
+  items = items.filter(g => {
+    const st = (g.lastStatus || '').trim();
+
+    if (st === 'Baru Merah' && showBaru) return true;
+    if (st === 'Masih Merah' && showMasih) return true;
+    if (st === 'Membaik' && showMembaik) return true;
+
+    return false;
+  });
+}
 
     // pencarian
     const q = (document.getElementById('trendSearch')?.value || '').trim().toLowerCase();
@@ -14363,7 +14474,8 @@ async function downloadAbsensiMerahTrendPDF() {
   const doc = new jsPDF({
 	  orientation: "landscape",
 	  unit: "pt",
-	  format: [935, 612] // F4 ukuran landscape (tinggi jadi lebar)
+	  format: [935, 612], // F4 ukuran landscape (tinggi jadi lebar)
+	  compress: true
 	});
 
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -14397,20 +14509,93 @@ async function downloadAbsensiMerahTrendPDF() {
   doc.setFont("helvetica", "bold").setFontSize(15);
   doc.text("LAPORAN MONITORING & PROGRES ABSENSI MERAH", pageWidth / 2, 135, { align: "center" });
   
-  // ==== CHART ABSENSI ====
-  const chartCanvas = document.querySelector("#absensiChartCanvas canvas");
-  if (chartCanvas) {
-    const chartData = chartCanvas.toDataURL("image/png", 1.0);
-    const maxChartWidth = pageWidth - marginX * 2;
-    const chartWidth = maxChartWidth * 0.6;
-    const chartHeight = chartWidth * 0.8;
-    const chartX = (pageWidth - chartWidth) / 2;
-    const chartY = 180;
-    doc.addImage(chartData, "PNG", chartX, chartY, chartWidth, chartHeight);
-    currentY = chartY + chartHeight + 60;
-  } else {
-    currentY = 200;
-  }
+ // ==== CHART ABSENSI RINGAN ====
+const chartEl = document.getElementById("absensiChartCanvas");
+
+if (chartEl && window.absensiChartInstance) {
+
+  const svgString =
+    window.absensiChartInstance.renderToSVGString();
+
+  const svgBlob = new Blob(
+    [svgString],
+    { type: "image/svg+xml;charset=utf-8" }
+  );
+
+  const svgUrl = URL.createObjectURL(svgBlob);
+
+  const img = new Image();
+
+  await new Promise((resolve, reject) => {
+
+    img.onload = () => {
+
+      const canvas = document.createElement("canvas");
+
+      
+      const scale = 2.2;
+
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+
+      const ctx = canvas.getContext("2d");
+
+      // background putih
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.scale(scale, scale);
+
+      ctx.drawImage(img, 0, 0);
+
+      // JPEG jauh lebih kecil
+      const chartData = canvas.toDataURL(
+        "image/jpeg",
+        0.88
+      );
+
+      const maxChartWidth =
+        pageWidth - marginX * 2;
+
+      const chartWidth = maxChartWidth * 0.58;
+
+      const chartHeight = chartWidth * 0.62;
+
+      const chartX =
+        (pageWidth - chartWidth) / 2;
+
+      const chartY = 180;
+
+      doc.addImage(
+        chartData,
+        "JPEG",
+        chartX,
+        chartY,
+        chartWidth,
+        chartHeight,
+        undefined,
+        "MEDIUM"
+      );
+
+      currentY =
+        chartY + chartHeight + 45;
+
+      URL.revokeObjectURL(svgUrl);
+
+      resolve();
+
+    };
+
+    img.onerror = reject;
+
+    img.src = svgUrl;
+
+  });
+
+}
+else {
+  currentY = 200;
+}
 
   // ==== AMBIL SEMUA DATA ====
   let allRows = [];
@@ -14572,23 +14757,65 @@ async function downloadAbsensiMerahTrendPDF() {
       if (data.section === "body" && data.column.index === 1) data.cell.text = [""];
     },
     didDrawCell(data) {
-      if (data.section === "body" && data.column.index === 1) {
-        const foto = data.cell.raw;
-        if (foto?.base64) {
-          const base = foto.base64;
-          const fmt = base.includes("image/jpeg") ? "JPEG" : "PNG";
-          const pad = 2;
-          const cw = data.cell.width - pad * 2;
-          const ch = data.cell.height - pad * 2;
-          const ratio = Math.min(cw / (foto.w || cw), ch / (foto.h || ch));
-          const nw = (foto.w || cw) * ratio;
-          const nh = (foto.h || ch) * ratio;
-          const x = data.cell.x + (data.cell.width - nw) / 2;
-          const y = data.cell.y + (data.cell.height - nh) / 2;
-          try { doc.addImage(foto.base64, fmt, x, y, nw, nh); } catch {}
-        }
+
+  if (
+    data.section === "body" &&
+    data.column.index === 1
+  ) {
+
+    const foto = data.cell.raw;
+
+    if (foto?.base64) {
+
+      const pad = 2;
+
+      const cw =
+        data.cell.width - pad * 2;
+
+      const ch =
+        data.cell.height - pad * 2;
+
+      const ratio = Math.min(
+        cw / (foto.w || cw),
+        ch / (foto.h || ch)
+      );
+
+      const nw =
+        (foto.w || cw) * ratio;
+
+      const nh =
+        (foto.h || ch) * ratio;
+
+      const x =
+        data.cell.x +
+        (data.cell.width - nw) / 2;
+
+      const y =
+        data.cell.y +
+        (data.cell.height - nh) / 2;
+
+      try {
+
+        doc.addImage(
+          foto.base64,
+          "JPEG",
+          x,
+          y,
+          nw,
+          nh,
+          undefined,
+          "MEDIUM"
+        );
+
+      } catch (e) {
+        console.warn("Gagal render foto", e);
       }
-    },
+
+    }
+
+  }
+
+},
     rowPageBreak: 'avoid',
     pageBreak: 'auto',
   });
