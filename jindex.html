@@ -16,7 +16,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
   <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
@@ -1784,8 +1783,13 @@ button:active {
   transition: opacity 0.25s, transform 0.25s;
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
-.toast-message.show { opacity: 1; transform: translateX(-50%) translateY(-8px); }
-.toast-message.error { background-color: #e53935; }
+.toast-message.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-8px);
+}
+.toast-message.error {
+  background-color: #e53935;
+}
 
 .non-aktif-group .unit-header {
   background-color: #f8d7da;  /* merah muda lembut */
@@ -1813,7 +1817,7 @@ button:active {
   to { transform: rotate(360deg); }
 }
 
-..laporan-alasan {
+.laporan-alasan {
   margin-top: 12px;
   border: 1px solid #cce0ff; /* border utama seragam */
   width: 100%;
@@ -5959,15 +5963,21 @@ async function fetchAbsensiForStambuks(stambukList = []) {
 }
 
 // === Event Listener Filter Absensi ===
+// === Debounce Utility (mencegah spam Supabase RPC saat user ketik) ===
+function _debounce(fn, ms) {
+  let t;
+  return function () { clearTimeout(t); t = setTimeout(() => fn.apply(this, arguments), ms); };
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const namaInput   = document.getElementById('absensiSearchNama');
   const kelasSelect = document.getElementById('absensiSearchKelas');
   const unitSelect  = document.getElementById('absensiSearchUnit');
   const merahCheck  = document.getElementById('filterMerahCheckbox');
-  const bulanSelect = document.getElementById('absensiSearchBulan'); // <-- tambah ini
+  const bulanSelect = document.getElementById('absensiSearchBulan');
 
   if (namaInput) {
-    namaInput.addEventListener('input', () => loadAbsensiData(1));
+    namaInput.addEventListener('input', _debounce(() => loadAbsensiData(1), 350));
   }
   if (kelasSelect) {
     kelasSelect.addEventListener('change', () => loadAbsensiData(1));
@@ -6675,6 +6685,25 @@ function getAllFilteredAbsensiSantri() {
   return filtered;
 }
 
+// ======================================
+// LOGO CACHE untuk export PDF (hindari fetch berulang)
+// ======================================
+let _cachedLogoBase64 = null;
+async function _getLogoBase64() {
+  if (_cachedLogoBase64) return _cachedLogoBase64;
+  try {
+    const resp = await fetch("https://i.imgur.com/Irgu32G.png");
+    if (!resp.ok) return null;
+    const blob = await resp.blob();
+    _cachedLogoBase64 = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    });
+  } catch { _cachedLogoBase64 = null; }
+  return _cachedLogoBase64;
+}
+
 async function downloadAbsensiPDF() {
   const { jsPDF } = window.jspdf;
 
@@ -6703,14 +6732,12 @@ async function downloadAbsensiPDF() {
   // HELPER: TAMBAH HEADER KOP SURAT (HALAMAN 1 SAJA)
   // ==========================================
   async function drawFirstPageHeader() {
-    const logoUrl = "https://i.imgur.com/Irgu32G.png";
-
-    // Logo
+    // Logo (pakai cache)
     try {
-      const logoData = await loadImageToBase64(logoUrl);
-      if (logoData?.base64) {
-        const fmt = logoData.base64.includes("image/jpeg") ? "JPEG" : "PNG";
-        doc.addImage(logoData.base64, fmt, marginX, 8, 16, 16);
+      const base64 = await _getLogoBase64();
+      if (base64) {
+        const fmt = base64.includes("image/jpeg") ? "JPEG" : "PNG";
+        doc.addImage(base64, fmt, marginX, 8, 16, 16);
       }
     } catch (e) {
       console.warn("Logo gagal dimuat:", e);
@@ -8054,17 +8081,10 @@ async function downloadPelanggaranPDF() {
   let cursorY = 25;
 
   try {
-    // === Header Logo ===
+    // === Header Logo (pakai cache) ===
     try {
-      const logoUrl = "https://i.imgur.com/Irgu32G.png";
-      const resp = await fetch(logoUrl);
-      if (resp.ok) {
-        const blob = await resp.blob();
-        const base64 = await new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result);
-          reader.readAsDataURL(blob);
-        });
+      const base64 = await _getLogoBase64();
+      if (base64) {
         doc.addImage(base64, "PNG", marginX, 25, 34, 34);
       }
     } catch (e) {
@@ -8294,13 +8314,13 @@ function initNilaiFilters() {
 
   // Event → kalau filter berubah, langsung reload data
   [kelasSelect, unitSelect].forEach(el => el.onchange = () => loadNilaiData(1));
-  namaInput.oninput = () => loadNilaiData(1);
+  namaInput.oninput = _debounce(() => loadNilaiData(1), 350);
 }
 
 async function initNilaiModule() {
   try {
     showLoading(true);
-    await loadSantri();               // master santri
+    if (!allSantriData || !allSantriData.length) await loadSantri(); // skip jika sudah ada
     try { await saveToDB && saveToDB('nilai1', []); } catch(e) {}
 
     initNilaiFilters();               // isi dropdown kelas/unit
