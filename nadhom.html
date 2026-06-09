@@ -1507,6 +1507,27 @@ table tbody tr:hover {
   overflow-x: auto; /* supaya tabel tidak terpotong di HP */
 }
 
+/* =================== MOBILE: Lebarkan kolom Kelas & Daftar Kitab/Juz =================== */
+@media (max-width: 768px) {
+  #tblFrekuensiSetoran th:nth-child(3),
+  #tblFrekuensiSetoran td:nth-child(3),
+  #tblFrekuensiSetoran th:nth-child(4),
+  #tblFrekuensiSetoran td:nth-child(4) {
+    min-width: 140px;
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  #tblLaporanQuranUnit th:nth-child(3),
+  #tblLaporanQuranUnit td:nth-child(3),
+  #tblLaporanQuranUnit th:nth-child(4),
+  #tblLaporanQuranUnit td:nth-child(4) {
+    min-width: 140px;
+    white-space: normal;
+    word-break: break-word;
+  }
+}
+
 /* ==========================
    FONT & STYLING UNTUK CHECKLIST LAPORAN
 ========================== */
