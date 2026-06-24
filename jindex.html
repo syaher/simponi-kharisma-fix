@@ -3751,22 +3751,22 @@ and (max-width:1024px){
     <div id="santri-container"></div>
   </div>
   
-  <!-- Tab Content: Data Lengkap -->
-  <div id="tab-data" class="tab-content">
-    <!-- Admin Tools khusus Data Lengkap -->
-    <div class="admin-tools">
-      <button class="admin-only" onclick="openAddSantri()">➕ Tambah</button>
-      <!-- Ganti tombol -->
-		<button id="btnSantriPDF" class="admin-only" onclick="handleDownloadSantri('pdf')">
-		  ⬇️ Download Full
-		</button>
-		<button id="btnSantriCustom" class="admin-only" onclick="handleDownloadSantri('pdfcustom')">
-		  ⬇️ Laporan Ndalem
-		</button>
-		<button id="btnSantriKoordinasi" class="admin-only" onclick="handleDownloadSantri('pdfkoordinasi')">⬇️ Koordinasi</button>
-
-
-    </div>
+ <!-- Tambahkan tombol Validasi di bagian Admin Tools Data Lengkap -->
+<div id="tab-data" class="tab-content">
+  <!-- Admin Tools khusus Data Lengkap -->
+  <div class="admin-tools">
+    <button class="admin-only" onclick="openAddSantri()">➕ Tambah</button>
+    <!-- Ganti tombol -->
+    <button id="btnSantriPDF" class="admin-only" onclick="handleDownloadSantri('pdf')">
+      Download Full
+    </button>
+    <button id="btnSantriCustom" class="admin-only" onclick="handleDownloadSantri('pdfcustom')">
+      Laporan Ndalem
+    </button>
+    <button id="btnSantriKoordinasi" class="admin-only" onclick="handleDownloadSantri('pdfkoordinasi')">Koordinasi</button>
+    <!-- TOMBOL VALIDASI BARU -->
+    <button id="btnSantriValidasi" class="admin-only" onclick="openValidasiModal()">Validasi</button>
+  </div>
 
     <!-- Table -->
     <div class="data-table-container">
@@ -4935,6 +4935,24 @@ document.addEventListener("DOMContentLoaded", () => {
 	  "Muharam", "Shofar", "Robi'ul Awal", "Robi'ul Akhir",
 	  "Jumadal Ula", "Jumadal Tsaniyah", "Rajab", "Sya'ban"
 	];
+	
+	// =============================
+// Fungsi untuk mengurutkan berdasarkan bulan Hijriah
+// =============================
+function sortByBulanHijriah(items) {
+  if (!Array.isArray(items) || items.length === 0) return items;
+  
+  const bulanMap = {};
+  bulanAbsensi.forEach((b, idx) => {
+    bulanMap[b] = idx;
+  });
+  
+  return [...items].sort((a, b) => {
+    const idxA = bulanMap[a.bulan] !== undefined ? bulanMap[a.bulan] : 999;
+    const idxB = bulanMap[b.bulan] !== undefined ? bulanMap[b.bulan] : 999;
+    return idxA - idxB;
+  });
+}
 
 	// Saat halaman selesai dimuat, isi dropdown bulan secara awal
 	document.addEventListener("DOMContentLoaded", () => {
@@ -6238,8 +6256,9 @@ async function fetchLaporanMerah(stambuk) {
     const { data, error } = await query;
     if (error) throw error;
 
-    console.log("Laporan untuk", stambuk, "bulan:", selectedBulan, data);
-    return data || [];
+    // 🔹 URUTKAN HASIL SEBELUM DIKEMBALIKAN
+    const sortedData = sortByBulanHijriah(data || []);
+    return sortedData;
   } catch (err) {
     console.error('fetchLaporanMerah error', err);
     return [];
@@ -6495,10 +6514,12 @@ function getExportFileName(prefix, ext, filters = {}) {
 }
 
 
-
 function renderLaporanTable(laporan = [], stambuk = '', isExport = false) {
   if (!Array.isArray(laporan) || laporan.length === 0) return '';
   const isAdmin = (localStorage.getItem('userRole') === 'admin');
+
+  // 🔹 URUTKAN LAPORAN BERDASARKAN BULAN HIJRIAH
+  const sortedLaporan = sortByBulanHijriah(laporan);
 
   // Jika sedang export (PDF/HTML/PNG), sembunyikan kolom Aksi
   const showAksi = isAdmin && !isExport;
@@ -6514,7 +6535,7 @@ function renderLaporanTable(laporan = [], stambuk = '', isExport = false) {
         </tr>
       </thead>
       <tbody>
-        ${laporan.map(r => `
+        ${sortedLaporan.map(r => `
           <tr>
             <td style="border:1px solid #cce0ff; padding:6px;">${r.bulan}</td>
             <td style="border:1px solid #cce0ff; padding:6px; text-align:left;">${r.alasan || '-'}</td>
@@ -12439,6 +12460,424 @@ async function handleDownloadSantri(type) {
     btn.innerHTML = originalHTML;
   }
 }
+
+// ====================== MODAL VALIDASI ======================
+function openValidasiModal() {
+  // Cek apakah modal sudah ada, jika belum buat
+  let modal = document.getElementById('validasiModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'validasiModal';
+    modal.className = 'crud-modal';
+    modal.style.display = 'block';
+    
+    // Daftar kolom yang tersedia untuk validasi
+    const columns = [
+      { key: 'No', label: 'No', default: true },
+      { key: 'Foto', label: 'Foto', default: true },
+      { key: 'Nama_Lengkap', label: 'Nama Lengkap', default: true },
+      { key: 'Stambuk', label: 'Stambuk', default: true },
+      { key: 'Kelas', label: 'Kelas', default: true },
+      { key: 'Bagian', label: 'Bagian', default: true },
+      { key: 'Asal_Daerah', label: 'Asal Daerah', default: false },
+      { key: 'Himpunan', label: 'Himpunan', default: false },
+      { key: 'Kamar', label: 'Kamar', default: false },
+      { key: 'Unit_Ndalem', label: 'Unit Ndalem', default: true },
+      { key: 'Posisi_Tugas', label: 'Posisi Tugas', default: false },
+      { key: 'Shift', label: 'Shift', default: false },
+      { key: 'Jam_Tugas', label: 'Jam Tugas', default: false },
+      { key: 'Usia', label: 'Usia', default: false },
+      { key: 'Masa_Khidmah', label: 'Masa Khidmah', default: true },
+      { key: 'Tempat_Ngaji', label: 'Tempat Ngaji', default: false },
+      { key: 'Kelas_Ngaji', label: 'Kelas Ngaji', default: false },
+      { key: 'Kategori', label: 'Kategori', default: false },
+      { key: 'Mulai_Ngabdi', label: 'Mulai Ngabdi', default: false },
+      { key: 'Tgl_Lahir', label: 'Tgl Lahir', default: false },
+      { key: 'No_Wali', label: 'No. Wali', default: false },
+      { key: 'Nama_Wali', label: 'Nama Wali', default: false },
+    ];
+    
+    modal.innerHTML = `
+      <div class="crud-modal-content" style="max-width:600px;">
+        <span class="crud-close" onclick="closeValidasiModal()">&times;</span>
+        <h3 style="color:#1a73e8; text-align:center;">📋 Pilih Kolom untuk Validasi</h3>
+        <p style="font-size:13px; color:#555; text-align:center; margin-bottom:12px;">
+          Centang kolom yang ingin ditampilkan di laporan Validasi
+        </p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:6px 12px; max-height:320px; overflow-y:auto; padding:8px; background:#f8faff; border-radius:8px; border:1px solid #e0e8f0;">
+          ${columns.map(col => `
+            <label style="display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; padding:3px 4px; border-radius:4px; transition:background 0.2s;" 
+                   onmouseover="this.style.background='#e8f0fe'" 
+                   onmouseout="this.style.background='transparent'">
+              <input type="checkbox" class="validasi-col-checkbox" 
+                     data-key="${col.key}" 
+                     ${col.default ? 'checked' : ''}>
+              ${col.label}
+            </label>
+          `).join('')}
+        </div>
+        <div style="margin-top:12px; display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap;">
+          <button onclick="selectAllValidasiCols(true)" style="background:#e8f0fe; color:#1a73e8; border:1px solid #1a73e8; padding:6px 14px; border-radius:6px; cursor:pointer; font-weight:500;">✅ Semua</button>
+          <button onclick="selectAllValidasiCols(false)" style="background:#f1f3f4; color:#555; border:1px solid #ccc; padding:6px 14px; border-radius:6px; cursor:pointer; font-weight:500;">⬜ Kosongkan</button>
+          <button onclick="downloadValidasiPDF()" style="background:linear-gradient(135deg,#1a73e8,#3f51b5); color:white; border:none; padding:6px 18px; border-radius:6px; cursor:pointer; font-weight:600;">⬇️ Download Validasi</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  } else {
+    modal.style.display = 'block';
+  }
+}
+
+function closeValidasiModal() {
+  const modal = document.getElementById('validasiModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function selectAllValidasiCols(checked) {
+  document.querySelectorAll('.validasi-col-checkbox').forEach(cb => cb.checked = checked);
+}
+
+function getSelectedValidasiCols() {
+  const checks = document.querySelectorAll('.validasi-col-checkbox:checked');
+  return Array.from(checks).map(cb => cb.dataset.key);
+}
+
+// ====================== DOWNLOAD VALIDASI PDF ======================
+async function downloadValidasiPDF() {
+  const selectedCols = getSelectedValidasiCols();
+  if (!selectedCols.length) {
+    alert('Pilih minimal 1 kolom untuk dicetak!');
+    return;
+  }
+
+  const exportData = (lastFilteredData && lastFilteredData.length)
+    ? lastFilteredData
+    : allSantriData;
+
+  if (!exportData.length) {
+    alert('Tidak ada data!');
+    return;
+  }
+
+  // Filter hanya santri aktif
+  let aktifData = exportData.filter(s => String(s.Status || '').toLowerCase() === 'aktif');
+  if (!aktifData.length) {
+    alert('Tidak ada santri aktif!');
+    return;
+  }
+
+  // Ambil filter untuk header
+  const selectedUnit = Array.from(
+    document.querySelectorAll('#filterUnit input[type="checkbox"]:checked')
+  ).map(cb => cb.value);
+
+  const selectedKelas = Array.from(
+    document.querySelectorAll('#filterKelas input[type="checkbox"]:checked')
+  ).map(cb => cb.value);
+
+  // Preload data relasi
+  const { data: guruList = [] } = await supabaseClient
+    .from('data_guru')
+    .select('Nama, Hp, Bagian, Kelas');
+
+  const guruMap = {};
+  guruList.forEach(g => {
+    guruMap[`${g.Bagian}__${g.Kelas}`] = g;
+  });
+
+  const { data: himpunanList = [] } = await supabaseClient
+    .from('himpunan')
+    .select('himpunan, nama, wa');
+
+  const himpunanMap = {};
+  himpunanList.forEach(h => {
+    himpunanMap[h.himpunan] = h;
+  });
+
+  // Mapping kolom dengan format yang benar
+  const colMap = {
+    'No': { label: 'No', get: (s, i) => i + 1 },
+    'Foto': { label: 'Foto', get: (s) => s.Foto || null },
+    'Nama_Lengkap': { label: 'Nama', get: (s) => s.Nama_Lengkap || '-' },
+    'Stambuk': { label: 'Stambuk', get: (s) => s.Stambuk || '-' },
+    'Kelas': { label: 'Kelas', get: (s) => s.Kelas || '-' },
+    'Bagian': { label: 'Bagian', get: (s) => s.Bagian || '-' },
+    'Asal_Daerah': { label: 'Asal Daerah', get: (s) => s.Asal_Daerah || '-' },
+    'Himpunan': { label: 'Himpunan', get: (s) => s.Himpunan || '-' },
+    'Kamar': { label: 'Kamar', get: (s) => s.Kamar || '-' },
+    'Unit_Ndalem': { label: 'Unit Ndalem', get: (s) => s.Unit_Ndalem || '-' },
+    'Posisi_Tugas': { label: 'Posisi Tugas', get: (s) => s.Posisi_Tugas || '-' },
+    'Shift': { label: 'Shift', get: (s) => s.Shift || '-' },
+    'Jam_Tugas': { label: 'Jam Tugas', get: (s) => s.Jam_Tugas || '-' },
+    'Usia': { label: 'Usia', get: (s) => calculateUsia(s.Tgl_Lahir) },
+    'Masa_Khidmah': { label: 'Masa Khidmah', get: (s) => calculateMasaKhidmah(s.Mulai_Ngabdi) },
+    'Tempat_Ngaji': { label: 'Tempat Ngaji', get: (s) => s.ngaji?.tempat_ngaji || '-' },
+    'Kelas_Ngaji': { label: 'Kelas Ngaji', get: (s) => s.ngaji?.Kelas_ngaji || '-' },
+    'Kategori': { label: 'Kategori', get: (s) => normalizeKategori(s.Kategori1) },
+    // 👇 PERBAIKAN: Mulai Ngabdi pakai format dd/mm/yyyy
+    'Mulai_Ngabdi': { 
+      label: 'Mulai Ngabdi', 
+      get: (s) => {
+        if (!s.Mulai_Ngabdi) return '-';
+        const d = new Date(s.Mulai_Ngabdi);
+        if (isNaN(d)) return '-';
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yyyy = d.getFullYear();
+        return `${dd}/${mm}/${yyyy}`;
+      }
+    },
+    // 👇 PERBAIKAN: Tgl Lahir pakai format dd/mm/yyyy
+    'Tgl_Lahir': { 
+      label: 'Tgl Lahir', 
+      get: (s) => {
+        if (!s.Tgl_Lahir) return '-';
+        const d = new Date(s.Tgl_Lahir);
+        if (isNaN(d)) return '-';
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yyyy = d.getFullYear();
+        return `${dd}/${mm}/${yyyy}`;
+      }
+    },
+    'No_Wali': { label: 'No. Wali', get: (s) => s.No_Wali || '-' },
+    'Nama_Wali': { label: 'Nama Wali', get: (s) => s.Nama_Wali || '-' },
+  };
+
+  // Bangun header dan mapping getter
+  const headers = [];
+  const getters = [];
+
+  selectedCols.forEach(key => {
+    if (colMap[key]) {
+      headers.push(colMap[key].label);
+      getters.push(colMap[key].get);
+    }
+  });
+
+  // ====================== GENERATE PDF ======================
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('landscape', 'pt', 'a4');
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const marginX = 40;
+
+  // HEADER
+  try {
+    const logo = await loadImageToBase64('https://i.imgur.com/Irgu32G.png');
+    if (logo) doc.addImage(logo.base64, 'PNG', marginX, 30, 50, 50);
+  } catch {}
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(18);
+  doc.text('KHUDAMA\' KHARISMA', pageWidth / 2, 45, { align: 'center' });
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(11);
+  doc.text('Pondok Pesantren Lirboyo Kota Kediri Jawa Timur', pageWidth / 2, 62, { align: 'center' });
+
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(9);
+  doc.text('Sekretariat: Kantor KHARISMA Gedung Nafis Lt. 02 Lirboyo Kota Kediri', pageWidth / 2, 75, { align: 'center' });
+
+  doc.setLineWidth(0.8);
+  doc.line(marginX, 85, pageWidth - marginX, 85);
+
+  // JUDUL
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.text('LAPORAN VALIDASI DATA SISWA', pageWidth / 2, 108, { align: 'center' });
+
+  let currentY = 125;
+
+  // Filter info
+  if (selectedUnit.length || selectedKelas.length) {
+    const info = [];
+    if (selectedUnit.length) info.push(`Unit: ${selectedUnit.join(', ')}`);
+    if (selectedKelas.length) info.push(`Kelas: ${selectedKelas.join(', ')}`);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.text(info.join('   |   '), marginX, currentY);
+    currentY += 18;
+  }
+
+  // Informasi jumlah data
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.text(`Total Santri Aktif: ${aktifData.length} orang`, marginX, currentY);
+  currentY += 12;
+
+  // ====================== TABEL ======================
+  const bodyRows = await Promise.all(aktifData.map(async (s, idx) => {
+    const row = [];
+    for (let i = 0; i < getters.length; i++) {
+      let val = getters[i](s, idx);
+      // Jika kolom Foto, simpan object untuk di-render
+      if (selectedCols[i] === 'Foto' && val) {
+        try {
+          const img = await loadImageToBase64(val);
+          val = img || val;
+        } catch { val = null; }
+      }
+      row.push(val);
+    }
+    return row;
+  }));
+
+  // Column styles (rata kiri untuk kolom teks panjang)
+  const colStyles = {};
+  headers.forEach((h, i) => {
+    if (['Nama', 'Nama Lengkap', 'Asal Daerah', 'Himpunan', 'Unit Ndalem', 'Posisi Tugas', 'Shift', 'Jam Tugas', 'Keterangan'].includes(h)) {
+      colStyles[i] = { halign: 'left' };
+    }
+    if (h === 'Foto') {
+      colStyles[i] = { cellWidth: 40 };
+    }
+    if (h === 'No') {
+      colStyles[i] = { cellWidth: 28 };
+    }
+    if (h === 'Stambuk') {
+      colStyles[i] = { cellWidth: 65 };
+    }
+    if (h === 'Kelas') {
+      colStyles[i] = { cellWidth: 60 };
+    }
+    if (h === 'Mulai Ngabdi' || h === 'Tgl Lahir') {
+      colStyles[i] = { cellWidth: 65 };
+    }
+    if (h === 'Masa Khidmah' || h === 'Usia') {
+      colStyles[i] = { cellWidth: 55 };
+    }
+  });
+
+  doc.autoTable({
+    head: [headers],
+    body: bodyRows,
+    startY: currentY,
+    margin: { left: marginX, right: marginX },
+    tableWidth: 'auto',
+    styles: {
+      fontSize: 8,
+      halign: 'center',
+      valign: 'middle',
+      minCellHeight: 32,
+      cellPadding: 3,
+      lineWidth: 0.3,
+      lineColor: [0, 0, 0],
+    },
+    headStyles: {
+      fillColor: [0, 102, 204],
+      textColor: [255, 255, 255],
+      fontStyle: 'bold',
+      halign: 'center',
+      lineWidth: 0.4,
+      lineColor: [0, 0, 0],
+    },
+    bodyStyles: {
+      fillColor: [255, 255, 255],
+      textColor: [0, 0, 0],
+      lineWidth: 0.3,
+      lineColor: [0, 0, 0],
+    },
+    alternateRowStyles: {
+      fillColor: [248, 250, 255],
+    },
+    columnStyles: colStyles,
+    rowPageBreak: 'avoid',
+    pageBreak: 'auto',
+
+    // Render Foto
+    willDrawCell(data) {
+      if (data.section === 'body') {
+        const colKey = selectedCols[data.column.index];
+        if (colKey === 'Foto') {
+          data.cell.text = [''];
+        }
+      }
+    },
+    didDrawCell(data) {
+      if (data.section === 'body') {
+        const colKey = selectedCols[data.column.index];
+        if (colKey === 'Foto') {
+          const raw = data.cell.raw;
+          if (raw && typeof raw === 'object' && raw.base64) {
+            const pad = 2;
+            const cw = data.cell.width - pad * 2;
+            const ch = data.cell.height - pad * 2;
+            const ratio = Math.min(cw / (raw.w || cw), ch / (raw.h || ch));
+            const nw = (raw.w || cw) * ratio;
+            const nh = (raw.h || ch) * ratio;
+            const x = data.cell.x + (data.cell.width - nw) / 2;
+            const y = data.cell.y + (data.cell.height - nh) / 2;
+            try {
+              doc.addImage(raw.base64, 'PNG', x, y, nw, nh);
+            } catch {}
+          }
+        }
+      }
+    }
+  });
+
+  // ====================== FOOTER ======================
+  const totalPages = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= totalPages; i++) {
+    doc.setPage(i);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.text(`Halaman ${i} dari ${totalPages}`, pageWidth / 2, pageHeight - 20, { align: 'center' });
+    if (i === totalPages) {
+      doc.setFont('helvetica', 'italic');
+      doc.setTextColor(120);
+      doc.text(`Admin – Simponi Kharisma – ${new Date().toLocaleString('id-ID')}`,
+        pageWidth - 40, pageHeight - 20, { align: 'right' });
+      doc.setTextColor(0);
+    }
+  }
+
+  // ====================== SAVE ======================
+  const filterStr = selectedUnit.length ? `_${selectedUnit.join('-')}` : '';
+  const dateStr = new Date().toISOString().slice(0, 10);
+  doc.save(`Validasi_Santri${filterStr}_${dateStr}.pdf`);
+
+  closeValidasiModal();
+}
+
+// ====================== TAMBAHKAN CSS UNTUK MODAL ======================
+(function addValidasiModalStyles() {
+  if (document.getElementById('validasi-modal-styles')) return;
+  const style = document.createElement('style');
+  style.id = 'validasi-modal-styles';
+  style.textContent = `
+    #validasiModal .crud-modal-content {
+      padding: 18px 20px;
+      border-radius: 14px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    }
+    #validasiModal .crud-modal-content h3 {
+      margin-top: 0;
+    }
+    #validasiModal .crud-close {
+      top: 8px;
+      right: 14px;
+      font-size: 22px;
+    }
+    #validasiModal .validasi-col-checkbox {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      accent-color: #1a73e8;
+    }
+    #validasiModal .validasi-col-checkbox:checked {
+      accent-color: #1a73e8;
+    }
+    #validasiModal label:hover {
+      background: #e8f0fe;
+      border-radius: 4px;
+    }
+  `;
+  document.head.appendChild(style);
+})();
 
 async function handleDownloadAbsensiMerahPDF() {
   const btn = document.getElementById('btnDownloadAbsensiMerahPDF');
