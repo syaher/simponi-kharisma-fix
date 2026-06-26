@@ -3732,7 +3732,22 @@ and (max-width:1024px){
     <div class="filter-group">
       <label for="searchNama">Cari Nama:</label>
       <input id="searchNama" placeholder="Cari Nama Santri..." oninput="filterSantri()">
+        <!-- ✅ TOTAL COUNT DI BAWAH INPUT PENCARIAN -->
+    <div id="santri-total-count" style="
+      margin-top: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #1a73e8;
+      background: #e8f0fe;
+      padding: 4px 12px;
+      border-radius: 10px;
+      display: inline-block;
+      border: 1px solid #c5d8f0;
+    ">
+      Total Siswa Aktif: <span id="santri-total-number" style="background: #1a73e8; color: white; padding: 0 10px; border-radius: 12px;">0</span>
     </div>
+  </div>
+	
     
     <div class="filter-group">
   <label>Kelas:</label>
@@ -3745,6 +3760,7 @@ and (max-width:1024px){
 </div>
 
   </div>
+  
 
   <!-- Tab Content: Kartu -->
   <div id="tab-kartu" class="tab-content active">
@@ -4894,7 +4910,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	let nilaiChartInstance = null;
 	let lastActiveData = [];        // untuk download
 	let lastEditedId = null;        // simpan id terakhir ditambah/diubah
-	let lastFilteredData = [];      // simpan hasil filter terakhir
+	let lastFilteredData = null;      // simpan hasil filter terakhir
 	let currentSortColumn = null;
 	let sortDirection = 'asc';
 	let allNilaiData = [];
@@ -5056,6 +5072,8 @@ function sortByBulanHijriah(items) {
           }
         });
       });
+	  
+	  updateSantriTotalCount([]);
       
       // Load initial data
       await loadInitialData();
@@ -5164,6 +5182,11 @@ async function loadInitialData() {
     renderCheckboxFilters(allSantriData);
     populateSuggestions();
     initSantriAutocomplete();
+	// ✅ TAMPILKAN TOTAL COUNT AWAL
+    updateSantriTotalCount(allSantriData);
+    
+    // ✅ RENDER KARTU AWAL
+    renderSantriCards(allSantriData);
 
   } catch (err) {
     console.warn("Gagal load Supabase, fallback IndexedDB:", err);
@@ -5200,7 +5223,6 @@ function sortByKelasOrder(list, order) {
     return ia - ib;
   });
 }
-
 
 
 function renderCheckboxFilters(data) {
@@ -5253,11 +5275,14 @@ function renderCheckboxFilters(data) {
       </label>
     `;
   });
+  
+  // ✅ SET TOTAL COUNT AWAL SETELAH RENDER CHECKBOX
+  updateSantriTotalCount(allSantriData);
 }
 
 
-
 async function renderSantriCards(list) {
+   updateSantriTotalCount(list);
   showLoading(true);
   await new Promise(resolve => requestAnimationFrame(resolve));
   try {
@@ -5520,6 +5545,34 @@ async function screenshotCard(cardElement, namaSantri) {
   }
 }
 
+
+// ========== UPDATE TOTAL SANTRI AKTIF ==========
+// ========== UPDATE TOTAL SANTRI AKTIF ==========
+function updateSantriTotalCount(filteredData) {
+  const totalEl = document.getElementById('santri-total-number');
+  if (!totalEl) return;
+  
+  // ✅ PASTIKAN MENGGUNAKAN DATA YANG DITERIMA
+  const dataToCount = (filteredData && Array.isArray(filteredData)) ? filteredData : [];
+  
+  // Hitung hanya yang aktif
+  const aktifCount = dataToCount.filter(s => 
+    s.Status && String(s.Status).toLowerCase() === 'aktif'
+  ).length;
+  
+  // ✅ TAMPILKAN ANGKA (TERMASUK 0)
+  totalEl.textContent = aktifCount;
+  
+  // ✅ UBAH WARNA JIKA 0
+  if (aktifCount === 0) {
+    totalEl.style.background = '#dc3545';
+    totalEl.style.color = 'white';
+  } else {
+    totalEl.style.background = '#1a73e8';
+    totalEl.style.color = 'white';
+  }
+}
+
 // ========== FILTER ==========
 function filterSantri() {
   const searchTerm =
@@ -5535,6 +5588,7 @@ function filterSantri() {
     document.querySelectorAll('#filterUnit input[type="checkbox"]:checked')
   ).map(cb => cb.value);
 
+  // ✅ FILTER DATA
   lastFilteredData = allSantriData.filter(s => {
     // 🔹 nama
     const namaMatch =
@@ -5554,14 +5608,19 @@ function filterSantri() {
     return namaMatch && kelasMatch && unitMatch;
   });
 
-  // render sesuai tab aktif
+  // ✅ UPDATE TOTAL COUNT
+  updateSantriTotalCount(lastFilteredData);
+
+  // ✅ RENDER SESUAI TAB AKTIF
   const activeTab =
     document.querySelector('.tab-item.active')?.dataset.tab;
 
   if (activeTab === 'kartu') {
+    // Kartu sudah benar (tidak menampilkan jika kosong)
     renderSantriCards(lastFilteredData);
   } else {
-    renderFullTable(lastFilteredData);
+    // ✅ Tabel - PASTIKAN MENGIRIM DATA YANG SUDAH DIFILTER
+    renderFullTable(lastFilteredData, 1);
   }
 
   // 🔹 urutkan (tetap seperti sebelumnya)
@@ -5569,7 +5628,6 @@ function filterSantri() {
   sortDirection = 'asc';
   sortTableBy('Masa Khidmah');
 }
-
 
 
 	// ===== Helper: hitung jumlah bulan sejak `start` sampai sekarang =====
@@ -5650,7 +5708,9 @@ const fieldMap = {
   const field = fieldMap[column];
   if (!field) return;
 
-  if (!lastFilteredData.length) lastFilteredData = [...allSantriData];
+  if (lastFilteredData === null) {
+    lastFilteredData = [...allSantriData];
+}
   
   const getValue = (obj, path) => {
 	  return path.split('.').reduce((o, k) => (o ? o[k] : null), obj);
@@ -5704,7 +5764,11 @@ const fieldMap = {
     return 0;
   });
 
-  renderFullTable(lastFilteredData);
+  // ✅ RENDER ULANG DENGAN DATA YANG SUDAH DIURUTKAN
+  const activeTab = document.querySelector('.tab-item.active')?.dataset.tab;
+  if (activeTab === 'data') {
+    renderFullTable(lastFilteredData, 1);
+  }
 
   // update indikator panah
   document.querySelectorAll('th.sortable').forEach(th => {
@@ -5733,12 +5797,35 @@ function getExportData() {
 
 // ========== SANTRI TABLE FUNCTIONS ==========
 async function renderFullTable(data, page = 1) {
+  updateSantriTotalCount(data);
   showLoading(true); // 🔹 tampilkan loader
   try {
     const container = document.getElementById('santri-table-container');
     container.innerHTML = '';
 
     const activeData = data.filter(s => s.Status && s.Status.toLowerCase() === 'aktif');
+	// ✅ CEK JIKA TIDAK ADA DATA
+    if (activeData.length === 0) {
+      container.innerHTML = `
+        <div style="
+          text-align: center; 
+          padding: 40px 20px; 
+          color: #666;
+          background: #f8f9fa;
+          border-radius: 10px;
+          border: 1px dashed #ccc;
+        ">
+          <i class="material-icons" style="font-size: 48px; color: #ccc;">search_off</i>
+          <p style="margin-top: 10px; font-size: 16px;">Tidak ada data santri aktif sesuai filter</p>
+          <p style="font-size: 13px; color: #999;">Coba ubah filter pencarian</p>
+        </div>
+      `;
+      
+      document.getElementById('paginationInfo').textContent = 'Menampilkan 0 data';
+      document.getElementById('paginationControls').innerHTML = '';
+      showLoading(false);
+      return;
+    }
     const totalRecords = activeData.length;
     const totalPages = Math.max(1, Math.ceil(totalRecords / pageSize));
     const start = (page - 1) * pageSize;
