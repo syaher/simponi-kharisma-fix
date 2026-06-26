@@ -516,35 +516,43 @@ textarea:focus {
   transition: all 0.2s ease;
 }
 
-/* ===================== NOTIFICATION POPUP ===================== */
-.notification-popup {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: #4CAF50;
-  color: white;
-  padding: 15px 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  z-index: 10000;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  transform: translateX(150%);
-  transition: transform 0.3s ease-in-out;
-  max-width: 300px;
+.notification-popup{
+    position:fixed;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%) scale(.9);
+    opacity:0;
+
+    background:#22c55e;
+    color:#fff;
+
+    padding:16px 28px;
+    border-radius:14px;
+
+    font-size:16px;
+    font-weight:600;
+
+    box-shadow:0 10px 35px rgba(0,0,0,.25);
+
+    z-index:999999;
+
+    transition:all .25s ease;
+    pointer-events:none;
+    min-width:240px;
+    text-align:center;
 }
 
-.notification-popup.show {
-  transform: translateX(0);
+.notification-popup.show{
+    opacity:1;
+    transform:translate(-50%,-50%) scale(1);
 }
 
-.notification-popup.success {
-  background: #4CAF50;
+.notification-popup.success{
+    background:#22c55e;
 }
 
-.notification-popup.error {
-  background: #f44336;
+.notification-popup.error{
+    background:#ef4444;
 }
 
 .notification-icon {
@@ -5128,23 +5136,30 @@ function setupBaitSelection(dariSel, sampaiSel) {
   });
 }
 
-// ===================== NOTIFICATION FUNCTION =====================
-function showNotification(message, type = 'success', duration = 3000) {
-  const popup = document.getElementById('notificationPopup');
-  const messageEl = document.getElementById('notificationMessage');
-  
-  // Set message and type
-  messageEl.textContent = message;
-  popup.className = 'notification-popup';
-  popup.classList.add(type);
-  
-  // Show popup
-  popup.classList.add('show');
-  
-  // Auto hide after duration
-  setTimeout(() => {
-    popup.classList.remove('show');
-  }, duration);
+let notificationTimer = null;
+
+function showNotification(message, type = "success", duration = 2500) {
+    let toast = document.getElementById("notificationToast");
+
+    if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "notificationToast";
+        toast.className = "notification-popup";
+        document.body.appendChild(toast);
+    }
+
+    toast.className = `notification-popup ${type}`;
+    toast.innerHTML = message;
+
+    requestAnimationFrame(() => {
+        toast.classList.add("show");
+    });
+
+    clearTimeout(notificationTimer);
+
+    notificationTimer = setTimeout(() => {
+        toast.classList.remove("show");
+    }, duration);
 }
 
 // ===================== LOAD PENYIMAK (SEMUA UNIT) =====================
