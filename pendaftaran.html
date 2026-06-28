@@ -1332,6 +1332,19 @@
     </div>
   </div>
   
+  <!-- Tambahkan setelah No_Wali, sebelum Status -->
+<div class="mb-3">
+  <label class="form-label small fw-semibold">Kategori</label>
+  <div class="input-group">
+    <span class="input-group-text bg-light"><i class="bi bi-tags"></i></span>
+    <select id="Kategori1" class="form-select form-control-modern">
+      <option value="">-- Pilih Kategori --</option>
+      <option value="DALEM SKTM">DALEM SKTM</option>
+      <option value="DALEM TANPA SKTM">DALEM TANPA SKTM</option>
+      <option value="BIASA">BIASA</option>
+    </select>
+  </div>
+</div>
 
 
   <div class="row g-2">
@@ -1489,20 +1502,63 @@ const kelasOrder = [
   "I-II Ma'had Aly","III-IV Ma'had Aly","V-VI Ma'had Aly",
   "I'dadiyah I","I'dadiyah II","I'dadiyah III"
 ];
-const unitNdalemList = [
-  'Al-amanah cell','Al-amanah Toko','Catering Arham (Pak Din)','Catering P3TQ',
-  'Frozen Food','Gorengan & Kost SPBE','Gus Shohib','Kandang Kambing',
-  'Kandang Sapi','KBR P3TQ','Kolam Koi','Kost P3TQ','Laundry P3TQ',
-  'Mandiri Grabah (Andika)','Mandiri Grabah (Gudang & Bandar)',
-  'Mandiri Grabah (Pasar Campurejo)','Mandiri Grabah (SMK)',
-  'Mandiri Grabah (Tembakau)','Ndalem Barat','Ndalem Timur',
-  'Pabrik Tahu & Tempe','Pangkas Rambut','PULP P3TQ',
-  'Rahmatuka I (Maqom)','Rahmatuka II (Pasar Campurejo)',
-  'Rizquna Baby & Fashion','Rizquna Bangunan','Rizqua Galon Barat',
-  'Rizqua Galon Timur','Rizquna Juwet','Rizquna Laundry',
-  'Selepan','Sopir', 'Tahu Goglek','Toko Nafisah','Warung Nafis','Rizquna Bakso'
-];
 
+// HAPUS const unitNdalemList = [...] yang hardcoded
+
+// Ganti dengan ini:
+let unitNdalemList = []; // global, akan diisi dari database
+
+// Fungsi untuk load unit dari database
+async function loadUnitNdalemFromDB() {
+  try {
+    const { data, error } = await supabase
+      .from('referensi_unit_ndalem')
+      .select('Nama_Unit')
+      .order('Nama_Unit', { ascending: true });
+    
+    if (error) throw error;
+    
+    unitNdalemList = data.map(item => item.Nama_Unit);
+    
+    // Update dropdowns
+    populateUnitDropdowns();
+    
+    return unitNdalemList;
+  } catch (err) {
+    console.error('Gagal load unit dari database:', err);
+    // Fallback ke hardcoded jika gagal
+    unitNdalemList = [
+      'Al-amanah cell','Al-amanah Toko','Catering Arham (Pak Din)','Catering P3TQ',
+      'Frozen Food','Gorengan & Kost SPBE','Gus Shohib','Kandang Kambing',
+      'Kandang Sapi','KBR P3TQ','Kolam Koi','Kost P3TQ','Laundry P3TQ',
+      'Mandiri Grabah (Andika)','Mandiri Grabah (Gudang & Bandar)',
+      'Mandiri Grabah (Pasar Campurejo)','Mandiri Grabah (SMK)',
+      'Mandiri Grabah (Tembakau)','Ndalem Barat','Ndalem Timur',
+      'Pabrik Tahu & Tempe','Pangkas Rambut','PULP P3TQ',
+      'Rahmatuka I (Maqom)','Rahmatuka II (Pasar Campurejo)',
+      'Rizquna Baby & Fashion','Rizquna Bangunan','Rizqua Galon Barat',
+      'Rizqua Galon Timur','Rizquna Juwet','Rizquna Laundry',
+      'Selepan','Sopir', 'Tahu Goglek','Toko Nafisah','Warung Nafis','Rizquna Bakso'
+    ];
+    populateUnitDropdowns();
+    return unitNdalemList;
+  }
+}
+
+// Fungsi untuk populate dropdown unit
+function populateUnitDropdowns() {
+  // Unit_Ndalem dropdown (form)
+  Unit_Ndalem.innerHTML = '<option value="">-- Pilih --</option>';
+  unitNdalemList.forEach(u => {
+    Unit_Ndalem.add(new Option(u, u));
+  });
+  
+  // filterUnit dropdown (filter section)
+  filterUnit.innerHTML = '<option value="">Semua Unit</option>';
+  unitNdalemList.forEach(u => {
+    filterUnit.add(new Option(u, u));
+  });
+}
 
 const ngajiData = [
   { id: 1, label: "MMQ - Jet Tempur" },
@@ -1517,10 +1573,7 @@ const ngajiData = [
   { id: 10, label: "MBQ - Ibtidaiyah" },
   { id: 11, label: "MBQ - Tsanawiyah" },
   { id: 12, label: "MBQ - Aliyah" }
-  
 ];
-
-
 
 // DOM refs
 const Kelas = document.getElementById('Kelas');
@@ -1546,9 +1599,9 @@ const aktifSantri = document.getElementById('aktifSantri');
 const kelasCount = document.getElementById('kelasCount');
 const unitCount = document.getElementById('unitCount');
 
-const Kategori = document.getElementById('Kategori');
-
-// populate selects
+// ===========================
+// POPULATE SELECTS
+// ===========================
 
 // KELAS
 Kelas.add(new Option('-- Pilih --', ''));
@@ -1559,14 +1612,17 @@ kelasOrder.forEach(k => {
   filterKelas.add(new Option(k, k)); 
 });
 
-// UNIT NDALEM
-Unit_Ndalem.add(new Option('-- Pilih --', ''));
-filterUnit.add(new Option('Semua Unit', ''));
+// UNIT NDALEM - Load dari database
+loadUnitNdalemFromDB();
 
-unitNdalemList.forEach(u => { 
-  Unit_Ndalem.add(new Option(u, u)); 
-  filterUnit.add(new Option(u, u)); 
+// NGAJI
+ngajiData.forEach(n => {
+  const opt = document.createElement("option");
+  opt.value = n.id;
+  opt.textContent = n.label;
+  Ngaji.appendChild(opt);
 });
+ 
 
 window.spinPDF = function(btn) {
   if (!btn) return;
@@ -1591,6 +1647,18 @@ let usePagination = true;
 let allData = [];
 
 
+
+// Fungsi untuk refresh unit dropdown (misal setelah ada perubahan data)
+async function refreshUnitDropdowns() {
+  await loadUnitNdalemFromDB();
+}
+
+// Panggil saat form dibuka
+document.addEventListener('DOMContentLoaded', async function() {
+  await loadUnitNdalemFromDB();
+  applyRoleAccess();
+  await loadData();
+});
 
 
 // helper show msg
@@ -1833,9 +1901,14 @@ window.onEdit = async function(id) {
   document.getElementById('Shift').value = data.Shift || '';
   document.getElementById('Nama_Wali').value = data.Nama_Wali || '';
   document.getElementById('No_Wali').value = data.No_Wali || '';
+  
+  // =========================
+  // TAMBAHKAN KATEGORI DI SINI
+  // =========================
+  document.getElementById('Kategori1').value = data.Kategori1 || '';
 
   // =========================
-  // PREVIEW FOTO DITEMPATKAN DI SINI
+  // PREVIEW FOTO
   // =========================
   if (data.Foto) {
     fotoPreview.src = data.Foto;
@@ -1850,7 +1923,6 @@ window.onEdit = async function(id) {
   submitBtn.innerHTML = '<i class="bi bi-check-lg me-2"></i>Update Data';
   window.scrollTo({top:0,behavior:'smooth'});
 };
-
 
 // delete handler
 window.onDelete = async function(id){
@@ -1872,6 +1944,7 @@ resetBtn.addEventListener('click', () => {
   editId = null; 
   submitBtn.textContent='Simpan';
   submitBtn.innerHTML = '<i class="bi bi-check-lg me-2"></i>Simpan';
+  document.getElementById('Kategori1').value = '';
 });
 
 // submit form
@@ -1881,20 +1954,18 @@ document.getElementById('formSantri').addEventListener('submit', async (ev) => {
   submitBtn.innerHTML = '<i class="bi bi-arrow-repeat spinner-border spinner-border-sm me-2"></i>Menyimpan...';
 
   const file = fotoInput.files[0];
- let finalFoto = null;
+  let finalFoto = null;
 
-if (file) {
-  finalFoto = await uploadFotoToStorage(file);
-} else if (editId) {
-  // kalau update dan tidak pilih foto baru, jangan ubah foto
-} else {
-  finalFoto = null;
-}
-
+  if (file) {
+    finalFoto = await uploadFotoToStorage(file);
+  } else if (editId) {
+    // kalau update dan tidak pilih foto baru, jangan ubah foto
+  } else {
+    finalFoto = null;
+  }
 
   const payload = {
     Kelas: Kelas.value || null,
-
     Bagian: document.getElementById('Bagian').value || null,
     Nama_Lengkap: document.getElementById('Nama_Lengkap').value || null,
     Foto: finalFoto,
@@ -1911,8 +1982,12 @@ if (file) {
     Posisi_Tugas: document.getElementById('Posisi_Tugas').value || null,
     Jam_Tugas: document.getElementById('Jam_Tugas').value || null,
     Shift: document.getElementById('Shift').value || null,
-	Nama_Wali: document.getElementById('Nama_Wali').value || null,
+    Nama_Wali: document.getElementById('Nama_Wali').value || null,
     No_Wali: document.getElementById('No_Wali').value || null,
+    // =========================
+    // TAMBAHKAN KATEGORI DI SINI
+    // =========================
+    Kategori1: document.getElementById('Kategori1').value || null,
     Kode_Unit: null,
     Masa_Khidmah: null
   };

@@ -3806,70 +3806,122 @@ and (max-width:1024px){
     <form id="santriForm" class="crud-form">
       <input type="hidden" id="santriId">
 
+      <!-- BAGIAN SISWA -->
+      <h4 style="color:#1a73e8; margin:10px 0 5px; border-bottom:2px solid #1a73e8; padding-bottom:5px;">— Siswa —</h4>
+
       <label>Nama Lengkap *</label>
-	  <input type="text" id="Nama_Lengkap" list="listNama" required>
-	  <datalist id="listNama"></datalist>
+      <input type="text" id="Nama_Lengkap" required>
 
-      <label>Kelas</label>
-      <select id="Kelas"></select>
+      <label>Kelas *</label>
+      <select id="Kelas" required></select>
 
-	  <label>Bagian</label>
-	  <input type="text" id="Bagian" list="listBagian">
-	  <datalist id="listBagian"></datalist>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div>
+          <label>Bagian</label>
+          <input type="text" id="Bagian">
+        </div>
+        <div>
+          <label>Stambuk</label>
+          <input type="text" id="Stambuk">
+        </div>
+      </div>
 
-      <label>Stambuk</label>
-      <input type="text" id="Stambuk">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div>
+          <label>Asal Daerah</label>
+          <input type="text" id="Asal_Daerah">
+        </div>
+        <div>
+          <label>Himpunan</label>
+          <select id="Himpunan">
+            <option value="">-- Pilih Himpunan --</option>
+          </select>
+        </div>
+      </div>
 
-      <label>Stambuk Ndalem</label>
-      <input type="text" id="Stambuk_Ndalem">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div>
+          <label>Kamar</label>
+          <input type="text" id="Kamar">
+        </div>
+        <div>
+          <label>Tgl Lahir</label>
+          <input type="date" id="Tgl_Lahir">
+        </div>
+      </div>
 
-      <label>Unit Ndalem</label>
-      <select id="Unit_Ndalem"></select>
+      <!-- BAGIAN NGAJI -->
+      <h4 style="color:#1a73e8; margin:15px 0 5px; border-bottom:2px solid #1a73e8; padding-bottom:5px;">— Ngaji —</h4>
 
-      <label>Kode Unit</label>
-      <input type="text" id="Kode_Unit">
-
-	  <label>Asal Daerah</label>
-	  <input type="text" id="Asal_Daerah" list="listDaerah">
-	  <datalist id="listDaerah"></datalist>
-
-	  <label>Himpunan</label>
-	  <input type="text" id="Himpunan" list="listHimpunan">
-	  <datalist id="listHimpunan"></datalist>
-
-	  <label>Kamar</label>
-	  <input type="text" id="Kamar" list="listKamar">
-	  <datalist id="listKamar"></datalist>
-
-      <label>Tgl Lahir</label>
-      <input type="date" id="Tgl_Lahir">
-
-      <label>Mulai Ngabdi</label>
-	  <input type="date" id="Mulai_Ngabdi">
-
-      <label>Tgl Keluar</label>
-      <input type="date" id="Tgl_Keluar">
-
-      <label>Status</label>
-      <select id="Status">
-        <option value="aktif">aktif</option>
-        <option value="tidak aktif">tidak aktif</option>
+      <label>Ngaji</label>
+      <select id="Ngaji">
+        <option value="">-- Pilih Ngaji --</option>
       </select>
+
+      <!-- BAGIAN NDALEM -->
+      <h4 style="color:#1a73e8; margin:15px 0 5px; border-bottom:2px solid #1a73e8; padding-bottom:5px;">— Ndalem —</h4>
+
+      <label>Unit Ndalem *</label>
+      <select id="Unit_Ndalem" required></select>
 
       <label>Posisi Tugas</label>
       <input type="text" id="Posisi_Tugas">
 
-      <label>Jam Tugas</label>
-      <input type="text" id="Jam_Tugas">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div>
+          <label>Jam Tugas</label>
+          <input type="text" id="Jam_Tugas">
+        </div>
+        <div>
+          <label>Shift</label>
+          <input type="text" id="Shift">
+        </div>
+      </div>
 
-      <label>Shift</label>
-      <input type="text" id="Shift">
+      <label>Mulai Ngabdi</label>
+      <input type="date" id="Mulai_Ngabdi">
 
-      <label>Foto (URL)</label>
-      <input type="text" id="Foto" oninput="previewFoto()">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div>
+          <label>Nama Wali</label>
+          <input type="text" id="Nama_Wali">
+        </div>
+        <div>
+          <label>No. Wali</label>
+          <input type="text" id="No_Wali" placeholder="62…">
+        </div>
+      </div>
+
+      <!-- ====== KATEGORI ====== -->
+      <label>Kategori</label>
+      <select id="Kategori1">
+        <option value="">-- Pilih Kategori --</option>
+        <option value="DALEM SKTM">DALEM SKTM</option>
+        <option value="DALEM TANPA SKTM">DALEM TANPA SKTM</option>
+        <option value="BIASA">BIASA</option>
+      </select>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div>
+          <label>Status</label>
+          <select id="Status">
+            <option value="">-- Pilih --</option>
+            <option value="aktif">aktif</option>
+            <option value="tidak aktif">tidak aktif</option>
+          </select>
+        </div>
+        <div>
+          <label>Tgl Keluar</label>
+          <input type="date" id="Tgl_Keluar">
+        </div>
+      </div>
+
+      <!-- FOTO -->
+      <label>Foto (upload)</label>
+      <input type="file" id="Foto" accept="image/*" onchange="previewFotoUpload()">
 
       <div style="margin:10px 0;">
-        <img id="fotoPreview" src="" alt="Preview Foto" style="max-height:120px;display:none;">
+        <img id="fotoPreview" src="" alt="Preview Foto" style="max-height:120px; display:none;">
       </div>
 
       <div class="crud-actions">
@@ -3879,7 +3931,6 @@ and (max-width:1024px){
     </form>
   </div>
 </div>
-
 
  <!-- Absensi Module - PERBAIKAN STRUKTUR -->
   <div id="absensi-module" class="module-container">
@@ -4924,8 +4975,11 @@ document.addEventListener("DOMContentLoaded", () => {
 	let absensiCurrentPage = 1;
 	let absensiDict = null;
 	let absensiFilteredSantri = [];
-
-
+	
+	// Data referensi
+	let kelasList = [];
+	let himpunanList = [];
+	let unitNdalemList = [];
 
     
     const kelasOrder = [
@@ -5077,6 +5131,7 @@ function sortByBulanHijriah(items) {
       
       // Load initial data
       await loadInitialData();
+	  await loadReferensiData();
     });
     
 
@@ -12167,9 +12222,6 @@ function formatTanggalDMY(dateStr) {
 }
 
 
-
-
-
 // ====== Dropdown Options ======
 function loadKelasOptions(selected = "") {
   const kelasSelect = document.getElementById("Kelas");
@@ -12201,210 +12253,410 @@ function loadKelasOptions(selected = "") {
 }
 
 async function loadUnitNdalemOptions(selected = "") {
+  const select = document.getElementById("Unit_Ndalem");
+  if (!select) return;
+  
+  // Jika data belum dimuat, ambil dari database
+  if (unitNdalemList.length === 0) {
+    await loadReferensiData();
+  }
+  
+  select.innerHTML = '<option value="">-- Pilih Unit --</option>';
+  
+  // Gunakan data dari database (unitNdalemList sudah berisi dari loadReferensiData)
+  unitNdalemList.forEach(u => {
+    const opt = document.createElement("option");
+    opt.value = u.Nama_Unit;
+    opt.textContent = u.Nama_Unit;
+    if (u.Nama_Unit === selected) opt.selected = true;
+    select.appendChild(opt);
+  });
+}
+
+// ===== Load Ngaji Options =====
+const ngajiData = [
+  { id: 1, label: "MMQ - Jet Tempur" },
+  { id: 2, label: "MMQ - Ibtidaiyah" },
+  { id: 3, label: "MMQ - Tsanawiyah" },
+  { id: 4, label: "MMQ - Aliyah" },
+  { id: 5, label: "MMQ - Takhtiman" },
+  { id: 6, label: "Maunah Sari - Setoran" },
+  { id: 7, label: "Kamar - Setoran" },
+  { id: 8, label: "Talaqi - Setoran" },
+  { id: 9, label: "MMA - Setoran" },
+  { id: 10, label: "MBQ - Ibtidaiyah" },
+  { id: 11, label: "MBQ - Tsanawiyah" },
+  { id: 12, label: "MBQ - Aliyah" }
+];
+
+function loadNgajiOptions(selected = "") {
+  const select = document.getElementById("Ngaji");
+  if (!select) return;
+  select.innerHTML = '<option value="">-- Pilih Ngaji --</option>';
+  ngajiData.forEach(n => {
+    const opt = document.createElement("option");
+    opt.value = n.id;
+    opt.textContent = n.label;
+    if (String(n.id) === String(selected)) opt.selected = true;
+    select.appendChild(opt);
+  });
+}
+
+async function loadReferensiData() {
   try {
-    const { data, error } = await supabaseClient
-      .from("santri_kharisma")
-      .select("Unit_Ndalem")
-      .order("Unit_Ndalem", { ascending: true });
-
-    if (error) throw error;
-
-    const unitSelect = document.getElementById("Unit_Ndalem");
-    unitSelect.innerHTML = "";
-
-    // default option
-    const def = document.createElement("option");
-    def.value = "";
-    def.textContent = "-- Pilih Unit --";
-    unitSelect.appendChild(def);
-
-    // unik & urut abjad
-    const unitSet = new Set();
-    data.forEach(row => {
-      if (row.Unit_Ndalem) unitSet.add(row.Unit_Ndalem.trim());
-    });
-
-    Array.from(unitSet).sort().forEach(u => {
-      const o = document.createElement("option");
-      o.value = u;
-      o.textContent = u;
-      if (u === selected) o.selected = true;
-      unitSelect.appendChild(o);
-    });
-
-    // fallback kalau data lama tidak ada di list
-    if (selected && !unitSet.has(selected)) {
-      const extra = document.createElement("option");
-      extra.value = selected;
-      extra.textContent = selected + " (lama)";
-      extra.selected = true;
-      unitSelect.appendChild(extra);
-    }
+    // 1. Load Kelas dari nadhom_kelas
+    const { data: kelasData, error: kelasError } = await supabaseClient
+      .from('nadhom_kelas')
+      .select('id, nama_kelas')
+      .order('id', { ascending: true });
+    
+    if (kelasError) throw kelasError;
+    kelasList = kelasData || [];
+    
+    // 2. Load Himpunan
+    const { data: himpunanData, error: himpunanError } = await supabaseClient
+      .from('himpunan')
+      .select('himpunan')
+      .order('himpunan', { ascending: true });
+    
+    if (himpunanError) throw himpunanError;
+    himpunanList = himpunanData || [];
+    
+    // 3. Load Unit Ndalem
+    const { data: unitData, error: unitError } = await supabaseClient
+      .from('referensi_unit_ndalem')
+      .select('Kode_Unit, Nama_Unit')
+      .order('Nama_Unit', { ascending: true });
+    
+    if (unitError) throw unitError;
+    unitNdalemList = unitData || [];
+    
+    
+    
   } catch (err) {
-    console.error("Gagal load Unit Ndalem:", err.message);
+    console.error('Gagal load referensi data:', err);
+    showToast('❌ Gagal memuat data referensi', 'error');
   }
 }
 
-// ====== Buka Modal Tambah ======
+function loadHimpunanOptions(selected = "") {
+  const select = document.getElementById("Himpunan");
+  if (!select) return;
+  
+  // Jika data belum dimuat, ambil dari database
+  if (himpunanList.length === 0) {
+    loadReferensiData().then(() => {
+      loadHimpunanOptions(selected);
+    });
+    return;
+  }
+  
+  select.innerHTML = '<option value="">-- Pilih Himpunan --</option>';
+  
+  himpunanList.forEach(h => {
+    const opt = document.createElement("option");
+    opt.value = h.himpunan;
+    opt.textContent = h.himpunan;
+    if (h.himpunan === selected) opt.selected = true;
+    select.appendChild(opt);
+  });
+}
+
+// ===== Upload Foto ke Storage =====
+async function uploadFotoToStorage(file) {
+  if (!file) return null;
+  try {
+    const fileName = `foto_${Date.now()}_${file.name.replace(/\s+/g,'_')}`;
+    const { error } = await supabaseClient.storage.from('foto').upload(fileName, file);
+    if (error) {
+      console.warn('Storage upload error:', error);
+      return null;
+    }
+    const { data } = supabaseClient.storage.from('foto').getPublicUrl(fileName);
+    return data.publicUrl;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}
+
+// ===== Preview Foto Upload =====
+function previewFotoUpload() {
+  const file = document.getElementById("Foto").files[0];
+  const preview = document.getElementById("fotoPreview");
+  if (file) {
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = "block";
+  } else {
+    preview.src = "";
+    preview.style.display = "none";
+  }
+}
+
 async function openAddSantri() {
+  // Pastikan referensi data sudah dimuat
+  if (kelasList.length === 0 || unitNdalemList.length === 0) {
+    await loadReferensiData();
+  }
+  
   document.getElementById("santriModalTitle").textContent = "Tambah Santri";
   document.getElementById("santriForm").reset();
   document.getElementById("santriId").value = "";
   document.getElementById("fotoPreview").style.display = "none";
+  document.getElementById("Foto").value = "";
 
-  loadKelasOptions();           // default kosong
-  await loadUnitNdalemOptions();// default kosong
+  // Panggil fungsi dengan data yang sudah dimuat
+  loadKelasOptions();
+  loadUnitNdalemOptions();
+  loadNgajiOptions();
+  loadHimpunanOptions();
+
+  // Set default kategori
+  document.getElementById("Kategori1").value = "";
 
   document.getElementById("santriModal").style.display = "block";
 }
 
-// ====== Buka Modal Edit ======
 async function openEditSantri(id) {
+  // Pastikan referensi data sudah dimuat
+  if (kelasList.length === 0 || unitNdalemList.length === 0) {
+    await loadReferensiData();
+  }
+  
   document.getElementById("santriModalTitle").textContent = "Edit Santri";
   document.getElementById("santriId").value = id;
 
   const s = allSantriData.find(x => x.id === id);
-  if (!s) return alert("❌ Data tidak ditemukan");
+  if (!s) return showToast("❌ Data tidak ditemukan", "error");
 
+  // Panggil fungsi dengan data yang sudah dimuat
   loadKelasOptions(s.Kelas || "");
-  await loadUnitNdalemOptions(s.Unit_Ndalem || "");
+  loadUnitNdalemOptions(s.Unit_Ndalem || "");
+  loadNgajiOptions(s.Ngaji || "");
+  loadHimpunanOptions(s.Himpunan || "");
 
-  [
-    "Nama_Lengkap","Bagian","Stambuk","Stambuk_Ndalem","Kode_Unit",
-    "Asal_Daerah","Himpunan","Kamar","Tgl_Lahir","Mulai_Ngabdi","Tgl_Keluar",
-    "Status","Posisi_Tugas","Jam_Tugas","Shift","Foto"
-  ].forEach(f => {
-    if (document.getElementById(f)) {
-      document.getElementById(f).value = s[f] || "";
-    }
+  const fields = [
+    "Nama_Lengkap", "Bagian", "Stambuk", "Asal_Daerah",
+    "Kamar", "Tgl_Lahir", "Mulai_Ngabdi", "Tgl_Keluar", "Status",
+    "Posisi_Tugas", "Jam_Tugas", "Shift", "Nama_Wali", "No_Wali",
+    "Kategori1"
+  ];
+  fields.forEach(f => {
+    const el = document.getElementById(f);
+    if (el) el.value = s[f] || "";
   });
 
-  // foto preview
+  // Preview foto
+  const preview = document.getElementById("fotoPreview");
   if (s.Foto) {
-    document.getElementById("fotoPreview").src = s.Foto;
-    document.getElementById("fotoPreview").style.display = "block";
+    preview.src = s.Foto;
+    preview.style.display = "block";
   } else {
-    document.getElementById("fotoPreview").style.display = "none";
+    preview.style.display = "none";
   }
+  document.getElementById("Foto").value = "";
 
   document.getElementById("santriModal").style.display = "block";
 }
+
+// ==========================================
+// SUBMIT FORM SANTRI (DENGAN KATEGORI)
+// ==========================================
+
+document.getElementById("santriForm").onsubmit = async function(e) {
+  e.preventDefault();
+
+  const id = document.getElementById("santriId").value;
+  const file = document.getElementById("Foto").files[0];
+
+  // Ambil data dari form
+  const formData = {
+    Nama_Lengkap: document.getElementById("Nama_Lengkap").value.trim(),
+    Kelas: document.getElementById("Kelas").value,
+    Bagian: document.getElementById("Bagian").value.trim() || null,
+    Stambuk: document.getElementById("Stambuk").value.trim() || null,
+    Asal_Daerah: document.getElementById("Asal_Daerah").value.trim() || null,
+    Himpunan: document.getElementById("Himpunan").value || null,
+    Kamar: document.getElementById("Kamar").value.trim() || null,
+    Tgl_Lahir: document.getElementById("Tgl_Lahir").value || null,
+    Ngaji: document.getElementById("Ngaji").value ? parseInt(document.getElementById("Ngaji").value) : null,
+    Unit_Ndalem: document.getElementById("Unit_Ndalem").value,
+    Posisi_Tugas: document.getElementById("Posisi_Tugas").value.trim() || null,
+    Jam_Tugas: document.getElementById("Jam_Tugas").value.trim() || null,
+    Shift: document.getElementById("Shift").value.trim() || null,
+    Mulai_Ngabdi: document.getElementById("Mulai_Ngabdi").value || null,
+    Nama_Wali: document.getElementById("Nama_Wali").value.trim() || null,
+    No_Wali: document.getElementById("No_Wali").value.trim() || null,
+    Kategori1: document.getElementById("Kategori1").value || null,  // <-- TAMBAHKAN INI
+    Status: document.getElementById("Status").value || "aktif",
+    Tgl_Keluar: document.getElementById("Tgl_Keluar").value || null
+  };
+
+  // Upload foto jika ada
+  if (file) {
+    const fotoUrl = await uploadFotoToStorage(file);
+    if (fotoUrl) {
+      formData.Foto = fotoUrl;
+    } else {
+      showToast("❌ Gagal upload foto", "error");
+      return;
+    }
+  }
+
+  // ==========================================
+  // VALIDASI
+  // ==========================================
+
+  // 1. Validasi wajib
+  if (!formData.Nama_Lengkap) {
+    return showToast("❌ Nama lengkap wajib diisi!", "error");
+  }
+  if (!formData.Kelas) {
+    return showToast("❌ Kelas wajib dipilih!", "error");
+  }
+  if (!formData.Unit_Ndalem) {
+    return showToast("❌ Unit Ndalem wajib dipilih!", "error");
+  }
+
+  // 2. Validasi Kategori (jika diisi, harus salah satu dari nilai yang diizinkan)
+  if (formData.Kategori1) {
+    const allowedKategori = ['DALEM SKTM', 'DALEM TANPA SKTM', 'BIASA'];
+    if (!allowedKategori.includes(formData.Kategori1)) {
+      return showToast("❌ Kategori tidak valid! Pilih: DALEM SKTM, DALEM TANPA SKTM, atau BIASA", "error");
+    }
+  }
+
+  // 3. Validasi Stambuk: cek duplikat
+  if (formData.Stambuk) {
+    const { data: existing, error: checkError } = await supabaseClient
+      .from('santri_kharisma')
+      .select('id')
+      .eq('Stambuk', formData.Stambuk)
+      .maybeSingle();
+    
+    if (checkError) {
+      console.error('Error checking Stambuk:', checkError);
+    } else if (existing && String(existing.id) !== String(id)) {
+      return showToast("❌ Stambuk sudah digunakan oleh santri lain!", "error");
+    }
+  }
+
+  // 4. Validasi Kelas: pastikan ada di nadhom_kelas
+  const kelasExists = kelasList.some(k => k.nama_kelas === formData.Kelas);
+  if (!kelasExists) {
+    return showToast(`❌ Kelas "${formData.Kelas}" tidak terdaftar di sistem!`, "error");
+  }
+
+  // 5. Validasi Unit: pastikan ada di referensi_unit_ndalem
+  const unitExists = unitNdalemList.some(u => u.Nama_Unit === formData.Unit_Ndalem);
+  if (!unitExists) {
+    return showToast(`❌ Unit "${formData.Unit_Ndalem}" tidak terdaftar di sistem!`, "error");
+  }
+
+  // 6. Validasi Himpunan jika diisi
+  if (formData.Himpunan) {
+    const himpunanExists = himpunanList.some(h => h.himpunan === formData.Himpunan);
+    if (!himpunanExists) {
+      return showToast(`❌ Himpunan "${formData.Himpunan}" tidak terdaftar di sistem!`, "error");
+    }
+  }
+
+  // 7. Validasi Ngaji jika diisi
+  if (formData.Ngaji) {
+    const ngajiExists = ngajiData.some(n => n.id === formData.Ngaji);
+    if (!ngajiExists) {
+      return showToast(`❌ ID Ngaji "${formData.Ngaji}" tidak valid!`, "error");
+    }
+  }
+
+  // 8. Validasi No_Wali format 62...
+  if (formData.No_Wali) {
+    const cleanNo = formData.No_Wali.replace(/\D/g, '');
+    if (!cleanNo.startsWith('62')) {
+      return showToast("❌ Nomor Wali harus dimulai dengan 62", "error");
+    }
+    formData.No_Wali = cleanNo;
+  }
+
+  // ==========================================
+  // KIRIM KE DATABASE
+  // ==========================================
+
+  const submitBtn = document.querySelector('#santriForm .crud-btn-save');
+  const originalText = submitBtn.innerHTML;
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '⏳ Menyimpan...';
+
+  try {
+    let result;
+    if (id) {
+      // UPDATE
+      const { data, error } = await supabaseClient
+        .from('santri_kharisma')
+        .update(formData)
+        .eq('id', id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      result = data;
+      showToast("✅ Data berhasil diperbarui!", "success");
+      
+    } else {
+      // INSERT
+      const { data, error } = await supabaseClient
+        .from('santri_kharisma')
+        .insert([formData])
+        .select()
+        .single();
+      
+      if (error) throw error;
+      result = data;
+      showToast("✅ Data berhasil ditambahkan!", "success");
+    }
+
+    closeSantriModal();
+    await loadInitialData();
+    filterSantri();
+
+  } catch (err) {
+    console.error("Gagal simpan:", err);
+    
+    let errorMsg = err.message || "Terjadi kesalahan";
+    
+    // Deteksi error constraint
+    if (errorMsg.includes('duplicate key value')) {
+      errorMsg = "❌ Stambuk sudah digunakan!";
+    } else if (errorMsg.includes('foreign key constraint')) {
+      if (errorMsg.includes('Kode_Unit')) {
+        errorMsg = "❌ Unit Ndalem tidak valid!";
+      } else if (errorMsg.includes('Ngaji')) {
+        errorMsg = "❌ Pilihan Ngaji tidak valid!";
+      } else if (errorMsg.includes('Himpunan')) {
+        errorMsg = "❌ Himpunan tidak valid!";
+      } else if (errorMsg.includes('Kelas_id')) {
+        errorMsg = "❌ Kelas tidak valid!";
+      } else {
+        errorMsg = "❌ Data referensi tidak valid!";
+      }
+    } else if (errorMsg.includes('kategori1_valid')) {
+      errorMsg = "❌ Kategori tidak valid! Pilih: DALEM SKTM, DALEM TANPA SKTM, atau BIASA";
+    }
+    
+    showToast(errorMsg, "error");
+    
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalText;
+  }
+};
 
 // ====== Tutup Modal ======
 function closeSantriModal() {
   document.getElementById("santriModal").style.display = "none";
 }
 
-// ====== Simpan (Tambah / Edit) - ONE robust handler ======
-document.getElementById("santriForm").onsubmit = async function(e) {
-  e.preventDefault();
 
-  // helper sleep
-  const sleep = ms => new Promise(r => setTimeout(r, ms));
-
-  try {
-    const idRaw = document.getElementById("santriId").value;
-    const id = idRaw ? String(idRaw) : null;
-
-    // kumpulkan form data
-    const formData = {};
-    [
-      "Nama_Lengkap","Kelas","Bagian","Stambuk","Stambuk_Ndalem","Unit_Ndalem","Kode_Unit",
-      "Asal_Daerah","Himpunan","Kamar","Tgl_Lahir","Mulai_Ngabdi","Tgl_Keluar",
-      "Status","Posisi_Tugas","Jam_Tugas","Shift","Foto"
-    ].forEach(f => {
-      const el = document.getElementById(f);
-      formData[f] = el ? (el.value?.trim() || null) : null;
-    });
-
-    // validasi wajib
-    if (!formData.Nama_Lengkap) throw new Error("Nama lengkap wajib diisi!");
-    if (!formData.Kelas) throw new Error("Kelas wajib dipilih!");
-    if (!formData.Unit_Ndalem) throw new Error("Unit Ndalem wajib dipilih!");
-
-    // lakukan save ke Supabase (pakai select('*').single() agar kita dapat data lengkap kembali)
-    let savedData = null;
-    if (id) {
-      const { data, error } = await supabaseClient
-        .from("santri_kharisma")
-        .update(formData)
-        .eq("id", id)
-        .select("*")
-        .single();
-
-      if (error) throw error;
-      savedData = data;
-      lastEditedId = Number(data.id);
-    } else {
-      const { data, error } = await supabaseClient
-        .from("santri_kharisma")
-        .insert([formData])
-        .select("*")
-        .single();
-
-      if (error) throw error;
-      savedData = data;
-      lastEditedId = Number(data.id);
-    }
-
-    // update memori (allSantriData) langsung supaya UI bisa menampilkan instan
-    if (!Array.isArray(window.allSantriData)) window.allSantriData = [];
-    const idx = window.allSantriData.findIndex(s => String(s.id) === String(lastEditedId));
-    if (idx >= 0) {
-      window.allSantriData[idx] = savedData;
-    } else {
-      window.allSantriData.push(savedData);
-    }
-
-    // tutup modal & tampilkan toast sukses
-    closeSantriModal();
-    showToast("✅ Data berhasil disimpan!", "success");
-
-    // beri jeda 2 detik supaya toast terlihat
-    await sleep(2000);
-
-    // tampilkan loading dan sinkronisasi ulang (fetch terbaru)
-    try {
-      showLoading(true);
-      await loadInitialData();   // loadInitialData async — akan mengembalikan ketika selesai
-      // setelah sinkron ulang, refresh tampilan
-      filterSantri();
-    } catch (syncErr) {
-      console.error("Sync error setelah simpan:", syncErr);
-      // tetap jalankan filter agar data lokal tetap tampil
-      filterSantri();
-      showToast("⚠️ Sinkronisasi gagal, data lokal sudah diperbarui.", "error");
-    } finally {
-      showLoading(false);
-    }
-
-    // scroll ke baris yang baru disimpan (jika ada di tabel data)
-    setTimeout(() => {
-      const activeTab = document.querySelector('.tab-item.active')?.dataset.tab;
-      if (activeTab === "data" && lastEditedId) {
-        const row = document.querySelector(`tr[data-id='${lastEditedId}']`);
-        if (row) row.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-    }, 300);
-
-  } catch (err) {
-    console.error("Gagal simpan:", err);
-    showToast("❌ Gagal simpan: " + (err.message || err), "error");
-  }
-};
-
-
-// === Preview Foto ===
-function previewFoto() {
-  const url = document.getElementById("Foto").value.trim();
-  const preview = document.getElementById("fotoPreview");
-  if (url && (url.endsWith(".jpg") || url.endsWith(".jpeg") || url.endsWith(".png") || url.endsWith(".gif") || url.startsWith("http"))) {
-    preview.src = url;
-    preview.style.display = "block";
-  } else {
-    preview.style.display = "none";
-  }
-}
 
 // ========== HAPUS ==========
 async function removeSantri(id) {
