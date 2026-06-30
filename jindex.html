@@ -16241,10 +16241,21 @@ async function insertSantri(row) {
     // CEK DATA PONDOK
     // =========================
     const { data: pondok, error: pondokError } = await supabaseClient
-      .from('pondok_induk')
-      .select('stambuk, kelas, kelas_id')
-      .eq('stambuk', row.stambuk)
-      .maybeSingle();
+	  .from('pondok_induk')
+	  .select(`
+	    stambuk,
+	    nama_lengkap,
+	    kelas,
+	    kelas_id,
+	    bagian,
+	    asal_daerah,
+	    himpunan,
+	    kamar,
+	    tgl_lahir,
+	    kategori
+	  `)
+	  .eq('stambuk', row.stambuk)
+	  .maybeSingle();
 
     if (pondokError) {
       console.error(pondokError);
@@ -16292,11 +16303,19 @@ async function insertSantri(row) {
     const { error } = await supabaseClient
   .from('santri_kharisma')
   .insert([
-  {
-    "Stambuk": row.stambuk.trim()
-  }
-]);
-
+    {
+      Stambuk: pondok.stambuk,
+      Kelas: pondok.kelas,
+      Kelas_id: pondok.kelas_id,
+      Nama_Lengkap: pondok.nama_lengkap,
+      Bagian: pondok.bagian,
+      Asal_Daerah: pondok.asal_daerah,
+      Himpunan: pondok.himpunan,
+      Kamar: pondok.kamar,
+      Tgl_Lahir: pondok.tgl_lahir,
+      Kategori: pondok.kategori
+    }
+  ]);
     // =========================
     // ERROR INSERT
     // =========================
