@@ -4483,7 +4483,7 @@ and (max-width:1024px){
     <input 
       type="text" 
       id="searchPondok" 
-      placeholder="Cari Nama / Stambuk..." 
+      placeholder="Cari Nama / Himpunan / Asal daerah" 
       style="width:100%; padding:8px;"
     >
   </div>
@@ -16016,7 +16016,7 @@ async function loadSinkronData(page = 1) {
   // 🔍 SEARCH SERVER SIDE
   if (currentSearch) {
     query = query.or(
-      `nama_lengkap.ilike.%${currentSearch}%,stambuk.ilike.%${currentSearch}%`
+      `nama_lengkap.ilike.%${currentSearch}%,himpunan.ilike.%${currentSearch}%,asal_daerah.ilike.%${currentSearch}%`
     );
   }
 
