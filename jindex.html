@@ -16020,7 +16020,6 @@ function applyFilterHP() {
   });
 }
 
-
 let pondokData = [];
 let currentPage = 1;
 let totalData = 0;
@@ -16045,18 +16044,19 @@ async function loadSinkronData(page = 1) {
   const to = from + pageSize - 1;
 
   const { data, error, count } = await query
-    .order('nama_lengkap')
-    .range(from, to)
-	.limit(pageSize);
+    .order('kelas_id', { ascending: true })      // Urut sesuai id di nadhom_kelas
+    .order('nama_lengkap', { ascending: true })  // Lalu urut nama
+    .range(from, to);
 
   if (error) {
     console.error(error);
     return;
   }
 
+  pondokData = data || [];
   totalData = count || 0;
 
-  renderPondokTable(data);
+  renderPondokTable(pondokData);
   renderPagination();
 }
 
@@ -16066,7 +16066,7 @@ function renderPondokTable(data) {
 
   tbody.innerHTML = '';
 
-  // 🔢 total data
+  // 🔢 Total data
   countEl.textContent = `Total: ${totalData} data (Halaman ${currentPage})`;
 
   data.forEach(row => {
@@ -16084,10 +16084,10 @@ function renderPondokTable(data) {
       <td>${row.kategori || ''}</td>
     `;
 
-    // 🖱️ tooltip
+    // 🖱️ Tooltip
     tr.title = "Double klik untuk lihat / insert";
 
-    // 📱 efek sentuh HP
+    // 📱 Efek sentuh HP
     tr.addEventListener('touchstart', () => {
       tr.style.backgroundColor = '#f5faff';
     });
@@ -16096,7 +16096,7 @@ function renderPondokTable(data) {
       tr.style.backgroundColor = '';
     });
 
-    // 🖱️ double klik
+    // 🖱️ Double klik
     tr.ondblclick = () => openPondokModal(row);
 
     tbody.appendChild(tr);
