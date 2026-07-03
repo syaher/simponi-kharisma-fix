@@ -8744,17 +8744,23 @@ async function loadSoroganUnits() {
 document.getElementById("soroganUnit")?.addEventListener("change", async () => {
   const unit = document.getElementById("soroganUnit").value;
   const namaSelect = document.getElementById("soroganNama");
+
   namaSelect.innerHTML = '<option value="">Memuat...</option>';
+
   const { data } = await client
     .from("santri_kharisma")
     .select("Stambuk, Nama_Lengkap, Kelas")
     .eq("Unit_Ndalem", unit)
-    .eq("Status", "aktif");
+    .eq("Status", "aktif")
+    .order("Kelas", { ascending: true })
+    .order("Nama_Lengkap", { ascending: true });
+
   namaSelect.innerHTML = '<option value="">Pilih Santri</option>';
+
   data?.forEach(s => {
     const opt = document.createElement("option");
     opt.value = s.Stambuk;
-    opt.textContent = `${s.Nama_Lengkap} (${s.Kelas || "-"})`;
+    opt.textContent = `${s.Kelas || "-"} - ${s.Nama_Lengkap}`;
     namaSelect.appendChild(opt);
   });
 });
