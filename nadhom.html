@@ -8744,23 +8744,45 @@ async function loadSoroganUnits() {
 document.getElementById("soroganUnit")?.addEventListener("change", async () => {
   const unit = document.getElementById("soroganUnit").value;
   const namaSelect = document.getElementById("soroganNama");
-  namaSelect.innerHTML = '<option value="">Memuat...</option>';
-  const { data } = await client
-	  .from("santri_kharisma")
-	  .select("Stambuk, Nama_Lengkap, Kelas")
-	  .eq("Unit_Ndalem", unit)
-	  .eq("Status", "aktif")
-	  .order("Kelas", { ascending: true })
-	  .order("Nama_Lengkap", { ascending: true });
-	
-	namaSelect.innerHTML = '<option value="">Pilih Santri</option>';
-	
-	data?.forEach(s => {
-	  const opt = document.createElement("option");
-	  opt.value = s.Stambuk;
-	  opt.textContent = `${s.Nama_Lengkap} (${s.Kelas || "-"})`; // sama persis
-	  namaSelect.appendChild(opt);
-	});
+
+  namaSelect.innerHTML = `<option value="">Memuat...</option>`;
+
+  const { data, error } = await client
+    .from("santri_kharisma")
+    .select("Nama_Lengkap, Kelas, Stambuk")
+    .eq("Unit_Ndalem", unit)
+    .eq("Status", "aktif");
+
+  if (error) {
+    console.error("Gagal load santri:", error);
+    namaSelect.innerHTML = `<option value="">Gagal memuat</option>`;
+    return;
+  }
+
+  // ✅ Sama persis dengan tab Quran-Hadist-Nadhom
+  const sortedData = [...data].sort((a, b) => {
+    const aIdx = kelasOrder.indexOf(a.Kelas);
+    const bIdx = kelasOrder.indexOf(b.Kelas);
+
+    if (aIdx === -1 && bIdx === -1)
+      return a.Nama_Lengkap.localeCompare(b.Nama_Lengkap);
+
+    if (aIdx === -1) return 1;
+    if (bIdx === -1) return -1;
+
+    if (aIdx !== bIdx) return aIdx - bIdx;
+
+    return a.Nama_Lengkap.localeCompare(b.Nama_Lengkap);
+  });
+
+  namaSelect.innerHTML = `<option value="">Pilih Santri</option>`;
+
+  sortedData.forEach(s => {
+    const opt = document.createElement("option");
+    opt.value = s.Stambuk;
+    opt.textContent = `${s.Nama_Lengkap} (${s.Kelas || "-"})`;
+    namaSelect.appendChild(opt);
+  });
 });
 
 const SOROGAN_KITAB_GROUPS_BY_ID = {
