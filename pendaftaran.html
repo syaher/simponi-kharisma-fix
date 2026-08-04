@@ -239,10 +239,6 @@
       font-weight: 500;
     }
 
-
-
-
-
     /* Card Grid Mobile */
   .card-grid-modern { 
   grid-template-columns: 1fr; 
@@ -319,8 +315,8 @@
   grid-column: 1 / span 2;
   grid-row: 3;
   display: grid;
-  grid-template-columns: repeat(5, auto); /* 🔥 kunci */
-  justify-content: center;                /* 🔥 tengah */
+  grid-template-columns: repeat(5, auto);
+  justify-content: center;
   gap: 0.4rem;
   margin-top: 0.5rem;
   padding-top: 0.5rem;
@@ -328,8 +324,8 @@
 }
 
 .action-buttons button {
-  aspect-ratio: 1 / 1;     /* 🔥 kotak */
-  border-radius: 12px;     /* 🔥 agak bulat */
+  aspect-ratio: 1 / 1;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -544,7 +540,7 @@
 
       .action-buttons {
         grid-template-columns: repeat(3, auto);
-		justify-content: center;
+    justify-content: center;
         gap: 0.2rem;
       }
 
@@ -566,8 +562,8 @@
         font-size: 0.75rem;
       }
     }
-	
-	/* Tambahan CSS untuk info masa khidmah dan usia */
+    
+    /* Tambahan CSS untuk info masa khidmah dan usia */
 .santri-detail .date-info {
   display: block;
   font-size: 0.75rem;
@@ -582,7 +578,35 @@
   font-style: italic;
 }
 
+/* Animasi untuk keterangan wrapper */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
+#keteranganWrapper {
+  transition: all 0.3s ease;
+}
+
+#keteranganWrapper .alert {
+  background: #fff3cd;
+  border-color: #ffc107;
+}
+
+#keteranganWrapper .alert i {
+  color: #ffc107;
+}
+
+#keteranganWrapper.show {
+  display: block !important;
+  animation: slideDown 0.3s ease;
+}
 
 /* Batasi zoom di HP */
 @media (max-width: 480px) {
@@ -1167,6 +1191,60 @@
   }
 }
 
+/* ==============================
+   RATA KIRI SEMUA ELEMEN SANTRI-DETAIL
+================================== */
+.santri-detail {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-bottom: 2px;
+  padding: 0;
+  color: #64748b;
+  font-size: 0.8rem;
+  line-height: 1.3;
+}
+
+.santri-detail i {
+  flex-shrink: 0;
+  width: 16px; /* 🔥 semua ikon lebar sama */
+  text-align: center;
+  margin-right: 0;
+  color: var(--primary);
+  margin-top: 2px;
+}
+
+.santri-detail .keterangan-icon {
+  color: #f59e0b !important;
+}
+
+/* Keterangan wrapper khusus */
+.santri-detail.keterangan-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  margin-top: 4px;
+  margin-bottom: 2px;
+  padding: 3px 10px 3px 6px;
+  background: #fff8e1;
+  border-left: 3px solid #ffc107;
+  border-radius: 4px;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.santri-detail.keterangan-wrapper .keterangan-text {
+  font-size: 0.75rem;
+  color: #92400e;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.santri-detail.keterangan-wrapper .keterangan-text strong {
+  font-weight: 700;
+  color: #78350f;
+}
+
   </style>
   <link rel="icon" type="image/png" href="https://i.imgur.com/Irgu32G.png">
 </head>
@@ -1179,8 +1257,6 @@
       <span>Kembali ke Menu</span>
     </a>
   </div>
-
- 
 
   <div class="row g-4 flex-column flex-lg-column">
     <!-- Form Section -->
@@ -1346,24 +1422,54 @@
   </div>
 </div>
 
-
-  <div class="row g-2">
-    <div class="col-md-6 mb-3">
-      <label class="form-label small fw-semibold">Status</label>
-      <select id="Status" class="form-select form-control-modern">
-        <option value="">-- Pilih --</option>
-        <option>aktif</option>
-        <option>tidak aktif</option>
-      </select>
-    </div>
-    <div class="col-md-6 mb-3">
-      <label class="form-label small fw-semibold">Tgl Keluar</label>
-      <div class="input-group">
-        <span class="input-group-text bg-light"><i class="bi bi-calendar-x"></i></span>
-        <input id="Tgl_Keluar" type="date" class="form-control form-control-modern">
-      </div>
+<!-- ============================================ -->
+<!-- BAGIAN STATUS + KETERANGAN                   -->
+<!-- ============================================ -->
+<div class="row g-2">
+  <div class="col-md-6 mb-3">
+    <label class="form-label small fw-semibold">Status</label>
+    <select id="Status" class="form-select form-control-modern">
+      <option value="">-- Pilih --</option>
+      <option>aktif</option>
+      <option>tidak aktif</option>
+    </select>
+  </div>
+  <div class="col-md-6 mb-3">
+    <label class="form-label small fw-semibold">Tgl Keluar</label>
+    <div class="input-group">
+      <span class="input-group-text bg-light"><i class="bi bi-calendar-x"></i></span>
+      <input id="Tgl_Keluar" type="date" class="form-control form-control-modern">
     </div>
   </div>
+</div>
+
+<!-- ============================================ -->
+<!-- FIELD KETERANGAN - MUNCUL SAAT STATUS TIDAK AKTIF -->
+<!-- ============================================ -->
+<div class="mb-3" id="keteranganWrapper" style="display:none;">
+  <div class="alert alert-warning py-2 px-3 mb-2 d-flex align-items-center" 
+       style="font-size: 0.85rem; border-radius: 8px; border-left: 4px solid #ffc107; background: #fff8e1;">
+    <i class="bi bi-exclamation-triangle-fill me-2" style="color: #f59e0b; font-size: 1.1rem;"></i>
+    <div>
+      <strong class="text-dark">Keterangan Keluar / Tidak Aktif</strong>
+      <span class="text-muted ms-2" style="font-weight: normal; font-size: 0.75rem;">* wajib diisi</span>
+    </div>
+  </div>
+  
+  <div class="input-group">
+    <span class="input-group-text bg-light"><i class="bi bi-chat text-warning"></i></span>
+    <textarea id="Keterangan" 
+              class="form-control form-control-modern" 
+              rows="1" 
+              placeholder="Contoh: pindah ke pondok, boyong, dll..."
+              style="border-color: #ffc107;"></textarea>
+  </div>
+  
+  <div class="text-muted mt-1" style="font-size: 0.7rem;">
+    <i class="bi bi-info-circle me-1"></i>
+    Keterangan ini akan muncul di kartu santri dan PDF
+  </div>
+</div>
 
   <!-- FOTO -->
   <div class="mb-3 mt-3">
@@ -1397,69 +1503,71 @@
       </div>
     </div>
 
-    <!-- Table & Controls Section -->
-    <div class="col-12">
-      <!-- Stats Cards -->
-      <div class="stats-row">        
-        <div class="stats-card">
-          <div class="stats-number" id="aktifSantri">0</div>
-          <div class="stats-label">Siswa Aktif</div>
-        </div>
-        <div class="stats-card">
-          <div class="stats-number" id="kelasCount">0</div>
-          <div class="stats-label">Kelas</div>
-        </div>
-        <div class="stats-card">
-          <div class="stats-number" id="unitCount">0</div>
-          <div class="stats-label">Unit</div>
-        </div>
-      </div>
+    <!-- Stats Cards -->
+	<div class="stats-row">        
+	  <div class="stats-card">
+		<div class="stats-number" id="aktifSantri">0</div>
+		<div class="stats-label" id="statusLabel">Siswa Aktif</div>
+	  </div>
+	  <div class="stats-card">
+		<div class="stats-number" id="kelasCount">0</div>
+		<div class="stats-label">Kelas</div>
+	  </div>
+	  <div class="stats-card">
+		<div class="stats-number" id="unitCount">0</div>
+		<div class="stats-label">Unit</div>
+	  </div>
+	</div>
       
       <!-- Filter Section -->
-      <div class="filter-section">
-        <div class="row g-3 align-items-center">
-          <div class="col-md-4">
-            <div class="input-group">
-              <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
-              <input id="searchInput" class="form-control form-control-modern border-start-0" placeholder="Cari nama atau stambuk...">
-            </div>
-          </div>
-          <div class="col-md-3">
-            <select id="filterKelas" class="form-select form-control-modern">
-              <option value="">Semua Kelas</option>
-            </select>
-          </div>
-          <div class="col-md-3">
-            <select id="filterUnit" class="form-select form-control-modern">
-              <option value="">Semua Unit</option>
-            </select>
-          </div>
-          <div class="col-md-2 d-flex gap-2 justify-content-end">
-            <select id="perPage" class="form-select form-control-modern" style="width:110px">
-              <option value="5">5</option>
-              <option value="10" selected>10</option>
-              <option value="25">25</option>
-              <option value="50">50</option>
-            </select>
-          </div>
-        </div>
-        
-        <div class="row mt-3 align-items-center">
-          <div class="col-md-6 d-flex gap-2">
-            <button id="togglePaginationBtn" class="btn btn-modern btn-outline-modern btn-sm">
-              <i class="bi bi-list-ul me-1"></i>Tampilkan semua
-            </button>
-          </div>
-          <div class="col-md-6 d-flex gap-2 justify-content-end">
-            <button id="refreshBtn" class="btn btn-modern btn-outline-modern btn-sm">
-              <i class="bi bi-arrow-repeat me-1"></i>Refresh
-            </button>
-            <button id="exportBtn" class="btn btn-modern btn-outline-modern btn-sm">
-              <i class="bi bi-download me-1"></i>Export
-            </button>
-          </div>
-        </div>
-      </div>
+	<div class="filter-section">
+	  <div class="row g-3 align-items-center">
+		<div class="col-md-4">
+		  <div class="input-group">
+			<span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
+			<input id="searchInput" class="form-control form-control-modern border-start-0" placeholder="Cari nama atau stambuk...">
+		  </div>
+		</div>
+		<div class="col-md-3">
+		  <select id="filterKelas" class="form-select form-control-modern">
+			<option value="">Semua Kelas</option>
+		  </select>
+		</div>
+		<div class="col-md-3">
+		  <select id="filterUnit" class="form-select form-control-modern">
+			<option value="">Semua Unit</option>
+		  </select>
+		</div>
+		<div class="col-md-2">
+		  <select id="filterStatus" class="form-select form-control-modern">
+			<option value="aktif" selected>Aktif</option>
+			<option value="tidak aktif">Tidak Aktif</option>
+		  </select>
+		</div>
+	  </div>
+	  
+	  <div class="row mt-3 align-items-center">
+		<div class="col-md-6 d-flex gap-2">
+		  <button id="togglePaginationBtn" class="btn btn-modern btn-outline-modern btn-sm">
+			<i class="bi bi-list-ul me-1"></i>Tampilkan semua
+		  </button>
+		</div>
+		<div class="col-md-6 d-flex gap-2 justify-content-end">
+		  <select id="perPage" class="form-select form-control-modern" style="width:110px">
+			<option value="5">5</option>
+			<option value="10" selected>10</option>
+			<option value="25">25</option>
+			<option value="50">50</option>
+		  </select>
+		  <button id="refreshBtn" class="btn btn-modern btn-outline-modern btn-sm">
+			<i class="bi bi-arrow-repeat me-1"></i>Refresh
+		  </button>
+		  <button id="exportBtn" class="btn btn-modern btn-outline-modern btn-sm">
+			<i class="bi bi-download me-1"></i>Export
+		  </button>
+		</div>
+	  </div>
+	</div>
 
       <!-- Data Display Area -->
       <div id="listArea" style="max-height: 75vh; overflow-y: auto;">
@@ -1503,12 +1611,8 @@ const kelasOrder = [
   "I'dadiyah I","I'dadiyah II","I'dadiyah III","Kelas Khusus"
 ];
 
-// HAPUS const unitNdalemList = [...] yang hardcoded
+let unitNdalemList = [];
 
-// Ganti dengan ini:
-let unitNdalemList = []; // global, akan diisi dari database
-
-// Fungsi untuk load unit dari database
 async function loadUnitNdalemFromDB() {
   try {
     const { data, error } = await supabase
@@ -1520,13 +1624,11 @@ async function loadUnitNdalemFromDB() {
     
     unitNdalemList = data.map(item => item.Nama_Unit);
     
-    // Update dropdowns
     populateUnitDropdowns();
     
     return unitNdalemList;
   } catch (err) {
     console.error('Gagal load unit dari database:', err);
-    // Fallback ke hardcoded jika gagal
     unitNdalemList = [
       'Al-amanah cell','Al-amanah Toko','Catering Arham (Pak Din)','Catering P3TQ',
       'Frozen Food','Gorengan & Kost SPBE','Gus Shohib','Kandang Kambing',
@@ -1545,15 +1647,12 @@ async function loadUnitNdalemFromDB() {
   }
 }
 
-// Fungsi untuk populate dropdown unit
 function populateUnitDropdowns() {
-  // Unit_Ndalem dropdown (form)
   Unit_Ndalem.innerHTML = '<option value="">-- Pilih --</option>';
   unitNdalemList.forEach(u => {
     Unit_Ndalem.add(new Option(u, u));
   });
   
-  // filterUnit dropdown (filter section)
   filterUnit.innerHTML = '<option value="">Semua Unit</option>';
   unitNdalemList.forEach(u => {
     filterUnit.add(new Option(u, u));
@@ -1581,6 +1680,7 @@ const Unit_Ndalem = document.getElementById('Unit_Ndalem');
 const Ngaji = document.getElementById('Ngaji');
 const filterKelas = document.getElementById('filterKelas');
 const filterUnit = document.getElementById('filterUnit');
+const filterStatus = document.getElementById('filterStatus');
 const cardGrid = document.getElementById('cardGrid');
 const searchInput = document.getElementById('searchInput');
 const perPage = document.getElementById('perPage');
@@ -1598,12 +1698,12 @@ const exportBtn = document.getElementById('exportBtn');
 const aktifSantri = document.getElementById('aktifSantri');
 const kelasCount = document.getElementById('kelasCount');
 const unitCount = document.getElementById('unitCount');
+const statusLabel = document.getElementById('statusLabel');
 
 // ===========================
 // POPULATE SELECTS
 // ===========================
 
-// KELAS
 Kelas.add(new Option('-- Pilih --', ''));
 filterKelas.add(new Option('Semua Kelas', ''));
 
@@ -1612,10 +1712,8 @@ kelasOrder.forEach(k => {
   filterKelas.add(new Option(k, k)); 
 });
 
-// UNIT NDALEM - Load dari database
 loadUnitNdalemFromDB();
 
-// NGAJI
 ngajiData.forEach(n => {
   const opt = document.createElement("option");
   opt.value = n.id;
@@ -1636,7 +1734,7 @@ window.stopSpinPDF = function(btn) {
   btn.disabled = false;
 };
 
-const PDF_PASSWORD = "imamfatoni24"; // ganti sesuai keinginan
+const PDF_PASSWORD = "imamfatoni24";
 
 // state
 let page = 1;
@@ -1648,16 +1746,29 @@ let allData = [];
 
 
 
-// Fungsi untuk refresh unit dropdown (misal setelah ada perubahan data)
 async function refreshUnitDropdowns() {
   await loadUnitNdalemFromDB();
 }
 
-// Panggil saat form dibuka
 document.addEventListener('DOMContentLoaded', async function() {
   await loadUnitNdalemFromDB();
   applyRoleAccess();
   await loadData();
+  
+  // Event listener untuk status - tampilkan/sembunyikan keterangan
+  const statusSelect = document.getElementById('Status');
+  const keteranganWrapper = document.getElementById('keteranganWrapper');
+  
+  statusSelect.addEventListener('change', function() {
+    if (this.value === 'tidak aktif') {
+      keteranganWrapper.style.display = 'block';
+      keteranganWrapper.style.animation = 'slideDown 0.3s ease';
+      document.getElementById('Keterangan').focus();
+    } else {
+      keteranganWrapper.style.display = 'none';
+      document.getElementById('Keterangan').value = '';
+    }
+  });
 });
 
 
@@ -1683,18 +1794,8 @@ function showAlert(text, type='success') {
 
 // preview foto function
 function previewFoto() {
-  const urlInput = fotoURLInput.value.trim();
   const file = fotoInput.files[0];
 
-  if (urlInput !== '') {
-    const validExt = ['.jpg','.jpeg','.png','.gif'];
-    const low = urlInput.toLowerCase();
-    if (low.startsWith('http') && validExt.some(e=>low.endsWith(e))) {
-      fotoPreview.src = urlInput;
-      fotoPreview.classList.remove('d-none');
-      return;
-    }
-  }
   if (file) {
     fotoPreview.src = URL.createObjectURL(file);
     fotoPreview.classList.remove('d-none');
@@ -1725,15 +1826,32 @@ async function uploadFotoToStorage(file) {
   }
 }
 
-// Update stats
+// Update stats - berdasarkan data yang sudah difilter
 function updateStats(data) {
+  // Ambil filter status yang sedang dipilih
+  const statusFilter = filterStatus.value;
   
-  const aktif = data.filter(r => r.Status === 'aktif').length;
-  aktifSantri.textContent = aktif;
+  // Jika filter "tidak aktif", hitung yang tidak aktif
+  // Jika filter "aktif" atau kosong, hitung yang aktif
+  let count = 0;
+  let label = 'Siswa Aktif';
   
+  if (statusFilter === 'tidak aktif') {
+    count = data.filter(r => r.Status === 'tidak aktif').length;
+    label = 'Siswa Tidak Aktif';
+  } else {
+    count = data.filter(r => r.Status === 'aktif').length;
+    label = 'Siswa Aktif';
+  }
+  
+  aktifSantri.textContent = count;
+  statusLabel.textContent = label;
+  
+  // Hitung unique Kelas dari data yang difilter
   const uniqueKelas = [...new Set(data.map(r => r.Kelas))].filter(k => k);
   kelasCount.textContent = uniqueKelas.length;
   
+  // Hitung unique Unit dari data yang difilter
   const uniqueUnit = [...new Set(data.map(r => r.Unit_Ndalem))].filter(u => u);
   unitCount.textContent = uniqueUnit.length;
 }
@@ -1744,6 +1862,7 @@ async function loadData() {
   const q = searchInput.value.trim().toLowerCase();
   const kelas = filterKelas.value;
   const unit = filterUnit.value;
+  const status = filterStatus.value;
 
   const { data, error } = await supabase.from('santri_kharisma').select('*').order('id',{ascending:false});
   if (error) { 
@@ -1753,7 +1872,6 @@ async function loadData() {
   }
   
   allData = data || [];
-  updateStats(allData);
   
   let rows = [...allData];
 
@@ -1763,6 +1881,10 @@ async function loadData() {
   );
   if (kelas) rows = rows.filter(r => r.Kelas === kelas);
   if (unit) rows = rows.filter(r => r.Unit_Ndalem === unit);
+  if (status) rows = rows.filter(r => r.Status === status);
+
+  // ✅ UPDATE STATS BERDASARKAN DATA YANG SUDAH DIFILTER
+  updateStats(rows);
 
   totalRows = rows.length;
   const start = (page-1)*pageSize;
@@ -1782,7 +1904,6 @@ function renderList(rows) {
       const div = document.createElement('div');
       div.className = 'santri-card';
       
-      // Hitung masa khidmah dan usia
       const masaKhidmah = calculateMasaKhidmah(r.Mulai_Ngabdi);
       const usia = calculateUsia(r.Tgl_Lahir);
       
@@ -1821,6 +1942,13 @@ function renderList(rows) {
             <i class="bi bi-person"></i>
             <span>${r.Tgl_Lahir ? new Date(r.Tgl_Lahir).toLocaleDateString('id-ID') : '-'} (${usia})</span>
           </div>
+          ${r.Status === 'tidak aktif' && r.Keterangan ? `
+			<div class="santri-detail keterangan-wrapper">
+			  <i class="bi bi-exclamation-triangle-fill text-warning keterangan-icon"></i>
+			  <span class="keterangan-text">
+				<strong>Keterangan:</strong> ${r.Keterangan}
+			  </span>
+			</div>` : ''}
         </div>
         
        <div class="action-buttons">
@@ -1866,7 +1994,6 @@ function renderList(rows) {
 
 </div>
 
-
       `;
       cardGrid.appendChild(div);
     });
@@ -1896,20 +2023,26 @@ window.onEdit = async function(id) {
   document.getElementById('Mulai_Ngabdi').value = data.Mulai_Ngabdi || '';
   document.getElementById('Tgl_Keluar').value = data.Tgl_Keluar || '';
   document.getElementById('Status').value = data.Status || '';
+  document.getElementById('Keterangan').value = data.Keterangan || '';
   document.getElementById('Posisi_Tugas').value = data.Posisi_Tugas || '';
   document.getElementById('Jam_Tugas').value = data.Jam_Tugas || '';
   document.getElementById('Shift').value = data.Shift || '';
   document.getElementById('Nama_Wali').value = data.Nama_Wali || '';
   document.getElementById('No_Wali').value = data.No_Wali || '';
-  
-  // =========================
-  // TAMBAHKAN KATEGORI DI SINI
-  // =========================
   document.getElementById('Kategori1').value = data.Kategori1 || '';
 
-  // =========================
-  // PREVIEW FOTO
-  // =========================
+  // Tampilkan/sembunyikan keterangan berdasarkan status
+  const keteranganWrapper = document.getElementById('keteranganWrapper');
+  const keteranganField = document.getElementById('Keterangan');
+  
+  if (data.Status === 'tidak aktif') {
+    keteranganWrapper.style.display = 'block';
+    keteranganField.value = data.Keterangan || '';
+  } else {
+    keteranganWrapper.style.display = 'none';
+    keteranganField.value = '';
+  }
+
   if (data.Foto) {
     fotoPreview.src = data.Foto;
     fotoPreview.classList.remove("d-none");
@@ -1917,7 +2050,6 @@ window.onEdit = async function(id) {
     fotoPreview.src = "";
     fotoPreview.classList.add("d-none");
   }
-  // =========================
 
   submitBtn.textContent = 'Update Data';
   submitBtn.innerHTML = '<i class="bi bi-check-lg me-2"></i>Update Data';
@@ -1945,6 +2077,8 @@ resetBtn.addEventListener('click', () => {
   submitBtn.textContent='Simpan';
   submitBtn.innerHTML = '<i class="bi bi-check-lg me-2"></i>Simpan';
   document.getElementById('Kategori1').value = '';
+  document.getElementById('keteranganWrapper').style.display = 'none';
+  document.getElementById('Keterangan').value = '';
 });
 
 // submit form
@@ -1979,14 +2113,12 @@ document.getElementById('formSantri').addEventListener('submit', async (ev) => {
     Mulai_Ngabdi: document.getElementById('Mulai_Ngabdi').value || null,
     Tgl_Keluar: document.getElementById('Tgl_Keluar').value || null,
     Status: document.getElementById('Status').value || null,
+    Keterangan: document.getElementById('Keterangan').value || null,
     Posisi_Tugas: document.getElementById('Posisi_Tugas').value || null,
     Jam_Tugas: document.getElementById('Jam_Tugas').value || null,
     Shift: document.getElementById('Shift').value || null,
     Nama_Wali: document.getElementById('Nama_Wali').value || null,
     No_Wali: document.getElementById('No_Wali').value || null,
-    // =========================
-    // TAMBAHKAN KATEGORI DI SINI
-    // =========================
     Kategori1: document.getElementById('Kategori1').value || null,
     Kode_Unit: null,
     Masa_Khidmah: null
@@ -2019,6 +2151,8 @@ document.getElementById('formSantri').addEventListener('submit', async (ev) => {
     document.getElementById('formSantri').reset();
     fotoPreview.src=''; 
     fotoPreview.classList.add('d-none');
+    document.getElementById('keteranganWrapper').style.display = 'none';
+    document.getElementById('Keterangan').value = '';
     await loadData();
   } catch (err) {
     console.error(err);
@@ -2038,6 +2172,7 @@ perPage.addEventListener('change', ()=>{ page=1; loadData(); });
 searchInput.addEventListener('input', ()=>{ page=1; loadData(); });
 filterKelas.addEventListener('change', ()=>{ page=1; loadData(); });
 filterUnit.addEventListener('change', ()=>{ page=1; loadData(); });
+filterStatus.addEventListener('change', ()=>{ page=1; loadData(); });
 prevBtn.addEventListener('click', ()=>{ if (page>1){ page--; loadData(); }});
 nextBtn.addEventListener('click', ()=>{ if (page*pageSize < totalRows){ page++; loadData(); }});
 
@@ -2053,6 +2188,7 @@ togglePaginationBtn.addEventListener('click', ()=>{
 refreshBtn.addEventListener('click', ()=>loadData());
 
 // Export functionality
+// Export functionality
 exportBtn.addEventListener('click', async () => {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF('landscape', 'pt', 'a4');
@@ -2065,22 +2201,44 @@ exportBtn.addEventListener('click', async () => {
   doc.setTextColor(100, 100, 100);
   doc.text(`Dicetak pada: ${new Date().toLocaleString('id-ID')}`, 40, 60);
   
-  const headers = [['No', 'Nama Lengkap', 'Kelas', 'Unit Ndalem', 'Asal Daerah', 'Status']];
+  const headers = [['No', 'Nama Lengkap', 'Kelas', 'Unit Ndalem', 'Asal Daerah', 'Status', 'Keterangan']];
   const data = allData.map((s, i) => [
     i + 1,
     s.Nama_Lengkap || '-',
     s.Kelas || '-',
     s.Unit_Ndalem || '-',
     s.Asal_Daerah || '-',
-    s.Status || '-'
+    s.Status || '-',
+    s.Keterangan || '-'
   ]);
   
   doc.autoTable({
     head: headers,
     body: data,
     startY: 80,
-    styles: { fontSize: 9 },
-    headStyles: { fillColor: [67, 97, 238] }
+    styles: { 
+      fontSize: 9,
+      cellPadding: 3,
+      overflow: 'linebreak', // ✅ biar teks turun ke bawah
+      halign: 'left',        // ✅ rata kiri
+      valign: 'middle'
+    },
+    headStyles: { 
+      fillColor: [67, 97, 238],
+      halign: 'center',
+      valign: 'middle'
+    },
+    columnStyles: {
+      0: { cellWidth: 25, halign: 'center' },  // No
+      1: { cellWidth: 70, halign: 'left' },    // Nama Lengkap
+      2: { cellWidth: 60, halign: 'left' },    // Kelas
+      3: { cellWidth: 70, halign: 'left' },    // Unit Ndalem
+      4: { cellWidth: 60, halign: 'left' },    // Asal Daerah
+      5: { cellWidth: 50, halign: 'center' },  // Status
+      6: { cellWidth: 80, halign: 'left' }     // Keterangan - auto wrap
+    },
+    tableWidth: 'auto',
+    pageBreak: 'auto'
   });
   
   doc.save(`data_santri_kharisma_${new Date().toISOString().slice(0,10)}.pdf`);
@@ -2124,21 +2282,21 @@ if (input !== PDF_PASSWORD) {
       alert("Gagal mengambil data santri");
       return;
     }
-	
-	// Mustahiq
-	const { data: guru } = await supabase
-	  .from("data_guru")
-	  .select("Nama, Hp")
-	  .eq("Bagian", s.Bagian)
-	  .eq("Kelas", s.Kelas)
-	  .single();
+    
+    // Mustahiq
+    const { data: guru } = await supabase
+      .from("data_guru")
+      .select("Nama, Hp")
+      .eq("Bagian", s.Bagian)
+      .eq("Kelas", s.Kelas)
+      .single();
 
-	// Himpunan
-	const { data: hp } = await supabase
-	  .from("himpunan")
-	  .select("nama, wa")
-	  .eq("himpunan", s.Himpunan)
-	  .single();
+    // Himpunan
+    const { data: hp } = await supabase
+      .from("himpunan")
+      .select("nama, wa")
+      .eq("himpunan", s.Himpunan)
+      .single();
 
 
     // Ambil Sekretaris
@@ -2225,105 +2383,153 @@ if (input !== PDF_PASSWORD) {
 
 
     // ======================
-    // 5. Data Santri
-    // ======================
-    const masaKhidmahPDF = calculateMasaKhidmah(s.Mulai_Ngabdi);
-    const usiaPDF = calculateUsia(s.Tgl_Lahir);
+	// 5. Data Santri (SEDERHANA - HANYA KETERANGAN YANG DIWRAP)
+	// ======================
+	const masaKhidmahPDF = calculateMasaKhidmah(s.Mulai_Ngabdi);
+	const usiaPDF = calculateUsia(s.Tgl_Lahir);
 
+	// Buat data list seperti biasa
 	const dataList = [
 	  ["Nama Lengkap", s.Nama_Lengkap || "-"],
 	  ["Kelas", s.Kelas || "-"],
 	  ["Bagian", s.Bagian || "-"],
 	  ["Stambuk", s.Stambuk || "-"],
-	  ["Tanggal Lahir", s.Tgl_Lahir ? `${new Date(s.Tgl_Lahir).toLocaleDateString('id-ID')} (${usiaPDF})` : "-"],	       
+	  ["Tanggal Lahir", s.Tgl_Lahir ? `${new Date(s.Tgl_Lahir).toLocaleDateString('id-ID')} (${usiaPDF})` : "-"],           
 	  ["Asal Daerah", s.Asal_Daerah || "-"],
 	  ["Kamar", s.Kamar || "-"],
 	  ["Himpunan", s.Himpunan || "-"],
 	  
-	  ["__SEPARATOR__", ""],
-	  
-	  ["Unit Ndalem", s.Unit_Ndalem || "-"],
-	  ["Posisi Tugas", s.Posisi_Tugas || "-"],
-	  ["Shift", s.Shift || "-"],
-	  ["Jam Tugas", s.Jam_Tugas || "-"],	  
-	  ["Masa Khidmah", s.Mulai_Ngabdi ? `${new Date(s.Mulai_Ngabdi).toLocaleDateString('id-ID')} (${masaKhidmahPDF})` : "-"],	  
-	  ["Status", s.Status || "-"],  
-	  
-	  ["__SEPARATOR__", ""],
-
+	  ["__SEPARATOR__", ""],   
+	   
 	  ["Mustahiq", guru?.Nama || "-"],
 	  ["No. Kontak", guru?.Hp || "-"], 
 	  ["Dewan Himpunan", hp?.nama || "-"],
 	  ["No. Kontak", hp?.wa || "-"], 
 	  ["Nama Wali", s.Nama_Wali || "-"],
-	  ["No. Kontak", s.No_Wali || "-"]	  
+	  ["No. Kontak", s.No_Wali || "-"],
+	  
+	  ["__SEPARATOR__", ""],
+
+	  ["Unit Ndalem", s.Unit_Ndalem || "-"],
+	  ["Posisi Tugas", s.Posisi_Tugas || "-"],
+	  ["Shift", s.Shift || "-"],
+	  ["Jam Tugas", s.Jam_Tugas || "-"],      
+	  ["Masa Khidmah", s.Mulai_Ngabdi ? `${new Date(s.Mulai_Ngabdi).toLocaleDateString('id-ID')} (${masaKhidmahPDF})` : "-"],      
+	  ["Status", s.Status || "-"],
 	];
 
+	// Tambahkan Keterangan jika status tidak aktif
+	if (s.Status === 'tidak aktif' && s.Keterangan) {
+	  dataList.push(["Keterangan Keluar", s.Keterangan]);
+	}
 
+	doc.setFont("helvetica", "normal");
+	doc.setFontSize(12);
 
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(12);
+	const maxValueWidth = 180 + 195 - 40 - 140 - 10; // lebar maksimum untuk value
 
-    dataList.forEach(([label, value]) => {
-
+	dataList.forEach(([label, value]) => {
 	  if (label === "__SEPARATOR__") {
-
-		const lineStart = 40;         // kiri (label)
-		const lineEnd   = 180 + 195;  // sebelah kanan value
-		
+		const lineStart = 40;
+		const lineEnd = 180 + 195;
 		doc.setLineWidth(1);
 		doc.line(lineStart, y - 10, lineEnd, y - 10);
-		
 		y += 10; 
 		return;
 	  }
 
+	  // Jika ini adalah Keterangan dan panjang teks > maxValueWidth
+	  let displayValue = value;
+	  if (label === "Keterangan Keluar" && String(value).length > 30) {
+		// Split teks menjadi beberapa baris
+		const lines = doc.splitTextToSize(String(value), maxValueWidth);
+		const lineHeight = 16;
+		const totalHeight = lines.length * lineHeight + 4;
+		
+		// Gambar label
+		doc.setFont("helvetica", "bold");
+		doc.text(label, 40, y);
+		
+		// Gambar value (multiple lines)
+		doc.setFont("helvetica", "normal");
+		lines.forEach((line, idx) => {
+	  const prefix = idx === 0 ? ": " : "  ";
+	  doc.text(prefix + line, 180, y + (idx * lineHeight));
+	});
+		
+		y += totalHeight + 6;
+		return;
+	  }
+
+	  // Default render (satu baris)
 	  doc.setFont("helvetica", "bold");
 	  doc.text(label, 40, y);
-
 	  doc.setFont("helvetica", "normal");
-	  doc.text(": " + value, 180, y);
-
+	  doc.text(": " + displayValue, 180, y);
 	  y += 22;
 	});
 
 
 
+	// ======================
+	// 6. Tanda Tangan Sekretaris
+	// ======================
+	if (sekretaris) {
 
-    // ======================
-    // 6. Tanda Tangan Sekretaris
-    // ======================
-    if (sekretaris) {
-      const ttY = 620;
+	  // Posisi blok tanda tangan (kanan bawah)
+	  const marginRight = 30;
+	  const signWidth = 140;
+	  const boxX = pageWidth - signWidth - marginRight;
+	  const ttY = 680;
 
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(12);
+	  const tgl = new Date().toLocaleDateString("id-ID", {
+		day: "numeric",
+		month: "long",
+		year: "numeric"
+	  });
 
-      const tgl = new Date().toLocaleDateString("id-ID", {
-        day: "numeric",
-        month: "long",
-        year: "numeric"
-      });
+	  doc.setFont("helvetica", "normal");
+	  doc.setFontSize(11);
 
-      doc.text("Kediri, " + tgl, pageWidth - 200, ttY);
-      doc.text("Mengetahui,", pageWidth - 200, ttY + 20);
-      doc.text(sekretaris.Status_Penasehat, pageWidth - 200, ttY + 40);
+	  // Tanggal
+	  doc.text(`Kediri, ${tgl}`, boxX, ttY);
 
-      // tanda tangan digital
-      if (sekretaris.Ttd_Url) {
-        try {
-          const ttd = await loadImageBase64(sekretaris.Ttd_Url);
-          if (ttd) {
-            doc.addImage(ttd, "PNG", pageWidth - 200, ttY + 50, 140, 70);
-          }
-        } catch (e) {
-          console.warn("Tanda tangan gagal dimuat:", e);
-        }
-      }
+	  // Keterangan
+	  doc.text("Mengetahui,", boxX, ttY + 18);
+	  doc.text(sekretaris.Status_Penasehat, boxX, ttY + 36);
 
-      doc.setFont("helvetica", "bold");
-      doc.text(bersihkanNama(sekretaris.Nama), pageWidth - 200, ttY + 150);
-    }
+	  // ======================
+	  // Tanda Tangan Digital
+	  // ======================
+	  if (sekretaris.Ttd_Url) {
+		try {
+		  const ttd = await loadImageBase64(sekretaris.Ttd_Url);
+
+		  if (ttd) {
+			doc.addImage(
+			  ttd,
+			  "PNG",
+			  boxX + 12,   // sedikit masuk agar rata
+			  ttY + 45,
+			  90,          // lebar diperkecil
+			  45           // tinggi diperkecil
+			);
+		  }
+		} catch (e) {
+		  console.warn("Tanda tangan gagal dimuat:", e);
+		}
+	  }
+
+	  // Garis nama
+	  doc.setLineWidth(0.5);
+	  doc.line(boxX, ttY + 102, boxX + 115, ttY + 102);
+
+	  // Nama
+	  doc.setFont("helvetica", "bold");
+	  doc.setFont("helvetica", "bold");
+	doc.setFontSize(11);
+	doc.text(sekretaris.Nama || "-", boxX, ttY + 118);
+	}
 
 
     // ======================
@@ -2419,7 +2625,6 @@ async function urlToBase64(url) {
 function bersihkanNama(nama) {
   if (!nama) return "-";
 
-  // hapus awalan umum: Bpk, Bp, Bapak, Ust, Ustadz, Ustdz, Ust.
   return nama.replace(/^(Bpk\.?|Bp\.?|Bapak|Ust\.?|Ustadz|Ustdz|Ustad)\s+/i, "").trim();
 }
 
@@ -2427,7 +2632,6 @@ function bersihkanNama(nama) {
 function spinPDF(btn) {
   if (!btn) return;
   btn.classList.add('pdf-spinning');
-  // optional: disable sementara supaya user tidak klik berkali-kali
   btn.disabled = true;
 }
 
@@ -2448,8 +2652,7 @@ async function getKetuaTiga() {
 
   if (error || !data) return null;
 
-  // Tambahkan URL TTD manual di sini
-  data.Ttd_Url = "https://oflkibeaesvwzdzyvdfy.supabase.co/storage/v1/object/public/foto/ttd-david.png";
+  data.Ttd_Url = "https://oflkibeaesvwzdzyvdfy.supabase.co/storage/v1/object/public/foto/ttd-sekertaris.png";
 
   return data;
 }
@@ -2465,7 +2668,6 @@ function monthsSince(date) {
   months -= startDate.getMonth();
   months += now.getMonth();
   
-  // Adjust for days in month
   if (now.getDate() < startDate.getDate()) {
     months--;
   }
@@ -2513,7 +2715,7 @@ function calculateUsia(tglLahirValue) {
 
 ngajiData.forEach(n => {
   const opt = document.createElement("option");
-  opt.value = n.id;       // ← INI YANG MASUK DB
+  opt.value = n.id;
   opt.textContent = n.label;
   Ngaji.appendChild(opt);
 });
@@ -2535,13 +2737,11 @@ window.onWA = async function (id) {
 
   const nomor = (data.No_Wali || "").toString().trim();
 
-  // 🔥 CEK KOSONG DULU
   if (!nomor) {
     alert("Nomor wali belum diisi!");
     return;
   }
 
-  // 🔥 CEK FORMAT
   if (!nomor.startsWith("62")) {
     alert("Format nomor wali harus 62xxxxxxxx");
     return;
@@ -2679,7 +2879,7 @@ loadData();
 
 let lastTapBtn = null;
 let lastTapTime = 0;
-const DOUBLE_TAP_DELAY = 400; // ms (ideal HP)
+const DOUBLE_TAP_DELAY = 400;
 
 document.addEventListener("click", function (e) {
   const btn = e.target.closest(".tooltip-btn");
