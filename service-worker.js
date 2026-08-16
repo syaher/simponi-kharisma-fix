@@ -2,7 +2,7 @@
    🧠 SERVICE WORKER - KHARISMA (FINAL)
    ===================================================== */
 
-const CACHE_NAME = "kharisma-cache-v18";
+const CACHE_NAME = "kharisma-cache-v19";
 const OFFLINE_URL = "/offline.html";
 
 const FILES_TO_CACHE = [
@@ -11,7 +11,8 @@ const FILES_TO_CACHE = [
   "/jindex.html",
   "/pendaftaran.html",
   "/nadhom.html",
-  "/import_excel.html",
+  "/import_excel_absensi.html",
+  "/import_excel_nilai.html",
   "/ubk-ubq.html",
   "/kitab.html",
   "/alumni.html",
