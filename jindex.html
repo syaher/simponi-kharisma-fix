@@ -1186,6 +1186,13 @@ button:active {
   text-align: left; /* Mata Pelajaran */
 }
 
+/* Nilai rendah: <= 40 */
+.nilai-subtable td.nilai-rendah {
+  background: #dc3545 !important;
+  color: #fff !important;
+  font-weight: 700;
+}
+
 /* Grafik */
 .nilai-chart-container {
   width: 100%;
@@ -1232,6 +1239,46 @@ button:active {
 
 /* Responsive tweaks */
 @media (max-width: 768px) {
+  /* Android portrait: checkbox + teks tetap satu baris dan dua opsi sejajar */
+  .nilai-sort-group {
+    width: 100% !important;
+  }
+  .nilai-sort-options {
+    display: grid !important;
+    grid-template-columns: max-content max-content;
+    align-items: center;
+    justify-content: start;
+    column-gap: 18px;
+    row-gap: 6px;
+    width: 100%;
+  }
+  .nilai-sort-option {
+    display: inline-flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 6px !important;
+    width: max-content !important;
+    min-width: max-content !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    white-space: nowrap !important;
+    line-height: 1.2;
+  }
+  .nilai-sort-option input[type="checkbox"] {
+    width: 16px !important;
+    min-width: 16px !important;
+    max-width: 16px !important;
+    height: 16px !important;
+    flex: 0 0 16px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .nilai-sort-option span {
+    display: inline-block !important;
+    white-space: nowrap !important;
+  }
+
   .nilai-card-header {
     font-size: .95rem;
   }
@@ -3621,6 +3668,49 @@ and (max-width:1024px){
   display: block !important;
   animation: slideDown 0.3s ease;
 }
+
+/* =========================================================
+   URUTAN RATA-RATA
+   Checkbox benar-benar dekat dengan teks
+   ========================================================= */
+
+.nilai-sort-options {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-wrap: nowrap !important;
+}
+
+.nilai-sort-option {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 2px !important;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-weight: 500 !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+}
+
+.nilai-sort-option input[type="checkbox"] {
+  width: 14px !important;
+  height: 14px !important;
+  min-width: 14px !important;
+  max-width: 14px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  flex: 0 0 14px !important;
+}
+
+.nilai-sort-option span {
+  display: inline-block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
   </style>
 </head>
 <body>
@@ -4011,7 +4101,7 @@ and (max-width:1024px){
     <h2>Data Absensi</h2>
     
     <div class="admin-tools">	 
-	  <button class="admin-only" onclick="window.location.href='import_excel.html'">📥 Import Excel</button>
+	  <button class="admin-only" onclick="window.location.href='import_excel_absensi.html'">📥 Import Excel</button>
 	  <button onclick="showAbsensiMerahTrendModule()">🔎 Detail Absen Merah</button>
 
 
@@ -4364,7 +4454,8 @@ and (max-width:1024px){
   <h2>Data Nilai</h2>
   
   <div class="admin-tools">
-  <button class="admin-only" onclick="openAddNilai()">➕ Tambah</button>
+  
+  <button class="admin-only" onclick="window.location.href='import_excel_nilai.html'">📥 Import Excel</button>
 
   <!-- 🔽 Dropdown download -->
 <select id="downloadFormat" class="admin-only">
@@ -4416,6 +4507,21 @@ and (max-width:1024px){
           <option value="semua">Semua</option>
         </select>
       </div>
+      <div class="nilai-filter-group nilai-sort-group">
+  <label>Urutan Rata-rata:</label>
+
+  <div class="nilai-sort-options">
+    <label class="nilai-sort-option">
+      <input type="checkbox" id="nilaiSortBottom" checked>
+      <span>Terendah</span>
+    </label>
+
+    <label class="nilai-sort-option">
+      <input type="checkbox" id="nilaiSortTop">
+      <span>Teratas</span>
+    </label>
+  </div>
+</div>
     </div>  
 
     <div class="nilai-list-container" id="nilai-list"></div>
@@ -5016,6 +5122,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	let lastActiveData = [];        // untuk download
 	let lastEditedId = null;        // simpan id terakhir ditambah/diubah
 	let lastFilteredData = null;      // simpan hasil filter terakhir
+	let nilaiSortMode = "bottom";    // default: rata-rata terendah
 	let currentSortColumn = null;
 	let sortDirection = 'asc';
 	let allNilaiData = [];
@@ -8541,10 +8648,11 @@ async function initNilaiModule() {
     try { await saveToDB && saveToDB('nilai1', []); } catch(e) {}
 
     initNilaiFilters();               // isi dropdown kelas/unit
-    await loadNilaiData(1);           // ⬅️ loadNilaiData sekarang fetch semua nilai aktif
-    initSemesterTahunDropdowns();     // isi semester/tahun dari nilaiDict yg sudah lengkap
+    await loadNilaiData(1);           // ambil data awal untuk membentuk dropdown tahun
+    initSemesterTahunDropdowns();     // isi semester/tahun + pilih tahun ajaran berjalan
+    await loadNilaiData(1);           // reload tabel memakai tahun ajaran berjalan
     bindNilaiTabs();                  // tab Tabel/Grafik
-    renderNilaiChart("kelas");        // tampilkan grafik default
+    renderNilaiChart("kelas");        // grafik default memakai tahun ajaran berjalan
   } catch (err) {
     console.error("initNilaiModule error:", err);
     showError("Gagal memuat modul Nilai: " + (err.message || err));
@@ -8689,31 +8797,83 @@ async function loadNilaiData(page = 1) {
       };
     });
 
-    // 🔹 gabungkan RPC + metadata santri
-    let students = (rpcData || []).map(r => {
-      const meta = (allSantriData || []).find(s => s.Stambuk === r.stambuk) || {};
-      return {
+    // 🔹 Gabungkan RPC + MASTER SANTRI AKTIF.
+    // Santri yang belum memiliki nilai bisa tidak muncul di RPC.
+    // Mereka tetap dimasukkan dengan Rerata = 0 sehingga
+    // mode "Rata-rata Terendah" benar-benar menampilkan nilai 0 paling atas.
+    const rpcMap = new Map(
+      (rpcData || []).map(r => [normStambuk(r.stambuk), r])
+    );
+
+    const keywordLower = keyword.toLowerCase();
+
+    let students = (allSantriData || [])
+      .filter(s => !s.Status || String(s.Status).toLowerCase() === "aktif")
+      .filter(s => !keywordLower || String(s.Nama_Lengkap || "").toLowerCase().includes(keywordLower))
+      .filter(s => (kelas === "semua" || s.Kelas === kelas))
+      .filter(s => (unit === "semua" || s.Unit_Ndalem === unit))
+      .map(s => {
+        const r = rpcMap.get(normStambuk(s.Stambuk));
+        return {
+          Stambuk: s.Stambuk,
+          Nama_Lengkap: s.Nama_Lengkap || r?.nama_lengkap || "-",
+          Kelas: s.Kelas || r?.kelas || "-",
+          Bagian: s.Bagian || r?.bagian || "-",
+          Unit_Ndalem: s.Unit_Ndalem || r?.unit_ndalem || "-",
+          Jumlah: Number(r?.total_nilai || 0),
+          Rerata: Number(r?.rata_rata || 0),
+          NilaiList: []
+        };
+      });
+
+    // Fallback untuk data RPC yang tidak ada di master santri.
+    const existingKeys = new Set(students.map(s => normStambuk(s.Stambuk)));
+    (rpcData || []).forEach(r => {
+      const key = normStambuk(r.stambuk);
+      if (existingKeys.has(key)) return;
+
+      const s = {
         Stambuk: r.stambuk,
-        Nama_Lengkap: meta.Nama_Lengkap || r.nama_lengkap || "-",
-        Kelas: meta.Kelas || r.kelas || "-",
-        Bagian: meta.Bagian || r.bagian || "-",
-        Unit_Ndalem: meta.Unit_Ndalem || r.unit_ndalem || "-",
+        Nama_Lengkap: r.nama_lengkap || "-",
+        Kelas: r.kelas || "-",
+        Bagian: r.bagian || "-",
+        Unit_Ndalem: r.unit_ndalem || "-",
         Jumlah: Number(r.total_nilai || 0),
         Rerata: Number(r.rata_rata || 0),
         NilaiList: []
       };
+
+      if (
+        (!keywordLower || s.Nama_Lengkap.toLowerCase().includes(keywordLower)) &&
+        (kelas === "semua" || s.Kelas === kelas) &&
+        (unit === "semua" || s.Unit_Ndalem === unit)
+      ) {
+        students.push(s);
+      }
     });
 
-    // 🔹 filter tambahan dari UI (kelas & unit)
-    students = students
-      .filter(s => (kelas === "semua" || s.Kelas === kelas))
-      .filter(s => (unit === "semua" || s.Unit_Ndalem === unit));
+    // 🔹 sort rata-rata: teratas / terendah
+    const sortTop = document.getElementById("nilaiSortTop")?.checked === true;
+    const sortBottom = document.getElementById("nilaiSortBottom")?.checked === true;
+    nilaiSortMode = sortTop && !sortBottom ? "top" : "bottom";
 
-    // 🔹 sort: rata-rata desc, jumlah desc, lalu nama
     students.sort((a, b) => {
-      if (b.Rerata !== a.Rerata) return b.Rerata - a.Rerata;
-      if (b.Jumlah !== a.Jumlah) return b.Jumlah - a.Jumlah;
-      return (a.Nama_Lengkap || "").localeCompare(b.Nama_Lengkap || "");
+      if (a.Rerata !== b.Rerata) {
+        return nilaiSortMode === "top"
+          ? b.Rerata - a.Rerata
+          : a.Rerata - b.Rerata;
+      }
+
+      // TOP = jumlah desc, nama asc
+      // BOTTOM = kebalikan TOP = jumlah asc, nama desc
+      if (a.Jumlah !== b.Jumlah) {
+        return nilaiSortMode === "top"
+          ? b.Jumlah - a.Jumlah
+          : a.Jumlah - b.Jumlah;
+      }
+
+      const namaCompare = (a.Nama_Lengkap || "").localeCompare(b.Nama_Lengkap || "");
+      return nilaiSortMode === "top" ? namaCompare : -namaCompare;
     });
 
     // 🔹 pagination
@@ -8819,11 +8979,17 @@ function renderNilaiTable(santriList = [], nilaiDictLocal = {}, page = 1, totalP
 
   const students = Array.from(grouped.values());
 
-  // ✅ sort rata-rata desc, lalu jumlah desc, lalu nama
-  students.sort((a,b) => {
-    if (b.Rerata !== a.Rerata) return b.Rerata - a.Rerata;
-    if (b.Jumlah !== a.Jumlah) return b.Jumlah - a.Jumlah;
-    return (a.Nama_Lengkap || '').localeCompare(b.Nama_Lengkap || '');
+  // 🔹 Ikuti urutan filter rata-rata.
+  // TOP: terbesar -> terkecil; BOTTOM: terkecil -> terbesar.
+  students.sort((a, b) => {
+    if (a.Rerata !== b.Rerata) {
+      return nilaiSortMode === "top" ? b.Rerata - a.Rerata : a.Rerata - b.Rerata;
+    }
+    if (a.Jumlah !== b.Jumlah) {
+      return nilaiSortMode === "top" ? b.Jumlah - a.Jumlah : a.Jumlah - b.Jumlah;
+    }
+    const namaCompare = (a.Nama_Lengkap || '').localeCompare(b.Nama_Lengkap || '');
+    return nilaiSortMode === "top" ? namaCompare : -namaCompare;
   });
 
   // render kartu
@@ -8860,7 +9026,7 @@ if (semFilter === "semua") {
       <tr>
         <td>${no1++}</td>
         <td>${escapeHtml(n.mapel)}</td>
-        <td style="text-align:center">${n.nilai}</td>
+        <td class="${Number(n.nilai) <= 40 ? 'nilai-rendah' : ''}" style="text-align:center">${n.nilai}</td>
       </tr>
     `;
   });
@@ -8882,7 +9048,7 @@ if (semFilter === "semua") {
       <tr>
         <td>${no2++}</td>
         <td>${escapeHtml(n.mapel)}</td>
-        <td style="text-align:center">${n.nilai}</td>
+        <td class="${Number(n.nilai) <= 40 ? 'nilai-rendah' : ''}" style="text-align:center">${n.nilai}</td>
       </tr>
     `;
   });
@@ -8897,7 +9063,7 @@ if (semFilter === "semua") {
       <tr>
         <td>${no++}</td>
         <td>${escapeHtml(n.mapel)}</td>
-        <td style="text-align:center">${n.nilai}</td>
+        <td class="${Number(n.nilai) <= 40 ? 'nilai-rendah' : ''}" style="text-align:center">${n.nilai}</td>
       </tr>
     `;
   });
@@ -9023,6 +9189,23 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
     });
+
+  const sortTop = document.getElementById("nilaiSortTop");
+  const sortBottom = document.getElementById("nilaiSortBottom");
+  const applyNilaiSort = (mode) => {
+    if (mode === "top") {
+      sortTop.checked = true;
+      sortBottom.checked = false;
+      nilaiSortMode = "top";
+    } else {
+      sortTop.checked = false;
+      sortBottom.checked = true;
+      nilaiSortMode = "bottom";
+    }
+    loadNilaiData(1);
+  };
+  sortTop?.addEventListener("change", () => applyNilaiSort("top"));
+  sortBottom?.addEventListener("change", () => applyNilaiSort("bottom"));
 });
 
 
@@ -9220,63 +9403,81 @@ function toNumber(x) {
   return 0;
 }
 
+function getCurrentAcademicYear() {
+  // Tahun ajaran berjalan dimulai bulan Juli.
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
+  return month >= 7 ? `${year}/${year + 1}` : `${year - 1}/${year}`;
+}
+
+function getAcademicYearStart(value) {
+  const match = String(value ?? '').match(/^(\d{4})\/(\d{4})$/);
+  return match ? Number(match[1]) : -Infinity;
+}
+
 function initSemesterTahunDropdowns() {
   const semesterSet = new Set();
   const tahunSet = new Set();
 
-  // isi dari nilaiDict (yang sudah lengkap dari stambuk aktif)
   for (const k of Object.keys(nilaiDropdownDict || {})) {
     const rows = nilaiDropdownDict[k] || [];
     rows.forEach(r => {
-      if (r.semester) semesterSet.add(r.semester);
-      if (r.tahun_ajaran) tahunSet.add(r.tahun_ajaran);
+      if (r.semester !== undefined && r.semester !== null && r.semester !== '') semesterSet.add(r.semester);
+      if (r.tahun_ajaran !== undefined && r.tahun_ajaran !== null && r.tahun_ajaran !== '') tahunSet.add(String(r.tahun_ajaran));
     });
   }
 
-  // helper untuk mengisi select tetapi RESTORE pilihan sebelumnya jika masih tersedia
-  const fillSelectPreserve = (id, arr, defaultLabel = 'semua') => {
+  const currentAcademicYear = getCurrentAcademicYear();
+
+  const fillSelectPreserve = (id, arr, defaultLabel = 'semua', preferredValue = null) => {
     const sel = document.getElementById(id);
     if (!sel) return;
-    const prev = sel.value;           // simpan pilihan sebelumnya (bisa undefined)
-    // rebuild options
+    const prev = sel.value;
+    const values = Array.from(new Set(arr)).filter(v => v !== undefined && v !== null && v !== '').map(v => String(v));
+
+    values.sort((a, b) => {
+      if (id === 'nilaiSearchTahun' || id === 'nilaiGraphTahun') return getAcademicYearStart(b) - getAcademicYearStart(a);
+      return a.localeCompare(b, undefined, { numeric: true });
+    });
+
     sel.innerHTML = '';
     const optAll = document.createElement('option');
     optAll.value = defaultLabel;
     optAll.textContent = defaultLabel;
     sel.appendChild(optAll);
 
-    // urutkan supaya tampil konsisten
-    arr = Array.from(new Set(arr)).filter(v => v !== undefined && v !== null);
-    arr.sort((a, b) => String(a).localeCompare(String(b)));
-    arr.forEach(v => {
+    values.forEach(v => {
       const opt = document.createElement('option');
       opt.value = v;
       opt.textContent = v;
       sel.appendChild(opt);
     });
 
-    // restore previous value kalau masih ada, kalau tidak set ke default
-    if (prev && Array.from(sel.options).some(o => o.value === prev)) {
-      sel.value = prev;
-    } else {
-      sel.value = defaultLabel;
-    }
+    const hasPrev = prev && prev !== defaultLabel && Array.from(sel.options).some(o => o.value === prev);
+    const hasPreferred = preferredValue && Array.from(sel.options).some(o => o.value === String(preferredValue));
+
+    if (hasPrev) sel.value = prev;
+    else if (!window._nilaiTahunDefaultSet && hasPreferred) sel.value = String(preferredValue);
+    else sel.value = defaultLabel;
   };
 
-  // isi semua select (tabel + grafik)
-  fillSelectPreserve("nilaiSearchSemester", Array.from(semesterSet));
-  fillSelectPreserve("nilaiGraphSemester", Array.from(semesterSet));
-  fillSelectPreserve("nilaiSearchTahun", Array.from(tahunSet));
-  fillSelectPreserve("nilaiGraphTahun", Array.from(tahunSet));
+  fillSelectPreserve('nilaiSearchSemester', Array.from(semesterSet));
+  fillSelectPreserve('nilaiGraphSemester', Array.from(semesterSet));
+  fillSelectPreserve('nilaiSearchTahun', Array.from(tahunSet), 'semua', currentAcademicYear);
+  fillSelectPreserve('nilaiGraphTahun', Array.from(tahunSet), 'semua', currentAcademicYear);
 
-  // pasang listener grafik hanya sekali (hindari double-binding)
+  if (document.getElementById('nilaiSearchTahun')?.value === currentAcademicYear || document.getElementById('nilaiGraphTahun')?.value === currentAcademicYear) {
+    window._nilaiTahunDefaultSet = true;
+  }
+
   if (!window._nilaiSemesterTahunBound) {
     window._nilaiSemesterTahunBound = true;
-    document.getElementById("nilaiGraphSemester")?.addEventListener("change", () => {
+    document.getElementById('nilaiGraphSemester')?.addEventListener('change', () => {
       const active = document.querySelector('.nilai-graph-tab.active')?.dataset.graph || 'kelas';
       renderNilaiChart(active);
     });
-    document.getElementById("nilaiGraphTahun")?.addEventListener("change", () => {
+    document.getElementById('nilaiGraphTahun')?.addEventListener('change', () => {
       const active = document.querySelector('.nilai-graph-tab.active')?.dataset.graph || 'kelas';
       renderNilaiChart(active);
     });
@@ -10490,10 +10691,11 @@ const nilaiCSS = `
 .nilai-subtable { width:100%; border-collapse:collapse; font-size:0.9rem; }
 .nilai-subtable th, .nilai-subtable td { border:1px solid #f0f0f0; padding:6px 10px; }
 .nilai-subtable th { background:#f8fafc; font-weight:600; text-align:center; }
+.nilai-subtable td.nilai-rendah { background:#dc3545 !important; color:#fff !important; font-weight:700; }
 `;
 
 // ================= BUILD CONTENT (dipakai HTML & PDF) =================
-function buildNilaiExportContent(ext = "html") {
+async function buildNilaiExportContent(ext = "html") {
   const today = new Date();
   const grafikTab = document.querySelector(".nilai-tab[data-nilai-tab='grafik']");
   const isGrafik = grafikTab && grafikTab.classList.contains("active");
@@ -10546,9 +10748,102 @@ function buildNilaiExportContent(ext = "html") {
     const imgData = canvas.toDataURL("image/png");
     bodyContent = `<div style="text-align:center;"><img src="${imgData}" style="max-width:100%;border:1px solid #ccc;border-radius:6px;"></div>`;
   } else {
-    const cards = document.querySelectorAll(".nilai-card");
-    if (!cards.length) throw new Error("Data nilai santri belum ada!");
-    cards.forEach(c => bodyContent += c.outerHTML);
+    // EXPORT TABEL SELALU MENGAMBIL SEMUA DATA SESUAI FILTER, BUKAN HALAMAN AKTIF.
+    const keyword = (document.getElementById("nilaiSearchNama")?.value || "").trim();
+    const kelasFilter = document.getElementById("nilaiSearchKelas")?.value || "semua";
+    const unitFilter = document.getElementById("nilaiSearchUnit")?.value || "semua";
+    const semFilter = document.getElementById("nilaiSearchSemester")?.value || "semua";
+    const thFilter = document.getElementById("nilaiSearchTahun")?.value || "semua";
+
+    const rpcData = await fetchNilaiAggByRpc(
+      keyword || null,
+      thFilter === "semua" ? null : thFilter,
+      semFilter === "semua" ? null : semFilter,
+      10000,
+      0
+    );
+
+    // EXPORT mengambil seluruh hasil filter, bukan halaman aktif.
+    // Master santri dipakai agar santri dengan rata-rata 0 ikut terdownload.
+    const rpcMap = new Map(
+      (rpcData || []).map(r => [normStambuk(r.stambuk), r])
+    );
+    const keywordLower = keyword.toLowerCase();
+
+    let exportStudents = (allSantriData || [])
+      .filter(s => !s.Status || String(s.Status).toLowerCase() === "aktif")
+      .filter(s => !keywordLower || String(s.Nama_Lengkap || "").toLowerCase().includes(keywordLower))
+      .filter(s => (kelasFilter === "semua" || s.Kelas === kelasFilter))
+      .filter(s => (unitFilter === "semua" || s.Unit_Ndalem === unitFilter))
+      .map(s => {
+        const r = rpcMap.get(normStambuk(s.Stambuk));
+        return {
+          Stambuk: s.Stambuk,
+          Nama_Lengkap: s.Nama_Lengkap || r?.nama_lengkap || "-",
+          Kelas: s.Kelas || r?.kelas || "-",
+          Bagian: s.Bagian || r?.bagian || "-",
+          Unit_Ndalem: s.Unit_Ndalem || r?.unit_ndalem || "-",
+          Jumlah: Number(r?.total_nilai || 0),
+          Rerata: Number(r?.rata_rata || 0)
+        };
+      });
+
+    // Fallback RPC jika ada baris yang tidak ada di master.
+    const exportKeys = new Set(exportStudents.map(s => normStambuk(s.Stambuk)));
+    (rpcData || []).forEach(r => {
+      const key = normStambuk(r.stambuk);
+      if (exportKeys.has(key)) return;
+
+      const s = {
+        Stambuk: r.stambuk,
+        Nama_Lengkap: r.nama_lengkap || "-",
+        Kelas: r.kelas || "-",
+        Bagian: r.bagian || "-",
+        Unit_Ndalem: r.unit_ndalem || "-",
+        Jumlah: Number(r.total_nilai || 0),
+        Rerata: Number(r.rata_rata || 0)
+      };
+
+      if (
+        (!keywordLower || s.Nama_Lengkap.toLowerCase().includes(keywordLower)) &&
+        (kelasFilter === "semua" || s.Kelas === kelasFilter) &&
+        (unitFilter === "semua" || s.Unit_Ndalem === unitFilter)
+      ) {
+        exportStudents.push(s);
+      }
+    });
+
+    exportStudents.sort((a,b) => {
+      if (a.Rerata !== b.Rerata) {
+        return nilaiSortMode === "top"
+          ? b.Rerata - a.Rerata
+          : a.Rerata - b.Rerata;
+      }
+
+      // Download mengikuti urutan tabel:
+      // TOP = jumlah desc, nama asc
+      // BOTTOM = kebalikan TOP = jumlah asc, nama desc
+      if (a.Jumlah !== b.Jumlah) {
+        return nilaiSortMode === "top"
+          ? b.Jumlah - a.Jumlah
+          : a.Jumlah - b.Jumlah;
+      }
+
+      const namaCompare = (a.Nama_Lengkap || "").localeCompare(b.Nama_Lengkap || "");
+      return nilaiSortMode === "top" ? namaCompare : -namaCompare;
+    });
+
+    const detailsDict = await fetchNilaiForStambuksBatched(exportStudents.map(s => normStambuk(s.Stambuk)).filter(Boolean));
+    const cardHtml = s => {
+      const rows = (detailsDict[normStambuk(s.Stambuk)] || []).filter(n => (thFilter === "semua" || String(n.tahun_ajaran) === String(thFilter)) && (semFilter === "semua" || String(n.semester) === String(semFilter)));
+      const sem1=rows.filter(n=>String(n.semester)==="1"), sem2=rows.filter(n=>String(n.semester)==="2");
+      let rowsHtml="";
+      const addRows=(arr,title=null)=>{ if(title && arr.length) rowsHtml += `<tr class="tr-semester-divider"><td colspan="3">${title}</td></tr>`; let no=1; arr.forEach(n=>{const v=Number(n.nilai||0); rowsHtml += `<tr><td>${no++}</td><td>${escapeHtml(n.mata_pelajaran||n.Mata_Pelajaran||n.mapel||"")}</td><td class="${v<=40?"nilai-rendah":""}" style="text-align:center">${v}</td></tr>`;}); };
+      if(semFilter==="semua"){addRows(sem1,"SEMESTER 1");addRows(sem2,"SEMESTER 2");}else addRows(rows);
+      return `<div class="nilai-card"><div class="nilai-card-header">${escapeHtml(s.Nama_Lengkap)}<span>Kelas: ${escapeHtml(s.Kelas)} | Bagian: ${escapeHtml(s.Bagian)} | Unit: ${escapeHtml(s.Unit_Ndalem)}</span><span>Jumlah: ${Math.round(s.Jumlah||0)} | Rata-rata: ${(s.Rerata||0).toFixed(2)}</span></div><div class="nilai-card-body"><table class="nilai-subtable"><thead><tr><th>No.</th><th>Mata Pelajaran</th><th>Nilai</th></tr></thead><tbody>${rowsHtml}</tbody></table></div></div>`;
+    };
+    if (!exportStudents.length) throw new Error("Tidak ada data nilai sesuai filter aktif.");
+    bodyContent = exportStudents.map(cardHtml).join("");
   }
 
   // filter info
@@ -10602,7 +10897,7 @@ ${bodyContent}
 
 async function downloadNilaiHTML() {
   try {
-    const { content, filename } = buildNilaiExportContent("html");
+    const { content, filename } = await buildNilaiExportContent("html");
     const blob = new Blob([content], { type: "text/html;charset=utf-8" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
@@ -10616,98 +10911,149 @@ async function downloadNilaiHTML() {
 }
 
 async function downloadNilaiPDF() {
+  let tempElement = null;
   try {
-    const { content, filename, judul } = buildNilaiExportContent("pdf");
+    const { content, filename, judul } = await buildNilaiExportContent("pdf");
+    const isTabel = /TABEL/i.test(judul);
 
-    // Buat elemen off-screen
-    const tempElement = document.createElement("div");
-    tempElement.style.position = "absolute";
-    tempElement.style.left = "-9999px";
+    // PDF selalu dirender pada lebar A4 yang tetap, bukan mengikuti lebar HP/PC.
+    // Ini membuat kop, logo, tabel dan grafik konsisten di semua perangkat.
+    tempElement = document.createElement("div");
+    tempElement.style.position = "fixed";
+    tempElement.style.left = "-100000px";
     tempElement.style.top = "0";
-    tempElement.style.width = "auto";
-    tempElement.style.padding = "10px";
+    tempElement.style.width = "794px";
+    tempElement.style.maxWidth = "794px";
+    tempElement.style.boxSizing = "border-box";
+    tempElement.style.padding = "24px 28px";
+    tempElement.style.margin = "0";
     tempElement.style.background = "#fff";
+    tempElement.style.color = "#111";
+    tempElement.style.overflow = "visible";
     tempElement.innerHTML = content;
     document.body.appendChild(tempElement);
 
-    // Deteksi apakah tab TABEL
-    const isTabel = /TABEL/i.test(judul);
+    const style = document.createElement("style");
+    style.textContent = `
+      * { box-sizing: border-box; }
+      body { width: 100% !important; margin: 0 !important; padding: 0 !important; background:#fff !important; }
+      .kop {
+        position: relative !important;
+        width: 100% !important;
+        min-height: 82px !important;
+        margin: 0 0 8px 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+      }
+      .kop img {
+        position: absolute !important;
+        left: 0 !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        width: 58px !important;
+        height: 58px !important;
+        max-width: 58px !important;
+        max-height: 58px !important;
+        object-fit: contain !important;
+        margin: 0 !important;
+      }
+      .identitas {
+        width: calc(100% - 82px) !important;
+        margin-left: 82px !important;
+        margin-right: 12px !important;
+        text-align: center !important;
+        line-height: 1.25 !important;
+      }
+      .identitas h1 { margin:0 !important; font-size:18px !important; line-height:1.2 !important; }
+      .identitas h2 { margin:2px 0 !important; font-size:12px !important; line-height:1.2 !important; }
+      .identitas p { margin:2px 0 0 !important; font-size:8px !important; line-height:1.2 !important; }
+      hr { margin:8px 0 10px !important; border:0 !important; border-top:1px solid #000 !important; }
+      /* PDF share satu lembar panjang: jangan paksa page-break. */
+      .nilai-card { break-inside:auto !important; page-break-inside:auto !important; }
+      .nilai-subtable { width:100% !important; table-layout:fixed !important; }
+      .nilai-subtable th:first-child, .nilai-subtable td:first-child { width:42px !important; }
+      .nilai-subtable th:last-child, .nilai-subtable td:last-child { width:70px !important; }
+      .nilai-subtable th:nth-child(2), .nilai-subtable td:nth-child(2) { width:auto !important; }
+      .nilai-subtable th, .nilai-subtable td { word-break:break-word !important; overflow-wrap:anywhere !important; }
+      ${isTabel ? `
+        .nilai-card { margin-bottom:8px !important; }
+        .nilai-card-header { padding:5px 7px !important; font-size:10px !important; }
+        .nilai-card-header span { font-size:8px !important; }
+        .nilai-card-body { padding:5px 7px !important; overflow:visible !important; }
+        .nilai-subtable { font-size:8px !important; }
+        .nilai-subtable th, .nilai-subtable td { padding:2.5px 3px !important; }
+      ` : `
+        #nilai-chart { max-width:100% !important; height:auto !important; }
+        .filter-info { font-size:9px !important; }
+      `}
+    `;
+    tempElement.appendChild(style);
 
-    // === Tambahkan CSS override khusus untuk TABEL ===
-    if (isTabel) {
-      const style = document.createElement("style");
-      style.textContent = `
-        .kop img { height: 24px !important; }
-        .identitas h1 { font-size: 12px !important; }
-        .identitas h2 { font-size: 9px !important; }
-        .identitas p { font-size: 7px !important; }
-        hr { margin: 6px 0 !important; }
-        h2 { font-size: 11px !important; }
-        .filter-info { font-size: 7px !important; }
-        .footer { font-size: 7px !important; }
-        .nilai-card-header { font-size: 10px !important; padding: 4px 6px !important; }
-        .nilai-card-header span { font-size: 8px !important; }
-        .nilai-card-body { padding: 4px 6px !important; }
-        .nilai-subtable { font-size: 8px !important; }
-        .nilai-subtable th, .nilai-subtable td { padding: 2px 3px !important; }
-      `;
-      tempElement.appendChild(style);
-    }
+    // Tunggu font dan gambar kop/logo selesai.
+    if (document.fonts?.ready) await document.fonts.ready;
+    await Promise.all(Array.from(tempElement.querySelectorAll("img")).map(img =>
+      new Promise(resolve => {
+        if (img.complete) return resolve();
+        img.onload = resolve;
+        img.onerror = resolve;
+      })
+    ));
 
-    // Tunggu semua gambar selesai load
-    await Promise.all(
-      Array.from(tempElement.querySelectorAll("img")).map(
-        img =>
-          new Promise(res => {
-            if (img.complete && img.naturalHeight > 0) return res();
-            img.onload = res;
-            img.onerror = res;
-          })
-      )
-    );
-
-    // Render ke canvas
     const canvas = await html2canvas(tempElement, {
-      scale: 3,
+      scale: 2,
       useCORS: true,
-      backgroundColor: "#fff"
+      allowTaint: false,
+      backgroundColor: "#fff",
+      width: 794,
+      windowWidth: 794,
+      scrollX: 0,
+      scrollY: 0,
+      logging: false
     });
 
     document.body.removeChild(tempElement);
+    tempElement = null;
 
-    // Hitung ukuran PDF
-    const pdfWidth = 794; // A4 px width
-    const margin = 20;
-    const scaleFactor = (pdfWidth - margin * 2) / canvas.width;
-    const pdfHeight = Math.ceil(canvas.height * scaleFactor + margin * 2);
+    // ==========================================================
+    // PDF SHARE: SATU LEMBAR PANJANG, BUKAN DIPECAH-POTONG
+    // TABEL  = A5 portrait dengan tinggi mengikuti seluruh data
+    // GRAFIK = A4 portrait dengan tinggi mengikuti seluruh grafik
+    // Tujuannya untuk share WhatsApp, bukan untuk dicetak.
+    // ==========================================================
+    const baseW = isTabel ? 148 : 210; // A5 / A4 dalam mm
+    const marginX = isTabel ? 5 : 8;
+    const marginY = isTabel ? 5 : 8;
+    const drawW = baseW - marginX * 2;
 
-    // Safety fallback
-    if (pdfHeight > 20000) {
-      const blob = new Blob([content], { type: "text/html;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      window.open(url, "_blank");
-      URL.revokeObjectURL(url);
-      alert("Konten terlalu panjang untuk PDF, dibuka sebagai HTML.");
-      return;
-    }
+    // Tinggi gambar dihitung dari rasio canvas sehingga seluruh isi
+    // masuk dalam SATU halaman panjang tanpa slicing/pagination.
+    const renderedH = drawW * canvas.height / canvas.width;
+    const pageH = renderedH + marginY * 2;
 
-    // Buat PDF
+    // Custom page size: lebar tetap A5/A4, tinggi mengikuti isi.
     const pdf = new window.jspdf.jsPDF({
-      unit: "px",
-      format: [pdfWidth, pdfHeight]
+      orientation: "portrait",
+      unit: "mm",
+      format: [baseW, pageH],
+      compress: true
     });
+
     pdf.addImage(
-      canvas.toDataURL("image/jpeg", 0.95),
+      canvas.toDataURL("image/jpeg", 0.92),
       "JPEG",
-      margin,
-      margin,
-      pdfWidth - margin * 2,
-      pdfHeight - margin * 2
+      marginX,
+      marginY,
+      drawW,
+      renderedH,
+      undefined,
+      "FAST"
     );
 
     pdf.save(filename);
   } catch (err) {
     console.error("❌ PDF export failed:", err);
+    if (tempElement && tempElement.parentNode) tempElement.parentNode.removeChild(tempElement);
     alert("Gagal membuat PDF: " + (err.message || err));
   }
 }
