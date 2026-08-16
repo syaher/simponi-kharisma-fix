@@ -137,6 +137,42 @@
             border-radius: 8px;
             margin-bottom: 20px
         }
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px
+        }
+        .summary-card {
+            background: #fff;
+            padding: 18px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .07);
+            border-left: 6px solid #2563eb
+        }
+        .summary-card.green {
+            border-left-color: #16a34a
+        }
+        .summary-card.red {
+            border-left-color: #dc2626
+        }
+        .summary-card.orange {
+            border-left-color: #ea580c
+        }
+        .summary-card.yellow {
+            border-left-color: #ca8a04
+        }
+        .summary-card.purple {
+            border-left-color: #7c3aed
+        }
+        .summary-card.teal {
+            border-left-color: #0d9488
+        }
+        .summary-card p {
+            margin: 7px 0 0;
+            font-size: 28px;
+            font-weight: bold
+        }
         .table-wrapper {
             width: 100%;
             overflow: auto;
@@ -235,10 +271,6 @@
             background: #ccfbf1;
             color: #0f766e
         }
-        .badge-gray {
-            background: #e5e7eb;
-            color: #374151
-        }
         .hidden {
             display: none !important;
         }
@@ -307,20 +339,6 @@
         .col-badge.header {
             background: #dbeafe;
             color: #1d4ed8;
-        }
-        .col-badge.duplicate {
-            background: #fef2f2;
-            color: #dc2626;
-        }
-        .col-badge.match {
-            background: #dbeafe;
-            color: #1d4ed8;
-        }
-        .col-badge.recommended {
-            background: #dcfce7;
-            color: #166534;
-            font-weight: bold;
-            border: 1px solid #16a34a;
         }
 
         /* Modal / Popup Custom */
@@ -460,8 +478,8 @@
 
                 <div>
                     <label for="mataPelajaran">Mata Pelajaran</label>
-                    <input type="text" id="mataPelajaran" placeholder="Contoh: Alfiyah Ibnu Malik" oninput="filterNilaiColumns()">
-                    <div class="hint" id="mapelHint">Ketik nama mata pelajaran untuk memfilter kolom nilai yang sesuai.</div>
+                    <input type="text" id="mataPelajaran" placeholder="Contoh: Alfiyah Ibnu Malik">
+                    <div class="hint" id="mapelHint">Akan otomatis diambil dari header kolom nilai di Excel.</div>
                 </div>
             </div>
 
@@ -479,7 +497,7 @@
                 <div>
                     <label for="colNilai">Kolom Nilai</label>
                     <select id="colNilai"><option value="">Pilih Excel terlebih dahulu</option></select>
-                    <div class="hint" id="nilaiColHint">Kolom akan difilter berdasarkan nama mata pelajaran yang diketik.</div>
+                    <div class="hint" id="nilaiColHint">Hanya menampilkan kolom yang memiliki nilai angka.</div>
                 </div>
             </div>
 
@@ -491,6 +509,15 @@
                         <span class="badge badge-purple">🟣 Sertakan Fuzzy Match</span>
                         <span style="color:#6b7280;font-size:13px;margin-left:8px;">
                             (Data yang cocok secara fuzzy akan ikut diupload)
+                        </span>
+                    </label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="skipDuplicate" checked>
+                    <label for="skipDuplicate">
+                        <span class="badge badge-teal">⏭️ Skip Duplikat</span>
+                        <span style="color:#6b7280;font-size:13px;margin-left:8px;">
+                            (Lewati data yang sudah ada di database)
                         </span>
                     </label>
                 </div>
@@ -511,21 +538,28 @@
             <div class="info">
                 <strong>Alur:</strong><br>
                 1. Pilih kelas dari database.<br>
-                2. Pilih Excel.<br>
-                3. Ketik nama mata pelajaran - kolom nilai otomatis difilter.<br>
-                4. Pilih kolom nama dan nilai yang sesuai.<br>
-                5. Preview data dan upload.
+                2. Pilih Excel - kolom nilai otomatis difilter yang memiliki data angka.<br>
+                3. Sistem mengambil hanya santri aktif untuk kelas tersebut.<br>
+                4. Nama Excel dicocokkan dengan Nama_Lengkap.<br>
+                5. <strong>Deteksi duplikat</strong> berdasarkan stambuk + mapel + semester + tahun ajaran.<br>
+                6. Preview utama hanya berisi data valid dan belum ada di database.<br>
+                7. Santri aktif yang tidak ada di Excel, nama Excel yang tidak cocok, dan nama ganda ditampilkan terpisah.
             </div>
+        </div>
+
+        <div class="summary">
+            <div class="summary-card"><h3>Santri Aktif</h3><p id="totalAktif">0</p></div>
+            <div class="summary-card green"><h3>Siap Upload</h3><p id="dataBaru">0</p></div>
+            <div class="summary-card teal"><h3>Duplikat</h3><p id="dataDuplicate">0</p></div>
+            <div class="summary-card purple"><h3>Fuzzy Match</h3><p id="dataFuzzy">0</p></div>
+            <div class="summary-card red"><h3>Tidak di Excel</h3><p id="dataTidakDiExcel">0</p></div>
+            <div class="summary-card orange"><h3>Excel Tidak Cocok</h3><p id="dataExcelTidakCocok">0</p></div>
+            <div class="summary-card yellow"><h3>Nama Ganda</h3><p id="dataGanda">0</p></div>
         </div>
 
         <!-- PREVIEW UTAMA -->
         <div class="table-card">
             <h2>Preview Data Siap Upload (Valid + Tidak Duplikat)</h2>
-            <div style="margin-bottom:15px;display:flex;gap:20px;flex-wrap:wrap;">
-                <span><span class="badge badge-green">Siap Upload</span> <strong id="totalUpload">0</strong> data</span>
-                <span><span class="badge badge-teal">Duplikat</span> <strong id="totalDuplicate">0</strong> data</span>
-                <span><span class="badge badge-purple">Fuzzy</span> <strong id="totalFuzzy">0</strong> data</span>
-            </div>
             <div class="table-wrapper">
                 <table>
                     <thead><tr>
@@ -546,6 +580,7 @@
         <!-- Detail Data Bermasalah dengan Tab -->
         <div class="table-card">
             <h2>Detail Data Lainnya</h2>
+            <div id="selisihSummary" class="info"></div>
             <div id="selisihTabs">
                 <button class="active" data-tab="tab-duplicate">Duplikat (<span id="badgeDuplicate">0</span>)</button>
                 <button data-tab="tab-fuzzy">Fuzzy Match (<span id="badgeFuzzy">0</span>)</button>
@@ -555,7 +590,7 @@
             </div>
 
             <div id="tab-duplicate" class="tab-content active">
-                <h3>Data Duplikat (Sudah Ada di Database) - <span class="badge badge-gray">Tidak diupload</span></h3>
+                <h3>Data Duplikat (Sudah Ada di Database)</h3>
                 <div class="table-wrapper">
                     <table><thead><tr><th>No</th><th>Nama Database</th><th>Stambuk</th><th>Kelas</th><th>Nilai</th><th>Keterangan</th></tr></thead>
                         <tbody id="duplicateBody"></tbody></table>
@@ -563,7 +598,7 @@
             </div>
 
             <div id="tab-fuzzy" class="tab-content">
-                <h3>Fuzzy Match - <span class="badge badge-purple">Akan diupload</span></h3>
+                <h3>Fuzzy Match</h3>
                 <div class="table-wrapper">
                     <table><thead><tr><th>No</th><th>Nama Database</th><th>Stambuk</th><th>Kelas</th><th>Nama Excel</th><th>Similarity</th><th>Nilai</th></tr></thead>
                         <tbody id="fuzzyBody"></tbody></table>
@@ -655,6 +690,8 @@
         const PER_PAGE = 20;
 
         // --- MODAL / POPUP ---
+        let modalResolve = null;
+
         function showModal(options) {
             return new Promise((resolve) => {
                 const overlay = document.getElementById('modalOverlay');
@@ -670,10 +707,14 @@
                 cancelBtn.textContent = options.cancelText || 'Batal';
                 confirmBtn.textContent = options.confirmText || 'Ya, Lanjutkan';
 
+                // Tampilkan/sembunyikan tombol
                 cancelBtn.style.display = options.showCancel !== false ? 'inline-block' : 'none';
                 confirmBtn.style.display = 'inline-block';
+
+                // Warna tombol confirm
                 confirmBtn.className = options.confirmDanger ? 'btn-confirm-danger' : 'btn-confirm';
 
+                // Event handler
                 const cleanup = () => {
                     overlay.classList.remove('active');
                     cancelBtn.removeEventListener('click', onCancel);
@@ -694,6 +735,8 @@
                 confirmBtn.addEventListener('click', onConfirm);
 
                 overlay.classList.add('active');
+
+                // Focus ke confirm
                 setTimeout(() => confirmBtn.focus(), 100);
             });
         }
@@ -924,14 +967,6 @@
                 if (headerIndex < 0) headerIndex = 0;
 
                 excelRows = [rows[headerIndex], ...rows.slice(headerIndex + 1)];
-
-                // Reset dropdown
-                const namaSelect = $("colNama");
-                const nilaiSelect = $("colNilai");
-                namaSelect.innerHTML = '<option value="">-- Pilih Kolom Nama --</option>';
-                nilaiSelect.innerHTML = '<option value="">-- Pilih Kolom Nilai --</option>';
-
-                // Generate mapping
                 generateMapping();
                 updatePreviewButton();
 
@@ -944,25 +979,13 @@
             }
         });
 
-        // --- FILTER KOLOM NILAI BERDASARKAN MATA PELAJARAN ---
-        function filterNilaiColumns() {
-            if (excelRows.length === 0) return;
-            generateMapping();
-        }
-
-        // --- MAPPING DENGAN FILTER BERDASARKAN MATA PELAJARAN ---
+        // --- MAPPING DENGAN FILTER KOLOM NILAI ---
         function generateMapping() {
             const header = excelRows[0] || [];
             const namaSelect = $("colNama");
             const nilaiSelect = $("colNilai");
-
-            // Simpan nilai yang dipilih sebelumnya
-            const prevNamaVal = namaSelect.value;
-            const prevNilaiVal = nilaiSelect.value;
-
-            // Reset dropdown
-            namaSelect.innerHTML = '<option value="">-- Pilih Kolom Nama --</option>';
-            nilaiSelect.innerHTML = '<option value="">-- Pilih Kolom Nilai --</option>';
+            namaSelect.innerHTML = "";
+            nilaiSelect.innerHTML = "";
 
             // Deteksi kolom yang memiliki nilai angka
             const colScores = header.map((_, i) => {
@@ -981,7 +1004,7 @@
             });
             if (ni < 0) ni = 0;
 
-            // Build dropdown nama (semua kolom)
+            // Build dropdown nama
             header.forEach((v, i) => {
                 const label = clean(v) || `(Kolom ${i + 1})`;
                 const isSelected = i === ni ? 'selected' : '';
@@ -993,154 +1016,72 @@
                 namaSelect.innerHTML += `<option value="${i}" ${isSelected}>${i + 1}. ${escapeHtml(label)} ${badge}</option>`;
             });
 
-            // Ambil mata pelajaran yang diketik
-            const mapelInput = clean($("mataPelajaran").value);
-            const mapelNorm = norm(mapelInput);
-
-            // Cari kolom yang cocok dengan mata pelajaran
-            let matchedCols = [];
-            let bestMatchIndex = -1;
-            let bestMatchScore = 0;
-
+            // Build dropdown nilai - HANYA kolom yang memiliki nilai
+            let hasValueCols = 0;
+            let nilaiHeaderText = '';
             header.forEach((v, i) => {
-                const label = clean(v);
-                const labelNorm = norm(label);
+                const score = colScores[i] || { count: 0, total: 0 };
+                const label = clean(v) || `(Kolom ${i + 1})`;
 
-                // Cek apakah header mengandung kata kunci mata pelajaran
-                if (mapelInput && labelNorm) {
-                    // Split menjadi kata-kata
-                    const mapelWords = mapelNorm.split(/\s+/);
-                    const labelWords = labelNorm.split(/\s+/);
+                const isNilaiHeader = norm(v) === "nilai" || norm(v).includes("nilai") || norm(v).includes("ujian") || norm(v) ===
+                    "angka";
+                const hasValue = score.count > 0 || isNilaiHeader;
 
-                    let matchCount = 0;
-                    for (const mw of mapelWords) {
-                        if (mw.length < 3) continue;
-                        for (const lw of labelWords) {
-                            if (lw.includes(mw) || mw.includes(lw)) {
-                                matchCount++;
-                                break;
-                            }
-                        }
-                    }
-
-                    const score = matchCount / Math.max(mapelWords.filter(w => w.length >= 3).length, 1);
-                    if (score > 0 && score > bestMatchScore) {
-                        bestMatchScore = score;
-                        bestMatchIndex = i;
-                    }
-
-                    // Jika score > 0.3, anggap match
-                    if (score > 0.3) {
-                        matchedCols.push(i);
-                    }
-                }
-
-                // Jika header mengandung kata "nilai" dan mapel belum diisi
-                if (!mapelInput && (labelNorm === "nilai" || labelNorm.includes("nilai") || labelNorm.includes("ujian") ||
-                        labelNorm === "angka")) {
-                    matchedCols.push(i);
-                }
-            });
-
-            // Jika ada yang cocok, gunakan itu untuk dropdown nilai
-            if (matchedCols.length > 0) {
-                // Tampilkan hanya kolom yang cocok
-                let hasValueCols = 0;
-                matchedCols.forEach(i => {
-                    const v = header[i];
-                    const label = clean(v) || `(Kolom ${i + 1})`;
-                    const score = colScores[i] || { count: 0, total: 0 };
-                    const hasValue = score.count > 0;
-
-                    // Cek apakah data di kolom ini sudah ada di database
-                    const isNilaiHeader = norm(v) === "nilai" || norm(v).includes("nilai") || norm(v).includes("ujian") ||
-                        norm(v) === "angka";
+                if (hasValue) {
+                    hasValueCols++;
                     const badge = isNilaiHeader ?
                         `<span class="col-badge header">Header</span>` :
                         `<span class="col-badge has-value">${score.count} nilai</span>`;
+                    nilaiSelect.innerHTML += `<option value="${i}">${i + 1}. ${escapeHtml(label)} ${badge}</option>`;
 
-                    const isRecommended = (i === bestMatchIndex && bestMatchScore > 0.5);
-                    const recBadge = isRecommended ? `<span class="col-badge recommended">⭐ Rekomendasi</span>` : '';
-
-                    nilaiSelect.innerHTML +=
-                        `<option value="${i}" ${i === bestMatchIndex ? 'selected' : ''}>${i + 1}. ${escapeHtml(label)} ${badge} ${recBadge}</option>`;
-                    hasValueCols++;
-                });
-
-                if (hasValueCols > 0) {
-                    $("nilaiColHint").textContent =
-                        `✅ Menampilkan ${hasValueCols} kolom yang cocok dengan mata pelajaran "${mapelInput || 'nilai'}".`;
-                    $("nilaiColHint").style.color = "#15803d";
-                } else {
-                    $("nilaiColHint").textContent =
-                        `⚠️ Tidak ada kolom yang cocok dengan "${mapelInput}". Periksa kembali nama mata pelajaran.`;
-                    $("nilaiColHint").style.color = "#c2410c";
-                }
-
-                // Jika ada rekomendasi, set mata pelajaran dari header
-                if (bestMatchIndex >= 0 && bestMatchScore > 0.5) {
-                    const mapelFromHeader = clean(header[bestMatchIndex]);
-                    if (mapelFromHeader && norm(mapelFromHeader) !== "nilai" && norm(mapelFromHeader) !== "angka" && !norm(
-                            mapelFromHeader).includes("ujian")) {
-                        if (!mapelInput || norm(mapelFromHeader) !== mapelNorm) {
-                            // Jika user belum mengisi atau berbeda, kasih tahu
-                            $("mapelHint").textContent =
-                                `💡 Ditemukan kolom "${mapelFromHeader}" yang cocok dengan "${mapelInput || 'nilai'}". Klik Preview untuk melanjutkan.`;
-                            $("mapelHint").style.color = "#0d9488";
-                        }
+                    // Simpan header untuk auto-fill mata pelajaran
+                    if (isNilaiHeader && !nilaiHeaderText) {
+                        nilaiHeaderText = label;
                     }
                 }
-            } else {
-                // Jika tidak ada yang cocok, tampilkan semua kolom yang memiliki nilai
-                let hasValueCols = 0;
+            });
+
+            // Jika tidak ada kolom dengan nilai, tampilkan semua
+            if (hasValueCols === 0) {
                 header.forEach((v, i) => {
-                    const score = colScores[i] || { count: 0, total: 0 };
                     const label = clean(v) || `(Kolom ${i + 1})`;
-                    const hasValue = score.count > 0;
-
-                    // Tampilkan kolom yang memiliki nilai
-                    if (hasValue) {
-                        hasValueCols++;
-                        const isNilaiHeader = norm(v) === "nilai" || norm(v).includes("nilai") || norm(v).includes(
-                            "ujian") || norm(v) === "angka";
-                        const badge = isNilaiHeader ?
-                            `<span class="col-badge header">Header</span>` :
-                            `<span class="col-badge has-value">${score.count} nilai</span>`;
-                        nilaiSelect.innerHTML +=
-                            `<option value="${i}">${i + 1}. ${escapeHtml(label)} ${badge}</option>`;
-                    }
+                    nilaiSelect.innerHTML += `<option value="${i}">${i + 1}. ${escapeHtml(label)}</option>`;
                 });
-
-                if (hasValueCols === 0) {
-                    nilaiSelect.innerHTML =
-                        `<option value="">-- Tidak ada kolom dengan nilai angka --</option>`;
-                    $("nilaiColHint").textContent = "⚠️ Tidak ada kolom dengan nilai angka. Periksa file Excel.";
-                    $("nilaiColHint").style.color = "#c2410c";
-                } else {
-                    $("nilaiColHint").textContent =
-                        `📋 Menampilkan ${hasValueCols} kolom yang memiliki nilai angka. Ketik mata pelajaran untuk filter.`;
-                    $("nilaiColHint").style.color = "#6b7280";
-                }
+                $("nilaiColHint").textContent = "⚠️ Tidak ada kolom dengan nilai angka. Menampilkan semua kolom.";
+                $("nilaiColHint").style.color = "#c2410c";
+            } else {
+                $("nilaiColHint").textContent = `✅ Menampilkan ${hasValueCols} kolom yang memiliki nilai angka.`;
+                $("nilaiColHint").style.color = "#15803d";
             }
 
-            // Restore nilai yang dipilih sebelumnya jika masih ada
-            if (prevNamaVal && Array.from(namaSelect.options).some(opt => opt.value == prevNamaVal)) {
-                namaSelect.value = prevNamaVal;
-            }
-            if (prevNilaiVal && Array.from(nilaiSelect.options).some(opt => opt.value == prevNilaiVal)) {
-                nilaiSelect.value = prevNilaiVal;
+            // Auto-select kolom nilai terbaik
+            let vi = header.findIndex(v => norm(v) === "nilai" || norm(v).includes("nilai") || norm(v).includes("ujian") || norm(
+                v) === "angka");
+            if (vi < 0) {
+                const bestCol = colScores.sort((a, b) => b.count - a.count)[0];
+                if (bestCol && bestCol.count > 0) vi = bestCol.i;
+                else vi = Math.max(0, header.length - 1);
             }
 
-            // Auto-set mata pelajaran dari header yang dipilih
-            const selectedVal = parseInt(nilaiSelect.value);
-            if (!isNaN(selectedVal) && selectedVal >= 0) {
-                const mapelFromHeader = clean(header[selectedVal]);
-                const currentMapel = clean($("mataPelajaran").value);
-                if (mapelFromHeader && !currentMapel) {
-                    $("mataPelajaran").value = mapelFromHeader;
-                    $("mapelHint").textContent = `✅ Diambil dari header kolom nilai: "${mapelFromHeader}"`;
-                    $("mapelHint").style.color = "#15803d";
-                }
+            const hasOption = Array.from(nilaiSelect.options).some(opt => opt.value == vi);
+            if (!hasOption && nilaiSelect.options.length > 0) {
+                vi = parseInt(nilaiSelect.options[0].value);
+            }
+            nilaiSelect.value = vi;
+
+            // Set mata pelajaran dari header kolom nilai
+            const mapel = clean(header[vi]);
+            if (mapel && norm(mapel) !== "nilai" && norm(mapel) !== "angka" && !norm(mapel).includes("ujian")) {
+                $("mataPelajaran").value = mapel;
+                $("mapelHint").textContent = `✅ Diambil dari header kolom nilai: "${mapel}"`;
+                $("mapelHint").style.color = "#15803d";
+            } else if (nilaiHeaderText && norm(nilaiHeaderText) !== "nilai") {
+                $("mataPelajaran").value = nilaiHeaderText;
+                $("mapelHint").textContent = `✅ Diambil dari header: "${nilaiHeaderText}"`;
+                $("mapelHint").style.color = "#15803d";
+            } else {
+                $("mapelHint").textContent = "⚠️ Tidak ada nama mata pelajaran di header. Silakan isi manual.";
+                $("mapelHint").style.color = "#c2410c";
             }
         }
 
@@ -1162,11 +1103,11 @@
 
             const colNama = parseInt($("colNama").value);
             const colNilai = parseInt($("colNilai").value);
-            if (Number.isNaN(colNama) || Number.isNaN(colNilai) || colNama < 0 || colNilai < 0) {
+            if (Number.isNaN(colNama) || Number.isNaN(colNilai)) {
                 return await showAlert({
                     icon: '⚠️',
                     title: 'Peringatan',
-                    message: 'Kolom nama dan nilai belum dipilih dengan benar.\n\nPastikan Anda sudah memilih kolom yang sesuai.'
+                    message: 'Kolom nama dan nilai belum dipilih dengan benar.'
                 });
             }
 
@@ -1437,10 +1378,6 @@
             } else {
                 $("btnUpload").textContent = "Upload ke Supabase";
             }
-
-            document.getElementById('totalUpload').textContent = totalData;
-            document.getElementById('totalDuplicate').textContent = duplicateData.length;
-            document.getElementById('totalFuzzy').textContent = dataFuzzy.length;
         }
 
         // --- RENDER PREVIEW ---
@@ -1472,19 +1409,50 @@
             tbody.innerHTML = '';
             tbody.appendChild(fragment);
 
+            $("totalAktif").textContent = kelasAktifCount();
+            $("dataBaru").textContent = uploadData.length;
+
             const pages = Math.ceil(previewData.length / PER_PAGE);
             $("pageInfo").textContent = `Halaman ${currentPage} / ${pages || 1}`;
+        }
 
-            updateUploadButton();
+        function kelasAktifCount() {
+            const k = kelasKey($("kelasExcel").value);
+            return santriAktif.filter(s => kelasKey(s.kelas) === k).length;
         }
 
         // --- RENDER SELISIH ---
         function renderSelisih() {
+            $("dataTidakDiExcel").textContent = tidakDiExcel.length;
+            $("dataExcelTidakCocok").textContent = excelTidakCocok.length;
+            $("dataGanda").textContent = dataGanda.length;
+            $("dataFuzzy").textContent = dataFuzzy.length;
+            $("dataDuplicate").textContent = duplicateData.length;
+
             document.getElementById('badgeDuplicate').textContent = duplicateData.length;
             document.getElementById('badgeFuzzy').textContent = dataFuzzy.length;
             document.getElementById('badgeTidak').textContent = tidakDiExcel.length;
             document.getElementById('badgeTidakCocok').textContent = excelTidakCocok.length;
             document.getElementById('badgeGanda').textContent = dataGanda.length;
+
+            const includeFuzzy = $("includeFuzzy").checked;
+            const totalUpload = uploadData.length + (includeFuzzy ? dataFuzzy.length : 0);
+
+            $("selisihSummary").innerHTML = `
+                <span class="badge badge-green">Siap Upload: ${uploadData.length}</span>
+                &nbsp;
+                <span class="badge badge-teal">Duplikat: ${duplicateData.length}</span>
+                &nbsp;
+                <span class="badge badge-purple">Fuzzy: ${dataFuzzy.length}</span>
+                &nbsp;
+                <span class="badge badge-red">Tidak di Excel: ${tidakDiExcel.length}</span>
+                &nbsp;
+                <span class="badge badge-yellow">Ganda: ${dataGanda.length}</span>
+                &nbsp;
+                <span class="badge badge-red">Excel tidak cocok: ${excelTidakCocok.length}</span>
+                &nbsp;
+                <span style="font-weight:bold;color:#0d9488;">Total upload: ${totalUpload}</span>
+            `;
 
             renderTableBody('duplicateBody', duplicateData, (x, i) =>
                 `<td>${i + 1}</td><td>${escapeHtml(x.nama_db)}</td>
@@ -1696,13 +1664,13 @@
         });
 
         // --- CHECKBOX ---
-        $("includeFuzzy").addEventListener("change", function() {
-            updateUploadButton();
-        });
+        $("includeFuzzy").addEventListener("change", updateUploadButton);
+        $("skipDuplicate").addEventListener("change", updateUploadButton);
 
         // --- UPLOAD ---
         async function uploadDataToSupabase() {
             const includeFuzzy = $("includeFuzzy").checked;
+            const skipDup = $("skipDuplicate").checked;
 
             let allUpload = [...uploadData];
             if (includeFuzzy) {
@@ -1731,16 +1699,17 @@
             const tahun = clean($("tahunAjaran").value);
             const kelas = clean($("kelasExcel").value);
 
-            // Cek duplikat lagi sebelum upload
-            await checkExistingData(mapel, semester, tahun);
-
-            // Filter data yang sudah ada
-            const finalUpload = allUpload.filter(x => {
-                const key = getDuplicateKey(x.stambuk, x.mata_pelajaran, x.semester, x.tahun_ajaran);
-                return !existingDataMap.has(key);
-            });
-
-            const skippedCount = allUpload.length - finalUpload.length;
+            // Filter duplikat jika skipDuplicate aktif
+            let finalUpload = allUpload;
+            let skippedCount = 0;
+            if (skipDup) {
+                await checkExistingData(mapel, semester, tahun);
+                finalUpload = allUpload.filter(x => {
+                    const key = getDuplicateKey(x.stambuk, x.mata_pelajaran, x.semester, x.tahun_ajaran);
+                    return !existingDataMap.has(key);
+                });
+                skippedCount = allUpload.length - finalUpload.length;
+            }
 
             if (finalUpload.length === 0) {
                 return await showAlert({
@@ -1750,7 +1719,7 @@
                 });
             }
 
-            // Tampilkan konfirmasi
+            // Tampilkan konfirmasi dengan modal custom
             const confirmMsg =
                 `📋 <strong>Konfirmasi Upload</strong>\n\n` +
                 `🏫 Kelas: <span class="highlight">${kelas}</span>\n` +
@@ -1794,6 +1763,7 @@
                         "loading");
                 }
 
+                // Tampilkan notifikasi berhasil
                 await showAlert({
                     icon: '✅',
                     title: 'Upload Berhasil!',
@@ -1859,16 +1829,11 @@
         $("colNilai").onchange = function() {
             const header = excelRows[0] || [];
             const i = parseInt(this.value);
-            if (!isNaN(i) && i >= 0) {
-                const v = clean(header[i]);
-                if (v && norm(v) !== "nilai" && norm(v) !== "angka" && !norm(v).includes("ujian")) {
-                    const currentMapel = clean($("mataPelajaran").value);
-                    if (!currentMapel) {
-                        $("mataPelajaran").value = v;
-                        $("mapelHint").textContent = `✅ Diambil dari header kolom nilai: "${v}"`;
-                        $("mapelHint").style.color = "#15803d";
-                    }
-                }
+            const v = clean(header[i]);
+            if (v && norm(v) !== "nilai" && norm(v) !== "angka" && !norm(v).includes("ujian")) {
+                $("mataPelajaran").value = v;
+                $("mapelHint").textContent = `✅ Diambil dari header kolom nilai: "${v}"`;
+                $("mapelHint").style.color = "#15803d";
             }
         };
 
@@ -1884,9 +1849,6 @@
             renderPreview();
             renderSelisih();
         }
-
-        // Expose filterNilaiColumns ke global
-        window.filterNilaiColumns = filterNilaiColumns;
 
         init();
     </script>

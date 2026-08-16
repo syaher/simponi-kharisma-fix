@@ -5119,6 +5119,18 @@ document.addEventListener("DOMContentLoaded", () => {
 	const NILAI_PAGE_SIZE = 10;
 	let nilaiDict = {};
 	let nilaiChartInstance = null;
+// Hanya santri aktif yang mempunyai minimal satu data di nilai1.
+let nilaiEligibleMap = new Map();
+let nilaiEligibleLoaded = false;
+
+async function loadNilaiEligibleSantri() {
+  const { data, error } = await supabaseClient.from('v_nilai_santri_aktif').select('stambuk, nama_lengkap, kelas, bagian, unit_ndalem');
+  if (error) throw error;
+  nilaiEligibleMap = new Map((data || []).filter(r => r.stambuk).map(r => [normStambuk(r.stambuk), r]));
+  nilaiEligibleLoaded = true;
+  console.log('Santri aktif + punya nilai:', nilaiEligibleMap.size);
+}
+
 	let lastActiveData = [];        // untuk download
 	let lastEditedId = null;        // simpan id terakhir ditambah/diubah
 	let lastFilteredData = null;      // simpan hasil filter terakhir
@@ -8645,7 +8657,7 @@ async function initNilaiModule() {
   try {
     showLoading(true);
     if (!allSantriData || !allSantriData.length) await loadSantri(); // skip jika sudah ada
-    try { await saveToDB && saveToDB('nilai1', []); } catch(e) {}
+    await loadNilaiEligibleSantri();
 
     initNilaiFilters();               // isi dropdown kelas/unit
     await loadNilaiData(1);           // ambil data awal untuk membentuk dropdown tahun
@@ -8709,22 +8721,19 @@ function normStambuk(x) {
 async function fetchNilaiForStambuksBatched(stambukList = []) {
   if (!Array.isArray(stambukList) || stambukList.length === 0) return {};
   const dict = {};
-  const CHUNK = 200; // lebih aman daripada 500
+  const CHUNK = 200;
 
-  // normalisasi + dedupe
   const normList = Array.from(new Set(
     stambukList.map(s => normStambuk(s)).filter(Boolean)
   ));
-
-  // jika kosong langsung return
   if (!normList.length) return dict;
 
   for (let i = 0; i < normList.length; i += CHUNK) {
     const chunk = normList.slice(i, i + CHUNK);
     try {
       const { data, error } = await supabaseClient
-        .from('nilai1')
-        .select('stambuk, mata_pelajaran, semester, tahun_ajaran, nilai')
+        .from('v_nilai_santri_aktif_detail')
+        .select('stambuk, nama_lengkap, kelas, bagian, unit_ndalem, mata_pelajaran, semester, tahun_ajaran, nilai, created_at')
         .in('stambuk', chunk);
 
       if (error) {
@@ -8745,10 +8754,8 @@ async function fetchNilaiForStambuksBatched(stambukList = []) {
       console.error("fetchNilaiForStambuksBatched exception:", err);
     }
   }
-
   return dict;
 }
-
 
 // ----- fallback helper: fetchAllRows (gunakan hati-hati; jangan pakai untuk tabel sangat besar) -----
 async function fetchAllRows(table, columns = '*', pageSize = 1000) {
@@ -8807,50 +8814,26 @@ async function loadNilaiData(page = 1) {
 
     const keywordLower = keyword.toLowerCase();
 
+    // Hanya santri aktif yang mempunyai minimal satu data nilai1.
     let students = (allSantriData || [])
-      .filter(s => !s.Status || String(s.Status).toLowerCase() === "aktif")
-      .filter(s => !keywordLower || String(s.Nama_Lengkap || "").toLowerCase().includes(keywordLower))
-      .filter(s => (kelas === "semua" || s.Kelas === kelas))
-      .filter(s => (unit === "semua" || s.Unit_Ndalem === unit))
+      .filter(s => nilaiEligibleMap.has(normStambuk(s.Stambuk)))
+      .filter(s => !keywordLower || String(s.Nama_Lengkap || '').toLowerCase().includes(keywordLower))
+      .filter(s => (kelas === 'semua' || s.Kelas === kelas))
+      .filter(s => (unit === 'semua' || s.Unit_Ndalem === unit))
       .map(s => {
         const r = rpcMap.get(normStambuk(s.Stambuk));
+        const eligible = nilaiEligibleMap.get(normStambuk(s.Stambuk));
         return {
           Stambuk: s.Stambuk,
-          Nama_Lengkap: s.Nama_Lengkap || r?.nama_lengkap || "-",
-          Kelas: s.Kelas || r?.kelas || "-",
-          Bagian: s.Bagian || r?.bagian || "-",
-          Unit_Ndalem: s.Unit_Ndalem || r?.unit_ndalem || "-",
+          Nama_Lengkap: s.Nama_Lengkap || eligible?.nama_lengkap || r?.nama_lengkap || '-',
+          Kelas: s.Kelas || eligible?.kelas || r?.kelas || '-',
+          Bagian: s.Bagian || eligible?.bagian || r?.bagian || '-',
+          Unit_Ndalem: s.Unit_Ndalem || eligible?.unit_ndalem || r?.unit_ndalem || '-',
           Jumlah: Number(r?.total_nilai || 0),
           Rerata: Number(r?.rata_rata || 0),
           NilaiList: []
         };
       });
-
-    // Fallback untuk data RPC yang tidak ada di master santri.
-    const existingKeys = new Set(students.map(s => normStambuk(s.Stambuk)));
-    (rpcData || []).forEach(r => {
-      const key = normStambuk(r.stambuk);
-      if (existingKeys.has(key)) return;
-
-      const s = {
-        Stambuk: r.stambuk,
-        Nama_Lengkap: r.nama_lengkap || "-",
-        Kelas: r.kelas || "-",
-        Bagian: r.bagian || "-",
-        Unit_Ndalem: r.unit_ndalem || "-",
-        Jumlah: Number(r.total_nilai || 0),
-        Rerata: Number(r.rata_rata || 0),
-        NilaiList: []
-      };
-
-      if (
-        (!keywordLower || s.Nama_Lengkap.toLowerCase().includes(keywordLower)) &&
-        (kelas === "semua" || s.Kelas === kelas) &&
-        (unit === "semua" || s.Unit_Ndalem === unit)
-      ) {
-        students.push(s);
-      }
-    });
 
     // 🔹 sort rata-rata: teratas / terendah
     const sortTop = document.getElementById("nilaiSortTop")?.checked === true;
@@ -9245,15 +9228,15 @@ async function renderNilaiChart(mode = 'kelas') {
     // ===============================
     // 🔹 QUERY VIEW + FILTER DROPDOWN
     // ===============================
-    let q = supabaseClient
-      .from('nilai_rata_kharisma')
-      .select('*');
-
-    if (sem !== "semua") q = q.eq('semester', sem);
-    if (th  !== "semua") q = q.eq('tahun_ajaran', th);
-
-    const { data, error } = await q.order('rata_rata', { ascending: false });
-    if (error) throw error;
+    // Grafik mengambil nilai dari view detail:
+    // aktif + mempunyai data nilai1.
+    const eligibleData = await fetchNilaiAggByRpc(
+      null,
+      th === "semua" ? null : th,
+      sem === "semua" ? null : sem,
+      10000,
+      0
+    );
 
     let labels = [];
     let values = [];
@@ -9262,7 +9245,7 @@ async function renderNilaiChart(mode = 'kelas') {
     // 👤 MODE INDIVIDU
     // ===============================
     if (mode === 'individu') {
-      const arr = (data || []).slice(0, 20).map((d, i) => ({
+      const arr = eligibleData.slice(0, 20).map((d, i) => ({
         nama: d.nama_lengkap,
         kelas: d.kelas || '-',
         unit: d.unit_ndalem || '-',
@@ -9282,7 +9265,7 @@ async function renderNilaiChart(mode = 'kelas') {
     // ===============================
     else if (mode === 'kelas') {
       const map = new Map();
-      (data || []).forEach(d => {
+      eligibleData.forEach(d => {
         const k = d.kelas || '-';
         if (!map.has(k)) map.set(k, { sum: 0, count: 0 });
         const o = map.get(k);
@@ -9303,7 +9286,7 @@ async function renderNilaiChart(mode = 'kelas') {
     // ===============================
     else if (mode === 'unit') {
       const map = new Map();
-      (data || []).forEach(d => {
+      eligibleData.forEach(d => {
         const u = d.unit_ndalem || '-';
         if (!map.has(u)) map.set(u, { sum: 0, count: 0 });
         const o = map.get(u);
@@ -9376,18 +9359,67 @@ async function renderNilaiChart(mode = 'kelas') {
 // Helper: ambil data agregat nilai via RPC Supabase
 async function fetchNilaiAggByRpc(namaFilter = null, tahunAjaran = null, semester = null, limit = 100, offset = 0) {
   try {
-    const { data, error } = await supabaseClient.rpc('get_rata_rata_santri_unit', {
-      nama_filter: namaFilter,
-      tahun_ajaran_filter: tahunAjaran,
-      semester_filter: semester,
-      limit_rows: limit,
-      offset_rows: offset
-    });
-    if (error) {
-      console.error("RPC error:", error);
-      return [];
+    let all = [];
+    let from = 0;
+    const pageSize = 1000;
+
+    while (true) {
+      let q = supabaseClient
+        .from('v_nilai_santri_aktif_detail')
+        .select('stambuk, nama_lengkap, kelas, bagian, unit_ndalem, mata_pelajaran, semester, tahun_ajaran, nilai')
+        .range(from, from + pageSize - 1);
+
+      if (tahunAjaran !== null && tahunAjaran !== undefined)
+        q = q.eq('tahun_ajaran', tahunAjaran);
+      if (semester !== null && semester !== undefined)
+        q = q.eq('semester', semester);
+
+      const { data, error } = await q;
+      if (error) throw error;
+      if (!data || !data.length) break;
+
+      all.push(...data);
+      if (data.length < pageSize) break;
+      from += pageSize;
     }
-    return data || [];
+
+    const keyword = String(namaFilter || '').trim().toLowerCase();
+    const map = new Map();
+
+    for (const r of all) {
+      if (keyword && !String(r.nama_lengkap || '').toLowerCase().includes(keyword)) continue;
+
+      const key = normStambuk(r.stambuk);
+      if (!key) continue;
+
+      if (!map.has(key)) {
+        map.set(key, {
+          stambuk: r.stambuk,
+          nama_lengkap: r.nama_lengkap || '-',
+          kelas: r.kelas || '-',
+          bagian: r.bagian || '-',
+          unit_ndalem: r.unit_ndalem || '-',
+          total_nilai: 0,
+          jumlah_nilai: 0,
+          sum_nilai: 0
+        });
+      }
+
+      const o = map.get(key);
+      const n = toNumber(r.nilai);
+      o.sum_nilai += n;
+      o.jumlah_nilai += 1;
+    }
+
+    let result = Array.from(map.values()).map(o => ({
+      ...o,
+      total_nilai: o.jumlah_nilai,
+      rata_rata: o.jumlah_nilai ? o.sum_nilai / o.jumlah_nilai : 0
+    }));
+
+    result.sort((a,b) => b.rata_rata - a.rata_rata || String(a.nama_lengkap).localeCompare(String(b.nama_lengkap)));
+
+    return result.slice(offset, offset + limit);
   } catch (err) {
     console.error("fetchNilaiAggByRpc failed:", err);
     return [];
