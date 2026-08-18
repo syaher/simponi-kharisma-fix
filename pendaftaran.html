@@ -42,7 +42,7 @@
     .app-container {
       max-width: 100%;
       margin: 0 auto;
-      padding: 1rem;
+      padding: 0.75rem 1rem 1rem;
     }
 
     /* Header Mobile */
@@ -205,8 +205,8 @@
       display: flex;
       overflow-x: auto;
       gap: 0.5rem;
-      margin-bottom: 1rem;
-      padding-bottom: 0.5rem;
+      margin-bottom: 0.6rem;
+      padding-bottom: 0.2rem;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
     }
@@ -680,9 +680,27 @@
 .filter-section {
   background: #ffffff;
   border-radius: var(--border-radius);
-  padding: 1rem 0.75rem;
-  margin-bottom: 1rem;
+  padding: 0.8rem 0.7rem 0.9rem;
+  margin-bottom: 0.75rem;
   box-shadow: var(--card-shadow);
+}
+
+#formSection {
+  margin-top: 0;
+}
+
+#toggleFormBtn {
+  margin-bottom: 0.6rem !important;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.16);
+}
+
+#formWrapper {
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: transparent;
 }
 
 /* Input group & select spacing */
@@ -801,6 +819,27 @@
 
 /* HP Layout — Semua 1 kolom, lebih rapi */
 @media (max-width: 576px) {
+  .app-container {
+    padding-top: 0.55rem !important;
+    padding-bottom: 0.9rem !important;
+  }
+
+  #formSection {
+    margin-top: 0 !important;
+  }
+
+  #toggleFormBtn {
+    margin-bottom: 0.5rem !important;
+  }
+
+  #formWrapper {
+    border-radius: 14px;
+  }
+
+  .stats-row {
+    margin-bottom: 0.45rem !important;
+  }
+
   .filter-section .row > div {
     flex: 0 0 100% !important;
     max-width: 100% !important;
@@ -808,6 +847,7 @@
 
   .filter-section {
     padding: .55rem !important;
+    margin-bottom: 0.5rem !important;
   }
 
   /* Tombol full width lebih ergonomis */
@@ -823,11 +863,133 @@
   }
 }
 
-.pdf-btn .btn-spinner { display: none; }
-.pdf-btn .btn-icon { display: inline-block; }
+#exportModal .modal-content {
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.14);
+}
+
+#exportModal .modal-header {
+  padding: 1rem 1.25rem 0.75rem;
+}
+
+#exportModal .modal-body {
+  padding: 0.75rem 1.25rem 1rem;
+}
+
+#exportModal .modal-footer {
+  padding: 0.75rem 1.25rem 1.1rem;
+}
+
+.export-filter-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 0.45rem;
+  color: #334155;
+}
+
+#confirmExportBtn {
+  min-width: 150px;
+  position: relative;
+}
+
+#confirmExportBtn .btn-label {
+  display: inline-block;
+}
+
+#confirmExportBtn .btn-spinner {
+  display: none;
+  width: 15px;
+  height: 15px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spinPDF 0.8s linear infinite;
+  vertical-align: middle;
+  margin-right: 0.5rem;
+}
+
+#confirmExportBtn.is-loading {
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+#confirmExportBtn.is-loading .btn-label {
+  display: none;
+}
+
+#confirmExportBtn.is-loading .btn-spinner {
+  display: inline-block;
+}
+
+.menu-gradient-btn,
+.pdf-btn {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+  border: none !important;
+  color: #fff !important;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3) !important;
+  transition: all 0.25s ease !important;
+}
+
+.menu-gradient-btn:hover,
+.pdf-btn:hover {
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5) !important;
+  transform: translateY(-2px) !important;
+}
+
+.menu-gradient-btn:active,
+.pdf-btn:active {
+  transform: translateY(0) !important;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3) !important;
+}
+
+.menu-gradient-btn i,
+.pdf-btn i {
+  color: #fff !important;
+}
+
+.pdf-btn {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+  padding: 0 !important;
+  border-radius: 12px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.pdf-btn .btn-spinner {
+  display: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spinPDF 0.8s linear infinite;
+}
+
+.pdf-btn .btn-icon { 
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+
+.pdf-btn.pdf-spinning .tooltip {
+  display: none !important;
+}
 
 .pdf-btn.pdf-spinning .btn-icon { display: none; }
 .pdf-btn.pdf-spinning .btn-spinner { display: inline-block; }
+
+@keyframes spinPDF {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
 
 /* ==============================
    PERBAIKAN UKURAN FOTO UNTUK HP
@@ -1548,7 +1710,7 @@
 	  
 	  <div class="row mt-3 align-items-center">
 		<div class="col-md-6 d-flex gap-2">
-		  <button id="togglePaginationBtn" class="btn btn-modern btn-outline-modern btn-sm">
+		  <button id="togglePaginationBtn" class="btn btn-modern btn-outline-modern btn-sm menu-gradient-btn">
 			<i class="bi bi-list-ul me-1"></i>Tampilkan semua
 		  </button>
 		</div>
@@ -1559,10 +1721,7 @@
 			<option value="25">25</option>
 			<option value="50">50</option>
 		  </select>
-		  <button id="refreshBtn" class="btn btn-modern btn-outline-modern btn-sm">
-			<i class="bi bi-arrow-repeat me-1"></i>Refresh
-		  </button>
-		  <button id="exportBtn" class="btn btn-modern btn-outline-modern btn-sm">
+		  <button id="exportBtn" class="btn btn-modern btn-outline-modern btn-sm admin-only menu-gradient-btn">
 			<i class="bi bi-download me-1"></i>Export
 		  </button>
 		</div>
@@ -1588,6 +1747,40 @@
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <div>
+          <div class="small text-uppercase text-primary fw-bold" style="letter-spacing: .08em;">Export Data</div>
+          <h5 id="exportModalLabel" class="modal-title mb-0">Santri Masuk</h5>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="exportStartDate" class="export-filter-label">Mulai Tanggal</label>
+            <input id="exportStartDate" type="date" class="form-control form-control-modern">
+          </div>
+          <div class="col-md-6">
+            <label for="exportEndDate" class="export-filter-label">Sampai Tanggal</label>
+            <input id="exportEndDate" type="date" class="form-control form-control-modern">
+          </div>
+        </div>
+        <div class="small text-muted mt-3 mb-0">Kosongkan salah satu atau keduanya untuk export semua data.</div>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-modern btn-outline-modern btn-sm" data-bs-dismiss="modal">Batal</button>
+        <button id="confirmExportBtn" type="button" class="btn btn-modern btn-primary-modern btn-sm">
+          <span class="btn-spinner"></span>
+          <span class="btn-label"><i class="bi bi-file-earmark-pdf me-1"></i>Export PDF</span>
+        </button>
       </div>
     </div>
   </div>
@@ -1619,29 +1812,20 @@ async function loadUnitNdalemFromDB() {
       .from('referensi_unit_ndalem')
       .select('Nama_Unit')
       .order('Nama_Unit', { ascending: true });
-    
+
     if (error) throw error;
-    
-    unitNdalemList = data.map(item => item.Nama_Unit);
-    
+
+    unitNdalemList = Array.isArray(data)
+      ? data
+          .map(item => item?.Nama_Unit)
+          .filter(value => value && String(value).trim() !== '')
+      : [];
+
     populateUnitDropdowns();
-    
     return unitNdalemList;
   } catch (err) {
     console.error('Gagal load unit dari database:', err);
-    unitNdalemList = [
-      'Al-amanah cell','Al-amanah Toko','Catering Arham (Pak Din)','Catering P3TQ',
-      'Frozen Food','Gorengan & Kost SPBE','Gus Shohib','Kandang Kambing',
-      'Kandang Sapi','KBR P3TQ','Kolam Koi','Kost P3TQ','Laundry P3TQ',
-      'Mandiri Grabah (Andika)','Mandiri Grabah (Gudang & Bandar)',
-      'Mandiri Grabah (Pasar Campurejo)','Mandiri Grabah (SMK)',
-      'Mandiri Grabah (Tembakau)','Ndalem Barat','Ndalem Timur',
-      'Pabrik Tahu & Tempe','Pangkas Rambut','PULP P3TQ',
-      'Rahmatuka I (Maqom)','Rahmatuka II (Pasar Campurejo)',
-      'Rizquna Baby & Fashion','Rizquna Bangunan','Rizqua Galon Barat',
-      'Rizqua Galon Timur','Rizquna Juwet','Rizquna Laundry',
-      'Selepan','Sopir', 'Tahu Goglek','Toko Nafisah','Warung Nafis','Rizquna Bakso'
-    ];
+    unitNdalemList = [];
     populateUnitDropdowns();
     return unitNdalemList;
   }
@@ -1692,9 +1876,12 @@ const fotoPreview = document.getElementById('fotoPreview');
 const alertBox = document.getElementById('alertBox');
 const submitBtn = document.getElementById('submitBtn');
 const resetBtn = document.getElementById('resetBtn');
-const refreshBtn = document.getElementById('refreshBtn');
 const togglePaginationBtn = document.getElementById('togglePaginationBtn');
 const exportBtn = document.getElementById('exportBtn');
+const exportModalLabel = document.getElementById('exportModalLabel');
+const exportStartDate = document.getElementById('exportStartDate');
+const exportEndDate = document.getElementById('exportEndDate');
+const confirmExportBtn = document.getElementById('confirmExportBtn');
 const aktifSantri = document.getElementById('aktifSantri');
 const kelasCount = document.getElementById('kelasCount');
 const unitCount = document.getElementById('unitCount');
@@ -1733,8 +1920,6 @@ window.stopSpinPDF = function(btn) {
   btn.classList.remove("pdf-spinning");
   btn.disabled = false;
 };
-
-const PDF_PASSWORD = "imamfatoni24";
 
 // state
 let page = 1;
@@ -1981,7 +2166,7 @@ function renderList(rows) {
     <i class="bi bi-telephone"></i>
   </button>
 
-  <button class="btn btn-sm btn-info action-btn tooltip-btn pdf-btn admin-only"
+  <button class="btn btn-sm btn-info action-btn tooltip-btn pdf-btn admin-only menu-gradient-btn"
     data-action="pdf"
     data-id="${r.id}">
     <span class="tooltip">Download PDF</span>
@@ -1989,7 +2174,7 @@ function renderList(rows) {
     <span class="btn-icon">
       <i class="bi bi-file-earmark-pdf"></i>
     </span>
-    <div class="btn-spinner spinner-border spinner-border-sm"></div>
+    <div class="btn-spinner"></div>
   </button>
 
 </div>
@@ -2172,7 +2357,11 @@ perPage.addEventListener('change', ()=>{ page=1; loadData(); });
 searchInput.addEventListener('input', ()=>{ page=1; loadData(); });
 filterKelas.addEventListener('change', ()=>{ page=1; loadData(); });
 filterUnit.addEventListener('change', ()=>{ page=1; loadData(); });
-filterStatus.addEventListener('change', ()=>{ page=1; loadData(); });
+filterStatus.addEventListener('change', ()=>{
+  page=1;
+  updateExportModalTitle();
+  loadData();
+});
 prevBtn.addEventListener('click', ()=>{ if (page>1){ page--; loadData(); }});
 nextBtn.addEventListener('click', ()=>{ if (page*pageSize < totalRows){ page++; loadData(); }});
 
@@ -2185,63 +2374,294 @@ togglePaginationBtn.addEventListener('click', ()=>{
     : '<i class="bi bi-list-ul me-1"></i>Paginasi';
 });
 
-refreshBtn.addEventListener('click', ()=>loadData());
+function formatTanggalExport(value) {
+  if (!value) return '-';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString('id-ID', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+}
 
-// Export functionality
-// Export functionality
-exportBtn.addEventListener('click', async () => {
+function getExportRowsByStatus() {
+  const startValue = exportStartDate.value ? new Date(`${exportStartDate.value}T00:00:00`) : null;
+  const endValue = exportEndDate.value ? new Date(`${exportEndDate.value}T23:59:59`) : null;
+  const statusFilter = (filterStatus.value || 'aktif').toLowerCase();
+
+  const filtered = (allData || []).filter(item => {
+    const itemStatus = String(item.Status || '').trim().toLowerCase();
+    const isActive = itemStatus === 'aktif';
+    const isInactive = itemStatus === 'tidak aktif' || !!item.Tgl_Keluar;
+
+    if (statusFilter === 'aktif') {
+      if (!isActive) return false;
+      const mulaiDate = item.Mulai_Ngabdi ? new Date(`${item.Mulai_Ngabdi}T00:00:00`) : null;
+      if (!mulaiDate || Number.isNaN(mulaiDate.getTime())) {
+        return !(startValue || endValue);
+      }
+      if (startValue && mulaiDate < startValue) return false;
+      if (endValue && mulaiDate > endValue) return false;
+      return true;
+    }
+
+    if (!isInactive) return false;
+    const keluarDate = item.Tgl_Keluar ? new Date(`${item.Tgl_Keluar}T00:00:00`) : null;
+    if (!keluarDate || Number.isNaN(keluarDate.getTime())) {
+      return !(startValue || endValue);
+    }
+    if (startValue && keluarDate < startValue) return false;
+    if (endValue && keluarDate > endValue) return false;
+    return true;
+  });
+
+  return filtered.sort((a, b) => {
+    const aDate = statusFilter === 'aktif'
+      ? (a.Mulai_Ngabdi ? new Date(`${a.Mulai_Ngabdi}T00:00:00`).getTime() : Number.MAX_SAFE_INTEGER)
+      : (a.Tgl_Keluar ? new Date(`${a.Tgl_Keluar}T00:00:00`).getTime() : Number.MAX_SAFE_INTEGER);
+    const bDate = statusFilter === 'aktif'
+      ? (b.Mulai_Ngabdi ? new Date(`${b.Mulai_Ngabdi}T00:00:00`).getTime() : Number.MAX_SAFE_INTEGER)
+      : (b.Tgl_Keluar ? new Date(`${b.Tgl_Keluar}T00:00:00`).getTime() : Number.MAX_SAFE_INTEGER);
+    return aDate - bDate;
+  });
+}
+
+function setDefaultExportDates() {
+  const today = new Date();
+  const start = new Date(today.getFullYear(), 0, 1);
+
+  const formatDate = (date) => {
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  };
+
+  exportStartDate.value = formatDate(start);
+  exportEndDate.value = formatDate(today);
+}
+
+function updateExportModalTitle() {
+  const isActiveExport = (filterStatus.value || 'aktif') === 'aktif';
+  if (exportModalLabel) {
+    exportModalLabel.textContent = isActiveExport ? 'Export Data Santri Masuk' : 'Export Data Santri Keluar';
+  }
+}
+
+async function exportSantriKeluarPdf() {
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF('landscape', 'pt', 'a4');
-  
+  const doc = new jsPDF('portrait', 'pt', 'a4');
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const statusFilter = (filterStatus.value || 'aktif').toLowerCase();
+  const rows = getExportRowsByStatus();
+  const startLabel = exportStartDate.value ? formatTanggalExport(exportStartDate.value) : 'Semua';
+  const endLabel = exportEndDate.value ? formatTanggalExport(exportEndDate.value) : 'Semua';
+  const isActiveExport = statusFilter === 'aktif';
+  const title = isActiveExport ? 'LAPORAN DATA SANTRI MASUK' : 'LAPORAN DATA SANTRI KELUAR';
+
+  try {
+    const logoUrl = 'https://i.imgur.com/Irgu32G.png';
+    const logoData = await loadImageToBase64(logoUrl);
+    if (logoData) {
+      doc.addImage(logoData.base64, 'PNG', 42, 34, 58, 58);
+    }
+  } catch (e) {
+    console.warn('Logo export gagal dimuat:', e);
+  }
+
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(15, 23, 42);
   doc.setFontSize(18);
-  doc.setTextColor(40, 40, 40);
-  doc.text('DATA SANTRI KHUDAMA\' KHARISMA', 40, 40);
-  
-  doc.setFontSize(10);
-  doc.setTextColor(100, 100, 100);
-  doc.text(`Dicetak pada: ${new Date().toLocaleString('id-ID')}`, 40, 60);
-  
-  const headers = [['No', 'Nama Lengkap', 'Kelas', 'Unit Ndalem', 'Asal Daerah', 'Status', 'Keterangan']];
-  const data = allData.map((s, i) => [
-    i + 1,
-    s.Nama_Lengkap || '-',
-    s.Kelas || '-',
-    s.Unit_Ndalem || '-',
-    s.Asal_Daerah || '-',
-    s.Status || '-',
-    s.Keterangan || '-'
-  ]);
-  
+  doc.text("KHUDAMA' KHARISMA", pageWidth / 2, 56, { align: 'center' });
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(11);
+  doc.setTextColor(71, 85, 105);
+  doc.text('Pondok Pesantren Lirboyo – Kota Kediri, Jawa Timur', pageWidth / 2, 76, { align: 'center' });
+  doc.text('Sekretariat: Kantor KHARISMA, Gedung Nafis Lt. 2', pageWidth / 2, 93, { align: 'center' });
+
+  doc.setDrawColor(203, 213, 225);
+  doc.setLineWidth(1);
+  doc.line(42, 104, pageWidth - 42, 104);
+
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(15, 23, 42);
+  doc.setFontSize(15);
+  doc.text(title, pageWidth / 2, 128, { align: 'center' });
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(71, 85, 105);
+  doc.text(`Periode: ${startLabel} s.d ${endLabel}`, 42, 146);
+
+  const headers = isActiveExport
+    ? [['No', 'Nama Lengkap', 'Kelas', 'Unit Ndalem', 'Asal Daerah', 'Tanggal Masuk']]
+    : [['No', 'Nama Lengkap', 'Kelas', 'Unit Ndalem', 'Tgl Keluar', 'Keterangan']];
+
+  const body = rows.map((s, index) => {
+    if (isActiveExport) {
+      return [
+        index + 1,
+        s.Nama_Lengkap || '-',
+        s.Kelas || '-',
+        s.Unit_Ndalem || '-',
+        s.Asal_Daerah || '-',
+        formatTanggalExport(s.Mulai_Ngabdi)
+      ];
+    }
+
+    return [
+      index + 1,
+      s.Nama_Lengkap || '-',
+      s.Kelas || '-',
+      s.Unit_Ndalem || '-',
+      formatTanggalExport(s.Tgl_Keluar),
+      s.Keterangan || '-'
+    ];
+  });
+
+  if (!body.length) {
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(100, 116, 139);
+    doc.setFontSize(11);
+    const emptyText = isActiveExport
+      ? 'Tidak ada data santri masuk pada rentang tanggal yang dipilih.'
+      : 'Tidak ada data santri keluar pada rentang tanggal yang dipilih.';
+    doc.text(emptyText, 42, 170);
+    doc.save(`data_santri_${isActiveExport ? 'masuk' : 'keluar'}_${new Date().toISOString().slice(0,10)}.pdf`);
+    return;
+  }
+
+  const tableWidth = pageWidth - 80;
+  const columnStyles = isActiveExport
+    ? {
+        0: { cellWidth: tableWidth * 0.08, halign: 'center' },
+        1: { cellWidth: tableWidth * 0.27 },
+        2: { cellWidth: tableWidth * 0.15 },
+        3: { cellWidth: tableWidth * 0.18 },
+        4: { cellWidth: tableWidth * 0.17 },
+        5: { cellWidth: tableWidth * 0.15, halign: 'center' }
+      }
+    : {
+        0: { cellWidth: tableWidth * 0.08, halign: 'center' },
+        1: { cellWidth: tableWidth * 0.30 },
+        2: { cellWidth: tableWidth * 0.14 },
+        3: { cellWidth: tableWidth * 0.18 },
+        4: { cellWidth: tableWidth * 0.14, halign: 'center' },
+        5: { cellWidth: tableWidth * 0.16 }
+      };
+
   doc.autoTable({
     head: headers,
-    body: data,
-    startY: 80,
-    styles: { 
-      fontSize: 9,
-      cellPadding: 3,
-      overflow: 'linebreak', // ✅ biar teks turun ke bawah
-      halign: 'left',        // ✅ rata kiri
-      valign: 'middle'
+    body: body,
+    startY: 160,
+    margin: { left: 40, right: 40 },
+    styles: {
+      fontSize: 8.1,
+      cellPadding: 4,
+      overflow: 'linebreak',
+      halign: 'left',
+      valign: 'middle',
+      lineColor: [226, 232, 240],
+      lineWidth: 0.2,
+      minCellHeight: 14
     },
-    headStyles: { 
-      fillColor: [67, 97, 238],
+    headStyles: {
+      fillColor: [31, 64, 122],
+      textColor: [255, 255, 255],
       halign: 'center',
-      valign: 'middle'
+      valign: 'middle',
+      fontStyle: 'bold'
     },
-    columnStyles: {
-      0: { cellWidth: 25, halign: 'center' },  // No
-      1: { cellWidth: 70, halign: 'left' },    // Nama Lengkap
-      2: { cellWidth: 60, halign: 'left' },    // Kelas
-      3: { cellWidth: 70, halign: 'left' },    // Unit Ndalem
-      4: { cellWidth: 60, halign: 'left' },    // Asal Daerah
-      5: { cellWidth: 50, halign: 'center' },  // Status
-      6: { cellWidth: 80, halign: 'left' }     // Keterangan - auto wrap
+    alternateRowStyles: {
+      fillColor: [248, 250, 252]
     },
-    tableWidth: 'auto',
-    pageBreak: 'auto'
+    columnStyles,
+    tableWidth,
+    pageBreak: 'auto',
+    didDrawCell: (data) => {
+      const keteranganIndex = isActiveExport ? 5 : 5;
+      if (data.section === 'body' && data.column.index === keteranganIndex && data.cell.raw && String(data.cell.raw).length > 0) {
+        const text = String(data.cell.raw);
+        const cellWidth = (columnStyles && columnStyles[keteranganIndex] && columnStyles[keteranganIndex].cellWidth) || 120;
+        const lines = doc.splitTextToSize(text, cellWidth - 8);
+        if (lines.length > 1) {
+          data.cell.height = Math.max(data.cell.height, lines.length * 10 + 8);
+        }
+      }
+    }
   });
-  
-  doc.save(`data_santri_kharisma_${new Date().toISOString().slice(0,10)}.pdf`);
+
+  const sekretaris = await getKetuaTiga();
+  if (sekretaris) {
+    const rightMargin = 38;
+    const signBoxWidth = 150;
+    const signX = pageWidth - rightMargin - signBoxWidth;
+    const signY = pageHeight - 165;
+    const signEndX = pageWidth - rightMargin;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text('Kediri, ' + new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }), signEndX, signY, { align: 'right' });
+    doc.text('Mengetahui,', signEndX, signY + 18, { align: 'right' });
+    doc.text(sekretaris.Status_Penasehat || 'Sekretaris', signEndX, signY + 36, { align: 'right' });
+
+    if (sekretaris.Ttd_Url) {
+      try {
+        const ttd = await loadImageBase64(sekretaris.Ttd_Url);
+        if (ttd) {
+          doc.addImage(ttd, 'PNG', signEndX - 90, signY + 42, 90, 40);
+        }
+      } catch (e) {
+        console.warn('Tanda tangan export gagal dimuat:', e);
+      }
+    }
+
+    doc.setLineWidth(0.5);
+    doc.line(signX + 10, signY + 92, signEndX, signY + 92);
+    doc.setFont('helvetica', 'bold');
+    doc.text(sekretaris.Nama || '-', signEndX, signY + 108, { align: 'right' });
+  }
+
+  const totalPages = doc.getNumberOfPages();
+  for (let i = 1; i <= totalPages; i++) {
+    doc.setPage(i);
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(8);
+    doc.setTextColor(100, 116, 139);
+    const footerDate = new Date().toLocaleString('id-ID');
+    doc.text(`Dicetak: ${footerDate}`, 42, pageHeight - 22);
+    doc.text(`Halaman ${i} / ${totalPages}`, pageWidth - 42, pageHeight - 22, { align: 'right' });
+  }
+
+  doc.save(`data_santri_${isActiveExport ? 'masuk' : 'keluar'}_${new Date().toISOString().slice(0,10)}.pdf`);
+}
+
+exportBtn.addEventListener('click', () => {
+  setDefaultExportDates();
+  updateExportModalTitle();
+  const modal = new bootstrap.Modal(document.getElementById('exportModal'));
+  modal.show();
+});
+
+confirmExportBtn.addEventListener('click', async () => {
+  const modalEl = document.getElementById('exportModal');
+  const modal = bootstrap.Modal.getInstance(modalEl);
+
+  if (!modal) return;
+
+  confirmExportBtn.disabled = true;
+  confirmExportBtn.classList.add('is-loading');
+
+  try {
+    await exportSantriKeluarPdf();
+  } finally {
+    confirmExportBtn.classList.remove('is-loading');
+    confirmExportBtn.disabled = false;
+    modal.hide();
+  }
 });
 
 // ===============================
@@ -2250,19 +2670,6 @@ exportBtn.addEventListener('click', async () => {
 window.downloadSantriPDF = async function(id, btn) {
   btn.classList.add("loading");
 
-const input = prompt("Masukkan sandi:");
-if (input === null) {
-  btn.classList.remove("loading");
-  return;
-}
-
-if (input !== PDF_PASSWORD) {
-  alert("Sandi salah!");
-  btn.classList.remove("loading");
-  return;
-}
-
-  
   // Mulai spinner
   if (btn) spinPDF(btn);
 
