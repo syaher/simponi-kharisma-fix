@@ -4725,7 +4725,7 @@ and (max-width:1024px){
       </select>
 
       <label>Keterangan</label>
-      <select id="Keterangan" required>
+      <select id="inventarisKeterangan" required>
         <option value="">-- Pilih Keterangan --</option>
         <option value="Layak">Layak</option>
         <option value="Tidak Layak">Tidak Layak</option>
@@ -12836,7 +12836,7 @@ async function openAddSantri() {
   document.getElementById("santriId").value = "";
   document.getElementById("fotoPreview").style.display = "none";
   document.getElementById("Foto").value = "";
-  document.getElementById("Keterangan").value = "";
+  document.getElementById("inventarisKeterangan").value = "";
   document.getElementById("keteranganWrapper").style.display = "none";
 
   // Panggil fungsi dengan data yang sudah dimuat
@@ -14469,7 +14469,7 @@ async function openEditInventaris(row) {
   document.getElementById("Merk").value = row.Merk || "";
   document.getElementById("NOPOL").value = row.NOPOL || "";
   document.getElementById("Tahun_Produksi").value = row.Tahun_Produksi || "";
-  document.getElementById("Keterangan").value = row.Keterangan || "";
+  document.getElementById("inventarisKeterangan").value = row.Keterangan || "";
   document.getElementById("STNK").value = row.STNK || "";
   document.getElementById("BPKB").value = row.BPKB || "";
   document.getElementById("Update_Tgl").value = row.Update_Tgl_iso || "";
@@ -14629,7 +14629,7 @@ try {
         document.getElementById("Tahun_Produksi").value?.trim() || null,
 
       Keterangan:
-        document.getElementById("Keterangan").value?.trim() || null,
+        document.getElementById("inventarisKeterangan").value?.trim() || null,
 
       STNK:
         document.getElementById("STNK").value?.trim() || null,
