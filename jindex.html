@@ -4271,6 +4271,7 @@ and (max-width:1024px){
   
   <div class="admin-tools">
     <button class="admin-only" onclick="openAddPenasehat()">➕ Tambah</button>
+    <button class="admin-only" onclick="openPindahMaHadAlyModal()">🔄 Ambil dari V-VI Ma'had Aly</button>
     <button class="admin-only" onclick="downloadPenasehatPDF()">⬇️ Download PDF</button>
   </div>
 
@@ -4296,6 +4297,50 @@ and (max-width:1024px){
   <div class="pagination">
     <div id="penasehatPaginationInfo" class="pagination-info">Menampilkan 0 data</div>
     <div id="penasehatPaginationControls" class="pagination-controls"></div>
+  </div>
+</div>
+
+
+/* ===== PINDAH MA'HAD ALY KE PENASEHAT ===== */
+.pindah-mahad-checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+.pindah-mahad-table th,
+.pindah-mahad-table td {
+  white-space: nowrap;
+}
+.pindah-mahad-table td.nama {
+  position: static;
+}
+.pindah-mahad-photo {
+  width: 45px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+<!-- ========== PINDAH SANTRI V-VI MA'HAD ALY KE PENASEHAT ========== -->
+<div id="pindahMaHadAlyModal" class="crud-modal">
+  <div class="crud-modal-content" style="max-width:900px; width:95%;">
+    <span class="crud-close" onclick="closePindahMaHadAlyModal()">&times;</span>
+    <h2>🔄 Pindahkan Santri V-VI Ma'had Aly ke Penasehat</h2>
+    <p style="margin:8px 0 14px; color:#555;">Pilih santri yang akan dipindahkan. Data nama, foto, kode unit, dan mulai ngabdi akan dibawa ke tabel <b>penasehat</b>.</p>
+
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
+      <button type="button" onclick="selectAllPindahMaHadAly(true)">☑️ Pilih Semua</button>
+      <button type="button" onclick="selectAllPindahMaHadAly(false)">⬜ Batal Pilih</button>
+      <button type="button" onclick="loadPindahMaHadAly()">🔄 Refresh</button>
+    </div>
+
+    <div id="pindahMaHadAlyInfo" style="margin-bottom:10px; font-weight:600;"></div>
+    <div id="pindahMaHadAlyList" class="data-table-container" style="max-height:55vh; overflow:auto;"></div>
+
+    <div class="crud-actions" style="margin-top:14px;">
+      <button type="button" class="crud-btn-save" onclick="pindahkanMaHadAlyKePenasehat()">🔄 Pindahkan Terpilih</button>
+      <button type="button" class="crud-btn-cancel" onclick="closePindahMaHadAlyModal()">❌ Batal</button>
+    </div>
   </div>
 </div>
 
@@ -9852,6 +9897,227 @@ function closePenasehatPreview() {
 
   if (modal) {
     modal.style.display = "none";
+  }
+}
+
+// ========== PINDAH V-VI MA'HAD ALY KE PENASEHAT ==========
+let pindahMaHadAlyData = [];
+
+async function openPindahMaHadAlyModal() {
+  if (userRole !== "admin") {
+    showToast("❌ Hanya admin yang dapat memindahkan data.", true);
+    return;
+  }
+
+  document.getElementById("pindahMaHadAlyModal").style.display = "block";
+  await loadPindahMaHadAly();
+}
+
+function closePindahMaHadAlyModal() {
+  const modal = document.getElementById("pindahMaHadAlyModal");
+  if (modal) modal.style.display = "none";
+}
+
+async function loadPindahMaHadAly() {
+  const list = document.getElementById("pindahMaHadAlyList");
+  const info = document.getElementById("pindahMaHadAlyInfo");
+  if (!list || !info) return;
+
+  list.innerHTML = "<div style='padding:15px;text-align:center;'>⏳ Memuat data V-VI Ma'had Aly...</div>";
+  info.textContent = "";
+
+  try {
+    // Hanya santri kelas V-VI Ma'had Aly yang masih ada di tabel santri.
+    const { data, error } = await supabaseClient
+      .from("santri_kharisma")
+      .select('id, "Nama_Lengkap", "Foto", "Stambuk", "Kode_Unit", "Unit_Ndalem", "Mulai_Ngabdi", "Status", "Kelas"')
+      .eq("Kelas", "V-VI Ma'had Aly")
+      .order("Nama_Lengkap", { ascending: true });
+
+    if (error) throw error;
+
+    // Jangan tampilkan yang sudah ada di penasehat berdasarkan Stambuk yang
+    // sebelumnya kita simpan di id_penasehat dengan pola PNSH-STAMBUK.
+    const { data: existing, error: existingError } = await supabaseClient
+      .from("penasehat")
+      .select("id_penasehat");
+
+    if (existingError) throw existingError;
+
+    const existingIds = new Set((existing || []).map(p => String(p.id_penasehat || "")));
+    pindahMaHadAlyData = (data || []).filter(s => {
+      const idPenasehat = s.Stambuk ? `PNSH-${String(s.Stambuk).trim()}` : `PNSH-SANTRI-${s.id}`;
+      return !existingIds.has(idPenasehat);
+    });
+
+    renderPindahMaHadAlyList();
+  } catch (err) {
+    console.error(err);
+    pindahMaHadAlyData = [];
+    list.innerHTML = `<div style="padding:15px;color:#dc3545;">❌ Gagal memuat data: ${escapeHtmlSafe(err.message || String(err))}</div>`;
+    info.textContent = "";
+  }
+}
+
+function renderPindahMaHadAlyList() {
+  const list = document.getElementById("pindahMaHadAlyList");
+  const info = document.getElementById("pindahMaHadAlyInfo");
+  if (!list || !info) return;
+
+  if (!pindahMaHadAlyData.length) {
+    info.textContent = "Tidak ada santri V-VI Ma'had Aly yang siap dipindahkan.";
+    list.innerHTML = "<div style='padding:15px;text-align:center;'>✅ Semua data sudah dipindahkan atau data kelas kosong.</div>";
+    return;
+  }
+
+  info.textContent = `${pindahMaHadAlyData.length} santri siap dipindahkan.`;
+
+  const rows = pindahMaHadAlyData.map(s => {
+    const foto = s.Foto
+      ? `<img src="${escapeHtmlSafe(s.Foto)}" class="pindah-mahad-photo" onerror="this.style.display='none'">`
+      : "-";
+    const idPenasehat = s.Stambuk
+      ? `PNSH-${String(s.Stambuk).trim()}`
+      : `PNSH-SANTRI-${s.id}`;
+
+    return `
+      <tr>
+        <td style="text-align:center;"><input type="checkbox" class="pindah-mahad-checkbox" value="${s.id}"></td>
+        <td>${foto}</td>
+        <td>${escapeHtmlSafe(s.Nama_Lengkap || "-")}</td>
+        <td>${escapeHtmlSafe(s.Stambuk || "-")}</td>
+        <td>${escapeHtmlSafe(s.Unit_Ndalem || s.Kode_Unit || "-")}</td>
+        <td>${escapeHtmlSafe(s.Mulai_Ngabdi || "-")}</td>
+        <td>${escapeHtmlSafe(idPenasehat)}</td>
+      </tr>`;
+  }).join("");
+
+  list.innerHTML = `
+    <table class="data-table pindah-mahad-table">
+      <thead>
+        <tr>
+          <th>Pilih</th>
+          <th>Foto</th>
+          <th>Nama</th>
+          <th>Stambuk</th>
+          <th>Unit</th>
+          <th>Mulai Ngabdi</th>
+          <th>ID Penasehat</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+function selectAllPindahMaHadAly(checked) {
+  document.querySelectorAll("#pindahMaHadAlyList .pindah-mahad-checkbox").forEach(cb => {
+    cb.checked = checked;
+  });
+}
+
+function escapeHtmlSafe(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+async function pindahkanMaHadAlyKePenasehat() {
+  if (userRole !== "admin") {
+    showToast("❌ Hanya admin yang dapat memindahkan data.", true);
+    return;
+  }
+
+  const selectedIds = Array.from(
+    document.querySelectorAll("#pindahMaHadAlyList .pindah-mahad-checkbox:checked")
+  ).map(cb => Number(cb.value));
+
+  if (!selectedIds.length) {
+    showToast("⚠️ Pilih minimal satu santri.", true);
+    return;
+  }
+
+  const selected = pindahMaHadAlyData.filter(s => selectedIds.includes(Number(s.id)));
+  const konfirmasi = confirm(
+    `Yakin memindahkan ${selected.length} santri V-VI Ma'had Aly ke Penasehat?\n\n` +
+    "Data akan disalin ke penasehat lalu dihapus dari santri_kharisma."
+  );
+  if (!konfirmasi) return;
+
+  showLoading(true);
+  let berhasil = 0;
+  const gagal = [];
+
+  try {
+    for (const s of selected) {
+      const idPenasehat = s.Stambuk
+        ? `PNSH-${String(s.Stambuk).trim()}`
+        : `PNSH-SANTRI-${s.id}`;
+
+      // Insert dahulu. Jika gagal, data santri tidak disentuh.
+      const payload = {
+        Nama: s.Nama_Lengkap
+          ? (s.Nama_Lengkap.trim().toLowerCase().startsWith("bpk.")
+              ? s.Nama_Lengkap.trim()
+              : `Bpk. ${s.Nama_Lengkap.trim()}`)
+          : null,
+        Kode_Unit: s.Kode_Unit || null,
+        Mulai_Ngabdi: s.Mulai_Ngabdi || null,
+        id_penasehat: idPenasehat,
+        Status: "aktif",
+        foto_url: s.Foto || null
+      };
+
+      const { data: inserted, error: insertError } = await supabaseClient
+        .from("penasehat")
+        .insert([payload])
+        .select("id")
+        .single();
+
+      if (insertError) {
+        gagal.push(`${s.Nama_Lengkap}: ${insertError.message}`);
+        continue;
+      }
+
+      // Setelah insert sukses, hapus sumber. Jika hapus gagal, rollback insert.
+      const { error: deleteError } = await supabaseClient
+        .from("santri_kharisma")
+        .delete()
+        .eq("id", s.id);
+
+      if (deleteError) {
+        if (inserted?.id) {
+          await supabaseClient.from("penasehat").delete().eq("id", inserted.id);
+        }
+        gagal.push(`${s.Nama_Lengkap}: gagal menghapus data santri (${deleteError.message})`);
+        continue;
+      }
+
+      berhasil++;
+    }
+
+    await loadPenasehat();
+    // Muat ulang data santri jika modul santri sedang tersedia.
+    if (typeof loadInitialData === "function") await loadInitialData();
+
+    if (gagal.length) {
+      alert(
+        `✅ Berhasil dipindahkan: ${berhasil}\n` +
+        `❌ Gagal: ${gagal.length}\n\n` +
+        gagal.join("\n")
+      );
+    } else {
+      showToast(`✅ ${berhasil} santri berhasil dipindahkan ke Penasehat!`);
+    }
+
+    await loadPindahMaHadAly();
+  } catch (err) {
+    console.error(err);
+    alert("❌ Proses pemindahan gagal: " + (err.message || String(err)));
+  } finally {
+    showLoading(false);
   }
 }
 
