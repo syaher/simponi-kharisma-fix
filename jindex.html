@@ -3712,201 +3712,398 @@ and (max-width:1024px){
   padding: 0 !important;
 }
 
-	/* =========================================================
+/* =========================================================
    PINDAH MA'HAD ALY KE PENASEHAT
-   RESPONSIVE - HP & KOMPUTER
+   FINAL - HP & KOMPUTER
+   - Kolom Pilih kecil
+   - Nama & Unit bisa wrap
+   - Tabel bisa scroll kanan-kiri
+   - Tidak menumpuk
 ========================================================= */
 
-/* Container tabel agar HP bisa scroll horizontal */
-.pindah-mahad-table-wrapper,
-.pindah-mahad-table-container {
+
+/* =========================================================
+   WRAPPER SCROLL
+========================================================= */
+
+.pindah-mahad-scroll {
   width: 100%;
   max-width: 100%;
-  overflow-x: auto;
-  overflow-y: visible;
+
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+
+  box-sizing: border-box;
+
+  /* Supaya scroll horizontal tetap terasa */
+  scrollbar-width: auto;
 }
+
+
+/* =========================================================
+   TABLE UTAMA
+========================================================= */
+
+.pindah-mahad-table {
+  width: 100%;
+
+  /*
+   * Jangan dipaksa 100%.
+   * Di HP tabel boleh lebih lebar dari layar
+   * sehingga bisa digeser kanan-kiri.
+   */
+  min-width: 850px;
+
+  border-collapse: collapse;
+
+  /*
+   * AUTO lebih aman untuk wrapping dibanding fixed.
+   */
+  table-layout: auto;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   SEMUA CELL
+========================================================= */
+
+.pindah-mahad-table th,
+.pindah-mahad-table td {
+  box-sizing: border-box;
+
+  vertical-align: middle !important;
+
+  padding: 7px 6px;
+
+  /*
+   * Jangan hidden secara global.
+   * Kalau hidden, beberapa isi tabel bisa terpotong.
+   */
+}
+
+
+/* =========================================================
+   KOLOM PILIH / CHECKBOX
+========================================================= */
+
+.pindah-mahad-table th.pindah-mahad-pilih,
+.pindah-mahad-table td.pindah-mahad-pilih {
+
+  width: 45px !important;
+  min-width: 45px !important;
+  max-width: 45px !important;
+
+  padding: 4px !important;
+
+  text-align: center !important;
+
+  white-space: nowrap !important;
+
+  overflow: hidden;
+}
+
 
 /* =========================================================
    CHECKBOX
 ========================================================= */
 
 .pindah-mahad-checkbox {
-  width: 20px;
-  height: 20px;
-  min-width: 20px;
-  min-height: 20px;
+
+  width: 18px !important;
+  height: 18px !important;
+
+  min-width: 18px !important;
+  min-height: 18px !important;
+
+  max-width: 18px !important;
+  max-height: 18px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
   cursor: pointer;
+
   vertical-align: middle;
-  box-sizing: border-box;
+
+  accent-color: #0d6efd;
 }
 
 
 /* =========================================================
-   TABLE
+   KOLOM FOTO
 ========================================================= */
 
-.pindah-mahad-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: auto;
+.pindah-mahad-table th.pindah-mahad-foto,
+.pindah-mahad-table td.pindah-mahad-foto {
+
+  width: 65px !important;
+  min-width: 65px !important;
+  max-width: 65px !important;
+
+  padding: 5px !important;
+
+  text-align: center !important;
+
+  white-space: nowrap !important;
 }
 
 
 /* =========================================================
-   SEMUA CELL DEFAULT
-   Kolom selain nama tetap satu baris.
-========================================================= */
-
-.pindah-mahad-table th,
-.pindah-mahad-table td {
-  white-space: nowrap;
-  vertical-align: middle;
-  box-sizing: border-box;
-}
-
-
-/* =========================================================
-   KOLOM NAMA SANTRI
-   Teks otomatis turun apabila kolom tidak cukup.
-========================================================= */
-
-.pindah-mahad-table td.nama {
-  position: static !important;
-
-  /* Izinkan teks turun ke bawah */
-  white-space: normal !important;
-
-  /* Mencegah teks keluar / menabrak border */
-  overflow-wrap: anywhere;
-  word-break: break-word;
-  hyphens: auto;
-
-  /* Lebar desktop */
-  min-width: 140px;
-  width: 180px;
-  max-width: 250px;
-
-  /* Pastikan ukuran tidak melebihi border */
-  box-sizing: border-box;
-
-  /* Tinggi mengikuti isi */
-  height: auto;
-
-  /* Hindari teks meluber */
-  overflow: hidden;
-}
-
-
-/* =========================================================
-   JIKA HEADER NAMA MENGGUNAKAN CLASS "nama"
-========================================================= */
-
-.pindah-mahad-table th.nama {
-  white-space: normal !important;
-  overflow-wrap: anywhere;
-  word-break: break-word;
-
-  min-width: 140px;
-  width: 180px;
-  max-width: 250px;
-
-  box-sizing: border-box;
-}
-
-
-/* =========================================================
-   FOTO
+   FOTO SANTRI
 ========================================================= */
 
 .pindah-mahad-photo {
+
   width: 45px;
   height: 60px;
 
-  min-width: 45px;
-  min-height: 60px;
+  max-width: 45px;
+  max-height: 60px;
 
   object-fit: cover;
+
   border-radius: 4px;
+
   display: block;
+
+  margin: 0 auto;
 }
 
 
 /* =========================================================
-   DESKTOP BESAR
+   KOLOM NAMA SANTRI - DIPERKECIL
 ========================================================= */
 
-@media screen and (min-width: 1200px) {
+.pindah-mahad-table th.pindah-mahad-nama,
+.pindah-mahad-table td.pindah-mahad-nama {
 
-  .pindah-mahad-table td.nama,
-  .pindah-mahad-table th.nama {
-    min-width: 180px;
-    width: 240px;
-    max-width: 300px;
-  }
+  width: 160px !important;
+  min-width: 150px !important;
+  max-width: 160px !important;
 
+  white-space: normal !important;
+
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+
+  line-height: 1.4 !important;
+
+  vertical-align: middle !important;
+}
+
+/* =========================================================
+   STAMBUK
+========================================================= */
+
+.pindah-mahad-table th.pindah-mahad-stambuk,
+.pindah-mahad-table td.pindah-mahad-stambuk {
+
+  width: 120px !important;
+  min-width: 120px !important;
+
+  white-space: nowrap !important;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
 }
 
 
 /* =========================================================
-   TABLET
+   KOLOM UNIT
+   BISA WRAP
 ========================================================= */
 
-@media screen and (max-width: 991px) {
+.pindah-mahad-table th.pindah-mahad-unit,
+.pindah-mahad-table td.pindah-mahad-unit {
 
-  .pindah-mahad-table td.nama,
-  .pindah-mahad-table th.nama {
-    min-width: 130px;
-    width: 170px;
-    max-width: 220px;
-  }
+  width: 150px !important;
+  min-width: 130px;
 
+  white-space: normal !important;
+
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+
+  line-height: 1.4 !important;
+
+  vertical-align: middle !important;
 }
 
 
 /* =========================================================
-   HP / MOBILE
+   MULAI NGABDI
 ========================================================= */
 
-@media screen and (max-width: 768px) {
+.pindah-mahad-table th.pindah-mahad-mulai,
+.pindah-mahad-table td.pindah-mahad-mulai {
+
+  width: 130px !important;
+  min-width: 130px !important;
+
+  white-space: nowrap !important;
+}
+
+
+/* =========================================================
+   ID PENASEHAT
+========================================================= */
+
+.pindah-mahad-table th.pindah-mahad-id,
+.pindah-mahad-table td.pindah-mahad-id {
+
+  width: 180px !important;
+  min-width: 150px;
+
+  white-space: normal !important;
+
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+
+  line-height: 1.4 !important;
+
+  vertical-align: middle !important;
+}
+
+
+/* =========================================================
+   DESKTOP
+========================================================= */
+
+@media screen and (min-width: 769px) {
 
   .pindah-mahad-table {
-    font-size: 13px;
+    min-width: 850px;
+    font-size: 14px;
   }
 
   .pindah-mahad-table th,
   .pindah-mahad-table td {
-    padding: 8px 6px;
+    padding: 7px 6px;
   }
 
-  /* Kolom Nama lebih sempit dan otomatis wrap */
-  .pindah-mahad-table td.nama,
-  .pindah-mahad-table th.nama {
-    min-width: 100px;
-    width: 120px;
-    max-width: 150px;
+}
+
+
+/* =========================================================
+   TABLET / HP
+========================================================= */
+
+@media screen and (max-width: 768px) {
+
+  .pindah-mahad-scroll {
+    width: 100%;
+
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+
+    -webkit-overflow-scrolling: touch;
+  }
+
+
+  /*
+   * Tetap dibuat lebar.
+   * Jadi HP bisa geser kanan-kiri.
+   */
+  .pindah-mahad-table {
+
+    min-width: 850px;
+
+    font-size: 12px;
+
+    table-layout: auto;
+  }
+
+
+  .pindah-mahad-table th,
+  .pindah-mahad-table td {
+
+    padding: 6px 5px;
+  }
+
+
+  /* PILIH */
+  .pindah-mahad-table th.pindah-mahad-pilih,
+  .pindah-mahad-table td.pindah-mahad-pilih {
+
+    width: 42px !important;
+    min-width: 42px !important;
+    max-width: 42px !important;
+
+    padding: 3px !important;
+  }
+
+
+  /* CHECKBOX */
+  .pindah-mahad-checkbox {
+
+    width: 17px !important;
+    height: 17px !important;
+
+    min-width: 17px !important;
+    min-height: 17px !important;
+
+    max-width: 17px !important;
+    max-height: 17px !important;
+  }
+
+
+  /* FOTO */
+  .pindah-mahad-table th.pindah-mahad-foto,
+  .pindah-mahad-table td.pindah-mahad-foto {
+
+    width: 60px !important;
+    min-width: 60px !important;
+    max-width: 60px !important;
+
+    padding: 4px !important;
+  }
+
+
+  .pindah-mahad-photo {
+
+    width: 40px;
+    height: 54px;
+
+    max-width: 40px;
+    max-height: 54px;
+  }
+
+
+  /* NAMA */
+  .pindah-mahad-table th.pindah-mahad-nama,
+  .pindah-mahad-table td.pindah-mahad-nama {
+
+    width: 210px !important;
+    min-width: 180px;
 
     white-space: normal !important;
-    overflow-wrap: anywhere;
-    word-break: break-word;
 
-    box-sizing: border-box;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+
+    line-height: 1.45 !important;
   }
 
-  /* Foto sedikit diperkecil */
-  .pindah-mahad-photo {
-    width: 40px;
-    height: 55px;
 
-    min-width: 40px;
-    min-height: 55px;
-  }
+  /* UNIT */
+  .pindah-mahad-table th.pindah-mahad-unit,
+  .pindah-mahad-table td.pindah-mahad-unit {
 
-  .pindah-mahad-checkbox {
-    width: 18px;
-    height: 18px;
-    min-width: 18px;
-    min-height: 18px;
+    width: 145px !important;
+    min-width: 125px;
+
+    white-space: normal !important;
+
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+
+    line-height: 1.45 !important;
   }
 
 }
@@ -3918,44 +4115,167 @@ and (max-width:1024px){
 
 @media screen and (max-width: 480px) {
 
-  .pindah-mahad-table {
-    font-size: 12px;
+  .pindah-mahad-scroll {
+
+    width: 100%;
+
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+
+    -webkit-overflow-scrolling: touch;
   }
+
+
+  /*
+   * JANGAN mengecilkan min-width terlalu banyak.
+   * Kalau terlalu kecil, tabel justru menumpuk.
+   */
+  .pindah-mahad-table {
+
+    min-width: 800px;
+
+    font-size: 11px;
+  }
+
 
   .pindah-mahad-table th,
   .pindah-mahad-table td {
-    padding: 6px 5px;
+
+    padding: 5px 4px;
   }
 
-  /* Nama tetap aman dan tidak keluar border */
-  .pindah-mahad-table td.nama,
-  .pindah-mahad-table th.nama {
-    min-width: 85px;
-    width: 105px;
-    max-width: 130px;
 
-    white-space: normal !important;
-    overflow-wrap: anywhere;
-    word-break: break-word;
-    line-height: 1.35;
+  /* =========================
+     PILIH SUPER KECIL
+  ========================= */
 
-    box-sizing: border-box;
-    overflow: hidden;
+  .pindah-mahad-table th.pindah-mahad-pilih,
+  .pindah-mahad-table td.pindah-mahad-pilih {
+
+    width: 38px !important;
+    min-width: 38px !important;
+    max-width: 38px !important;
+
+    padding: 2px !important;
   }
 
-  .pindah-mahad-photo {
-    width: 35px;
-    height: 48px;
-
-    min-width: 35px;
-    min-height: 48px;
-  }
 
   .pindah-mahad-checkbox {
-    width: 17px;
-    height: 17px;
-    min-width: 17px;
-    min-height: 17px;
+
+    width: 16px !important;
+    height: 16px !important;
+
+    min-width: 16px !important;
+    min-height: 16px !important;
+
+    max-width: 16px !important;
+    max-height: 16px !important;
+  }
+
+
+  /* =========================
+     FOTO
+  ========================= */
+
+  .pindah-mahad-table th.pindah-mahad-foto,
+  .pindah-mahad-table td.pindah-mahad-foto {
+
+    width: 55px !important;
+    min-width: 55px !important;
+    max-width: 55px !important;
+
+    padding: 3px !important;
+  }
+
+
+  .pindah-mahad-photo {
+
+    width: 34px;
+    height: 47px;
+
+    max-width: 34px;
+    max-height: 47px;
+  }
+
+
+  /* =========================
+     NAMA
+  ========================= */
+
+  .pindah-mahad-table th.pindah-mahad-nama,
+  .pindah-mahad-table td.pindah-mahad-nama {
+
+    width: 200px !important;
+    min-width: 175px;
+
+    white-space: normal !important;
+
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+
+    line-height: 1.45 !important;
+  }
+
+
+  /* =========================
+     STAMBUK
+  ========================= */
+
+  .pindah-mahad-table th.pindah-mahad-stambuk,
+  .pindah-mahad-table td.pindah-mahad-stambuk {
+
+    width: 110px !important;
+    min-width: 110px !important;
+  }
+
+
+  /* =========================
+     UNIT
+  ========================= */
+
+  .pindah-mahad-table th.pindah-mahad-unit,
+  .pindah-mahad-table td.pindah-mahad-unit {
+
+    width: 140px !important;
+    min-width: 120px;
+
+    white-space: normal !important;
+
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+
+    line-height: 1.45 !important;
+  }
+
+
+  /* =========================
+     MULAI NGABDI
+  ========================= */
+
+  .pindah-mahad-table th.pindah-mahad-mulai,
+  .pindah-mahad-table td.pindah-mahad-mulai {
+
+    width: 120px !important;
+    min-width: 120px !important;
+  }
+
+
+  /* =========================
+     ID PENASEHAT
+  ========================= */
+
+  .pindah-mahad-table th.pindah-mahad-id,
+  .pindah-mahad-table td.pindah-mahad-id {
+
+    width: 160px !important;
+    min-width: 140px;
+
+    white-space: normal !important;
+
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+
+    line-height: 1.45 !important;
   }
 
 }
@@ -10211,32 +10531,60 @@ function renderPindahMaHadAlyList() {
       : `PNSH-SANTRI-${s.id}`;
 
     return `
-      <tr>
-        <td style="text-align:center;"><input type="checkbox" class="pindah-mahad-checkbox" value="${s.id}"></td>
-        <td>${foto}</td>
-        <td>${escapeHtmlSafe(s.Nama_Lengkap || "-")}</td>
-        <td>${escapeHtmlSafe(s.Stambuk || "-")}</td>
-        <td>${escapeHtmlSafe(s.Unit_Ndalem || s.Kode_Unit || "-")}</td>
-        <td>${escapeHtmlSafe(s.Mulai_Ngabdi || "-")}</td>
-        <td>${escapeHtmlSafe(idPenasehat)}</td>
-      </tr>`;
+  <tr>
+    <td class="pindah-mahad-pilih">
+      <input
+        type="checkbox"
+        class="pindah-mahad-checkbox"
+        value="${s.id}"
+      >
+    </td>
+
+    <td class="pindah-mahad-foto">
+      ${foto}
+    </td>
+
+    <td class="pindah-mahad-nama">
+      ${escapeHtmlSafe(s.Nama_Lengkap || "-")}
+    </td>
+	
+	<td class="pindah-mahad-unit">
+      ${escapeHtmlSafe(s.Unit_Ndalem || s.Kode_Unit || "-")}
+    </td>
+
+    <td class="pindah-mahad-stambuk">
+      ${escapeHtmlSafe(s.Stambuk || "-")}
+    </td>    
+
+    <td class="pindah-mahad-mulai">
+      ${escapeHtmlSafe(s.Mulai_Ngabdi || "-")}
+    </td>
+
+    <td class="pindah-mahad-id">
+      ${escapeHtmlSafe(idPenasehat)}
+    </td>
+  </tr>`;
   }).join("");
 
   list.innerHTML = `
+  <div class="pindah-mahad-scroll">
     <table class="data-table pindah-mahad-table">
       <thead>
         <tr>
-          <th>Pilih</th>
-          <th>Foto</th>
-          <th>Nama</th>
-          <th>Stambuk</th>
-          <th>Unit</th>
-          <th>Mulai Ngabdi</th>
-          <th>ID Penasehat</th>
+          <th class="pindah-mahad-pilih">Pilih</th>
+          <th class="pindah-mahad-foto">Foto</th>
+          <th class="pindah-mahad-nama">Nama</th>
+		  <th class="pindah-mahad-unit">Unit</th>
+          <th class="pindah-mahad-stambuk">Stambuk</th>          
+          <th class="pindah-mahad-mulai">Mulai Ngabdi</th>
+          <th class="pindah-mahad-id">ID Penasehat</th>
         </tr>
       </thead>
+
       <tbody>${rows}</tbody>
-    </table>`;
+    </table>
+  </div>
+`;
 }
 
 function selectAllPindahMaHadAly(checked) {
