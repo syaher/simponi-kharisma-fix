@@ -3712,24 +3712,252 @@ and (max-width:1024px){
   padding: 0 !important;
 }
 
-	  /* ===== PINDAH MA'HAD ALY KE PENASEHAT ===== */
+	/* =========================================================
+   PINDAH MA'HAD ALY KE PENASEHAT
+   RESPONSIVE - HP & KOMPUTER
+========================================================= */
+
+/* Container tabel agar HP bisa scroll horizontal */
+.pindah-mahad-table-wrapper,
+.pindah-mahad-table-container {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* =========================================================
+   CHECKBOX
+========================================================= */
+
 .pindah-mahad-checkbox {
   width: 20px;
   height: 20px;
+  min-width: 20px;
+  min-height: 20px;
   cursor: pointer;
+  vertical-align: middle;
+  box-sizing: border-box;
 }
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.pindah-mahad-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+}
+
+
+/* =========================================================
+   SEMUA CELL DEFAULT
+   Kolom selain nama tetap satu baris.
+========================================================= */
+
 .pindah-mahad-table th,
 .pindah-mahad-table td {
   white-space: nowrap;
+  vertical-align: middle;
+  box-sizing: border-box;
 }
+
+
+/* =========================================================
+   KOLOM NAMA SANTRI
+   Teks otomatis turun apabila kolom tidak cukup.
+========================================================= */
+
 .pindah-mahad-table td.nama {
-  position: static;
+  position: static !important;
+
+  /* Izinkan teks turun ke bawah */
+  white-space: normal !important;
+
+  /* Mencegah teks keluar / menabrak border */
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  hyphens: auto;
+
+  /* Lebar desktop */
+  min-width: 140px;
+  width: 180px;
+  max-width: 250px;
+
+  /* Pastikan ukuran tidak melebihi border */
+  box-sizing: border-box;
+
+  /* Tinggi mengikuti isi */
+  height: auto;
+
+  /* Hindari teks meluber */
+  overflow: hidden;
 }
+
+
+/* =========================================================
+   JIKA HEADER NAMA MENGGUNAKAN CLASS "nama"
+========================================================= */
+
+.pindah-mahad-table th.nama {
+  white-space: normal !important;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+
+  min-width: 140px;
+  width: 180px;
+  max-width: 250px;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   FOTO
+========================================================= */
+
 .pindah-mahad-photo {
   width: 45px;
   height: 60px;
+
+  min-width: 45px;
+  min-height: 60px;
+
   object-fit: cover;
   border-radius: 4px;
+  display: block;
+}
+
+
+/* =========================================================
+   DESKTOP BESAR
+========================================================= */
+
+@media screen and (min-width: 1200px) {
+
+  .pindah-mahad-table td.nama,
+  .pindah-mahad-table th.nama {
+    min-width: 180px;
+    width: 240px;
+    max-width: 300px;
+  }
+
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media screen and (max-width: 991px) {
+
+  .pindah-mahad-table td.nama,
+  .pindah-mahad-table th.nama {
+    min-width: 130px;
+    width: 170px;
+    max-width: 220px;
+  }
+
+}
+
+
+/* =========================================================
+   HP / MOBILE
+========================================================= */
+
+@media screen and (max-width: 768px) {
+
+  .pindah-mahad-table {
+    font-size: 13px;
+  }
+
+  .pindah-mahad-table th,
+  .pindah-mahad-table td {
+    padding: 8px 6px;
+  }
+
+  /* Kolom Nama lebih sempit dan otomatis wrap */
+  .pindah-mahad-table td.nama,
+  .pindah-mahad-table th.nama {
+    min-width: 100px;
+    width: 120px;
+    max-width: 150px;
+
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+
+    box-sizing: border-box;
+  }
+
+  /* Foto sedikit diperkecil */
+  .pindah-mahad-photo {
+    width: 40px;
+    height: 55px;
+
+    min-width: 40px;
+    min-height: 55px;
+  }
+
+  .pindah-mahad-checkbox {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    min-height: 18px;
+  }
+
+}
+
+
+/* =========================================================
+   HP KECIL
+========================================================= */
+
+@media screen and (max-width: 480px) {
+
+  .pindah-mahad-table {
+    font-size: 12px;
+  }
+
+  .pindah-mahad-table th,
+  .pindah-mahad-table td {
+    padding: 6px 5px;
+  }
+
+  /* Nama tetap aman dan tidak keluar border */
+  .pindah-mahad-table td.nama,
+  .pindah-mahad-table th.nama {
+    min-width: 85px;
+    width: 105px;
+    max-width: 130px;
+
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    line-height: 1.35;
+
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  .pindah-mahad-photo {
+    width: 35px;
+    height: 48px;
+
+    min-width: 35px;
+    min-height: 48px;
+  }
+
+  .pindah-mahad-checkbox {
+    width: 17px;
+    height: 17px;
+    min-width: 17px;
+    min-height: 17px;
+  }
+
 }
   </style>
 </head>
