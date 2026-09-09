@@ -2767,7 +2767,54 @@ table tbody tr:hover {
     text-overflow: ellipsis;
   }
 }
-  </style>  
+  
+/* ===== TEMA BIRU REKAP / LAPORAN ===== */
+.laporan-container .laporan-table {
+  border:1px solid #1a73e8;
+  background:#fff;
+  color:#1f2937;
+  box-shadow:0 4px 14px rgba(26,115,232,.12);
+}
+
+.laporan-container .laporan-table th {
+  background:linear-gradient(180deg,#1a73e8 0%,#1565c0 100%);
+  color:#fff;
+  border-color:#0d47a1;
+  font-weight:700;
+}
+
+.laporan-container .laporan-table td {
+  background:#fff;
+  color:#1f2937;
+  border-color:#b9d4f5;
+}
+
+/* Baris selang-seling putih dan biru terang */
+.laporan-container .laporan-table tbody tr:nth-child(odd) td {
+  background:#fff;
+}
+
+.laporan-container .laporan-table tbody tr:nth-child(even) td {
+  background:#eef6ff;
+}
+
+.laporan-container .laporan-table tbody tr:hover td {
+  background:#dceeff;
+}
+
+/* Rekap aktivitas harian tetap menjadi tabel utama dengan biru tegas */
+#tblRekapAktivitasHarian {
+  border:2px solid #1a73e8 !important;
+}
+
+/* Baris TOTAL / RATA-RATA */
+#tblRekapAktivitasHarian tbody tr:last-child td {
+  background:#d9ecff !important;
+  color:#0d3b75 !important;
+  border-color:#1a73e8 !important;
+  font-weight:700 !important;
+}
+</style>  
 </head>
 <body>
   <div class="container">
@@ -3279,6 +3326,11 @@ table tbody tr:hover {
     <div class="download-modal-body">
 
       <label class="download-check-item">
+        <input type="checkbox" value="tblRekapAktivitasHarian" checked>
+        Rekap Aktivitas Harian
+      </label>
+
+      <label class="download-check-item">
         <input type="checkbox" value="tblKelas" checked>
         Rekap Prosentase Kelas
       </label>
@@ -3343,6 +3395,52 @@ table tbody tr:hover {
 </div>
 
 <div class="laporan-container">
+
+  <!-- ============================================================
+       REKAP FINAL UNTUK PIMPINAN
+       Ringkasan 9 tabel laporan menjadi 1 tabel utama
+       ============================================================ -->
+  <div id="rekapAktivitasHarian" style="margin-bottom:18px; margin-top:10px; background:#fff; border:2px solid #1a73e8; border-radius:12px; overflow:hidden;">
+    <div style="padding:12px 15px; background:linear-gradient(135deg,#1a73e8,#1565c0); color:#fff; font-weight:700;">
+      <span>📊 REKAP AKTIVITAS HARIAN</span>
+      <div style="font-size:0.82rem; font-weight:400; margin-top:3px; opacity:.95;">Ringkasan aktivitas setoran Al-Qur'an & Nadhom santri aktif</div>
+    </div>
+
+    <!-- KETERANGAN REKAP AKTIVITAS HARIAN -->
+    <div class="laporan-info" style="margin:12px 12px 0;">
+      <div class="laporan-info-title">
+        📊 Keterangan Rekap Aktivitas Harian
+      </div>
+      <div class="laporan-info-body">
+        Tabel ini menyajikan ringkasan aktivitas setoran santri aktif dari dua metode, yaitu <strong>Al-Qur'an</strong> dan <strong>Nadhom</strong>, yang diringkas per Unit Ndalem.
+      </div>
+      <ul class="laporan-info-list">
+        <li><strong>Santri Aktif</strong> : Jumlah santri berstatus aktif pada unit yang masuk filter.</li>
+        <li><strong>Hari Aktif</strong> : Jumlah hari yang memiliki aktivitas setoran.</li>
+        <li><strong>Setoran / Minggu</strong> : Rata-rata frekuensi aktivitas setoran per minggu dari Qur'an dan Nadhom.</li>
+        <li><strong>Capaian Qur'an</strong> : Persentase capaian menuju khatam Al-Qur'an per-Juz.</li>
+        <li><strong>Capaian Nadhom</strong> : Persentase capaian menuju khatam Nadhom.</li>        
+      </ul>
+    </div>
+
+    <div style="overflow-x:auto; padding:0;">
+      <table id="tblRekapAktivitasHarian" class="laporan-table" style="margin:0; min-width:860px;">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Unit Ndalem</th>
+            <th>Santri Aktif</th>
+            <th>Hari Aktif</th>
+            <th>Setoran / Minggu</th>
+            <th>Capaian Qur'an</th>
+            <th>Capaian Nadhom</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>    
+    </div>
+  </div>
   
   <!-- Accordion Section 1: Rekap Prosentase Kelas -->
   <div class="accordion-section">
@@ -5434,124 +5532,33 @@ const kelasMalam = [
 // ===================== UPDATE KELAS =====================
 
 function updateKelasByShift(shift) {
-
   let targetKelas = [];
+  if (shift === "pagi") targetKelas = [...kelasPagi];
+  else if (shift === "malam") targetKelas = [...kelasMalam];
+  else targetKelas = [...kelasPagi, ...kelasMalam];
 
-  if (shift === 'pagi') {
-
-    targetKelas = kelasPagi;
-
-  } else if (shift === 'malam') {
-
-    targetKelas = kelasMalam;
-
-  } else {
-
-    targetKelas = [
-      ...kelasPagi,
-      ...kelasMalam
-    ];
-
-  }
-
-  // =====================
-  // SIMPAN CHECKLIST LAMA
-  // =====================
-
-  const checkedSebelumnya = [
-    ...document.querySelectorAll(
-      '#kelasChecklist input[type="checkbox"]:checked'
-    )
-  ].map(cb => cb.value);
-
-  // =====================
-  // RENDER ULANG
-  // =====================
-
-  renderChecklist(
-    'kelasChecklist',
-    targetKelas,
-    'kelas'
-  );
-
-  // =====================
-  // RESTORE CHECKLIST
-  // =====================
+  targetKelas = [...new Set(targetKelas)];
+  renderChecklist("kelasChecklist", targetKelas, "kelas");
 
   requestAnimationFrame(() => {
-
-    document
-      .querySelectorAll(
-        '#kelasChecklist input[type="checkbox"]'
-      )
-      .forEach(cb => {
-
-        // kalau sebelumnya pernah dicentang
-        // maka tetap centang
-
-        if (
-          checkedSebelumnya.includes(cb.value)
-        ) {
-
-          cb.checked = true;
-
-        }
-
-      });
-
-    // kalau belum ada satupun yang dicentang
-    // otomatis centang semua
-
-    const adaYangChecked =
-      document.querySelector(
-        '#kelasChecklist input[type="checkbox"]:checked'
-      );
-
-    if (!adaYangChecked) {
-
-      document
-        .querySelectorAll(
-          '#kelasChecklist input[type="checkbox"]'
-        )
-        .forEach(cb => {
-
-          cb.checked = true;
-
-        });
-
-    }
-
+    document.querySelectorAll('#kelasChecklist input[type="checkbox"]').forEach(cb => {
+      cb.checked = true;
+    });
     loadLaporanDebounced();
-
   });
-
 }
 
 // ===================== EVENT LISTENER RADIO SHIFT =====================
-document.addEventListener('change', e => {
-  if (e.target.name === 'shift') {
-    updateKelasByShift(e.target.value);
-    document.addEventListener('change', e => {
-
-  if (e.target.name === 'shift') {
-
-    updateKelasByShift(
-      e.target.value
-    );
-
-  }
-
-});
-  }
+document.addEventListener("change", e => {
+  if (e.target.name === "shift") updateKelasByShift(e.target.value);
 });
 
 // ===================== INISIALISASI AWAL =====================
-// saat halaman pertama kali dimuat, tampilkan semua sekolah & centang semua kelas
 document.addEventListener("DOMContentLoaded", () => {
-  const defaultShift = 'semua'; // ✅ default awal: semua sekolah
+  const defaultShift = "semua";
   const defaultRadio = document.querySelector(`input[name="shift"][value="${defaultShift}"]`);
   if (defaultRadio) defaultRadio.checked = true;
-  updateKelasByShift(defaultShift); // tampilkan semua kelas pagi + malam
+  updateKelasByShift(defaultShift);
 });
 
 // ==================== GLOBAL HELPERS ====================
@@ -5604,6 +5611,10 @@ function renderNgajiSummary(summary) {
     )
     .join(' | ');
 }
+
+let summaryUnitAktifData = [];
+let summaryFrekuensiData = [];
+let aktivitasData = [];
 
 async function loadLaporan() {
   try {
@@ -5827,6 +5838,8 @@ async function loadLaporan() {
           unitValid.includes(row.Unit_Ndalem)
         );
 
+      summaryUnitAktifData = unitAktifFiltered || [];
+
       const tblRekapUnit =
         document.querySelector("#tblRekapUnit tbody");
 
@@ -5921,7 +5934,7 @@ try {
   }
 
   const {
-    data: aktivitasData = [],
+    data: aktivitasDataRaw = [],
     error: aktivitasErr
   } = await queryAktivitas
     .order("Unit_Ndalem", { ascending: true })
@@ -5940,11 +5953,14 @@ try {
 
   // ==================== SORT TERBANYAK SETORAN ====================
   const aktivitasFiltered =
-    (aktivitasData || [])
+    (aktivitasDataRaw || [])
       .filter(filterLogic)
       .sort((a, b) => {
         return (b.total_ayat_setor || 0) - (a.total_ayat_setor || 0);
       });
+
+  // Simpan hasil yang sudah terfilter untuk rekap final.
+  aktivitasData = aktivitasFiltered;
 
   const tblAktivitas =
     document.querySelector("#tblAktivitasUnit tbody");
@@ -6073,6 +6089,8 @@ try {
         );
 
       }
+
+      summaryFrekuensiData = frekuensiData || [];
 
       const tbody =
         document.querySelector(
@@ -6209,126 +6227,110 @@ const semuaStambuk = new Set(
     .filter(Boolean)
 );
 
-// ==================== SANTRI KHATAM & LANCAR ====================
+// ==================== RINGKASAN DUA METODE ====================
+// Semua statistik tetap memakai denominator TOTAL SANTRI AKTIF hasil filter,
+// tetapi dihitung terpisah antara Qur'an dan Nadhom supaya tidak tercampur.
 
-const santriKhatam = new Set();
-const santriLancar = new Set();
+const getStambuk = (row) => String(
+  row?.Stambuk ??
+  row?.stambuk ??
+  row?.santri_kharisma?.Stambuk ??
+  ""
+).trim();
 
-filteredDetail.forEach(item => {
+const quranStats = {
+  setor: new Set(),
+  khatam: new Set(),
+  lancar: new Set()
+};
 
-  const stambuk = String(
-    item.Stambuk ||
-    item.santri_kharisma?.Stambuk ||
-    ""
-  ).trim();
+(filteredLaporanQuran || []).forEach(row => {
+  const stambuk = getStambuk(row);
+  if (!stambuk || !semuaStambuk.has(stambuk)) return;
 
-  if (!stambuk) return;
+  const transaksi = Number(row["Jumlah Transaksi"] ?? 0);
+  const totalSetoran = Number(row["Total Setoran"] ?? 0);
+  const batasKhatam = Number(row["Total Batas Khatam"] ?? 0);
+  const persenKhatamQuran = Number(String(row["% Khatam"] ?? 0).replace(",", ".").replace("%", "")) || 0;
+  const lancarText = String(row["Kelancaran"] ?? "").trim().toLowerCase();
 
-  // hanya santri aktif hasil filter
-  if (!semuaStambuk.has(stambuk)) return;
-
-  // ==================== KHATAM ====================
-
-  if (
-    String(item.status_khatam || "")
-      .trim()
-      .toLowerCase() === "khatam"
-  ) {
-    santriKhatam.add(stambuk);
+  if (transaksi > 0 || totalSetoran > 0) {
+    quranStats.setor.add(stambuk);
   }
-
-  // ==================== LANCAR ====================
-
-  if (
-    String(item.status_lancar || "")
-      .trim()
-      .toLowerCase() === "lancar"
-  ) {
-    santriLancar.add(stambuk);
+  if (persenKhatamQuran >= 100 || (batasKhatam > 0 && totalSetoran >= batasKhatam)) {
+    quranStats.khatam.add(stambuk);
   }
-
+  if (lancarText === "lancar") {
+    quranStats.lancar.add(stambuk);
+  }
 });
 
-// ==================== SUDAH / BELUM SETOR ====================
+const nadhomStats = {
+  setor: new Set(),
+  khatam: new Set(),
+  lancar: new Set()
+};
 
-// filteredBelum = data santri yang BELUM setor
-// jadi tinggal dihitung langsung
+(filteredStatus || []).forEach(row => {
+  const stambuk = getStambuk(row);
+  if (!stambuk || !semuaStambuk.has(stambuk)) return;
 
-const belumSetoranCount = filteredBelum.length;
+  if (String(row.status_khatam ?? "").trim().toLowerCase() === "khatam") {
+    nadhomStats.khatam.add(stambuk);
+  }
+  if (String(row.status_lancar ?? "").trim().toLowerCase() === "lancar") {
+    nadhomStats.lancar.add(stambuk);
+  }
+});
 
-const sudahSetoranCount =
-  Math.max(0, totalSantri - belumSetoranCount);
+(filteredDetail || []).forEach(row => {
+  const stambuk = getStambuk(row);
+  if (!stambuk || !semuaStambuk.has(stambuk)) return;
+  nadhomStats.setor.add(stambuk);
+});
 
-// ==================== KHATAM & LANCAR ====================
+const makeMethodSummary = (stats) => ({
+  khatam: stats.khatam.size,
+  belumKhatam: Math.max(0, totalSantri - stats.khatam.size),
+  lancar: stats.lancar.size,
+  belumLancar: Math.max(0, totalSantri - stats.lancar.size),
+  setor: stats.setor.size,
+  belumSetor: Math.max(0, totalSantri - stats.setor.size)
+});
 
-const sudahKhatamCount = santriKhatam.size;
-const sudahLancarCount = santriLancar.size;
-
-const belumKhatamCount =
-  Math.max(0, totalSantri - sudahKhatamCount);
-
-const belumLancarCount =
-  Math.max(0, totalSantri - sudahLancarCount);
-
-// ==================== PERSENTASE ====================
+const quranSummary = makeMethodSummary(quranStats);
+const nadhomSummary = makeMethodSummary(nadhomStats);
 
 const pct = (n) =>
   totalSantri
     ? ((n / totalSantri) * 100).toFixed(1) + "%"
     : "0%";
 
-// ==================== RENDER SUMMARY ====================
-
 const summary = document.getElementById("laporanSummary");
 
 if (summary) {
-
   summary.innerHTML = `
     <div>
       📊 <b>Total Santri Aktif:</b>
       <span id="totalSantri">${totalSantri}</span>
     </div>
 
-    <div>
-      <b>Khatam:</b>
-      <span id="persenKhatam">
-        ${pct(sudahKhatamCount)}
-      </span>
-
-      |
-     
-      <b>Belum Khatam:</b>
-      <span id="belumKhatam">
-        ${pct(belumKhatamCount)}
-      </span>
+    <div style="line-height:1.7;">
+      <b>Khatam:</b> Qur'an ${pct(quranSummary.khatam)} | Nadhom ${pct(nadhomSummary.khatam)}
+      &nbsp;·&nbsp;
+      <b>Belum Khatam:</b> Qur'an ${pct(quranSummary.belumKhatam)} | Nadhom ${pct(nadhomSummary.belumKhatam)}
     </div>
 
-    <div>
-     <b>Lancar:</b>
-      <span id="persenLancar">
-        ${pct(sudahLancarCount)}
-      </span>
-
-      |
-
-      <b>Belum Lancar:</b>
-      <span id="belumLancar">
-        ${pct(belumLancarCount)}
-      </span>
+    <div style="line-height:1.7;">
+      <b>Lancar:</b> Qur'an ${pct(quranSummary.lancar)} | Nadhom ${pct(nadhomSummary.lancar)}
+      &nbsp;·&nbsp;
+      <b>Belum Lancar:</b> Qur'an ${pct(quranSummary.belumLancar)} | Nadhom ${pct(nadhomSummary.belumLancar)}
     </div>
 
-    <div>
-      <b>Setoran:</b>
-      <span id="sudahSetoran">
-        ${pct(sudahSetoranCount)}
-      </span>
-
-      |
-
-      <b>Belum Setoran:</b>
-      <span id="belumSetoran">
-        ${pct(belumSetoranCount)}
-      </span>
+    <div style="line-height:1.7;">
+      <b>Setoran:</b> Qur'an ${pct(quranSummary.setor)} | Nadhom ${pct(nadhomSummary.setor)}
+      &nbsp;·&nbsp;
+      <b>Belum Setoran:</b> Qur'an ${pct(quranSummary.belumSetor)} | Nadhom ${pct(nadhomSummary.belumSetor)}
     </div>
   `;
 }
@@ -6546,6 +6548,16 @@ if (summary) {
     // ==================== RENDER LAPORAN QURAN UNIT ====================
     renderLaporanQuranUnit(filteredLaporanQuranUnit);
 
+    // ==================== REKAP FINAL AKTIVITAS HARIAN ====================
+    renderRekapAktivitasHarian({
+      santriAktif: santriFilteredByKelasUnit,
+      aktivitasNadhom: aktivitasData || [],
+      aktivitasQuran: filteredLaporanQuran || [],
+      unitAktif: summaryUnitAktifData || [],
+      frekuensiNadhom: summaryFrekuensiData || [],
+      quranUnit: filteredLaporanQuranUnit || []
+    });
+
   } catch (err) {
 
     console.error(
@@ -6554,6 +6566,159 @@ if (summary) {
     );
 
   }
+}
+
+// ==================== REKAP FINAL AKTIVITAS HARIAN ====================
+function renderRekapAktivitasHarian({
+  santriAktif = [],
+  aktivitasNadhom = [],
+  aktivitasQuran = [],
+  unitAktif = [],
+  frekuensiNadhom = [],
+  quranUnit = []
+} = {}) {
+  const tbody = document.querySelector("#tblRekapAktivitasHarian tbody");
+  if (!tbody) return;
+
+  // Peta nama -> stambuk supaya santri yang setor Qur'an dan Nadhom
+  // tetap dihitung satu orang pada kolom "Aktif Setor".
+  const namaKeStambuk = {};
+  santriAktif.forEach(s => {
+    const nama = String(s?.Nama_Lengkap ?? s?.Nama ?? "").trim().toLowerCase();
+    const stambuk = String(s?.Stambuk ?? s?.stambuk ?? "").trim();
+    if (nama && stambuk) namaKeStambuk[nama] = stambuk;
+  });
+
+  const keyPerson = (row) => {
+    const stambuk = String(row?.Stambuk ?? row?.stambuk ?? "").trim();
+    if (stambuk) return `S:${stambuk}`;
+    const nama = String(
+      row?.Nama_Lengkap ?? row?.Nama ?? row?.nama_lengkap ?? ""
+    ).trim().toLowerCase();
+    if (namaKeStambuk[nama]) return `S:${namaKeStambuk[nama]}`;
+    return nama ? `N:${nama}` : "";
+  };
+
+  const activeByUnit = {};
+  santriAktif.forEach(s => {
+    const unit = String(s.Unit_Ndalem ?? "Tidak Diketahui").trim() || "Tidak Diketahui";
+    if (!activeByUnit[unit]) activeByUnit[unit] = [];
+    const k = keyPerson(s);
+    if (k && !activeByUnit[unit].includes(k)) activeByUnit[unit].push(k);
+  });
+
+  // Santri yang benar-benar muncul pada data setoran Qur'an atau Nadhom.
+  const setorByUnit = {};
+  const addSetor = (row, unitKey) => {
+    const unit = String(unitKey ?? row?.Unit_Ndalem ?? row?.["Unit Ndalem"] ?? "Tidak Diketahui").trim() || "Tidak Diketahui";
+    const k = keyPerson(row);
+    if (!k) return;
+    if (!setorByUnit[unit]) setorByUnit[unit] = new Set();
+    setorByUnit[unit].add(k);
+  };
+
+  aktivitasNadhom.forEach(r => addSetor(r, r.Unit_Ndalem));
+  aktivitasQuran.forEach(r => addSetor(r, r["Unit Ndalem"]));
+
+  const hariMap = {};
+  unitAktif.forEach(r => {
+    const unit = String(r.Unit_Ndalem ?? "").trim();
+    if (unit) hariMap[unit] = Number(r.total_hari_aktif ?? 0);
+  });
+
+  const nadhomMap = {};
+  frekuensiNadhom.forEach(r => {
+    const unit = String(r.Unit_Ndalem ?? "").trim();
+    if (unit) nadhomMap[unit] = r;
+  });
+
+  const quranMap = {};
+  quranUnit.forEach(r => {
+    const unit = String(r["Unit Ndalem"] ?? "").trim();
+    if (unit) quranMap[unit] = r;
+  });
+
+  const units = new Set([
+    ...Object.keys(activeByUnit),
+    ...Object.keys(nadhomMap),
+    ...Object.keys(quranMap),
+    ...Object.keys(hariMap)
+  ]);
+
+  const rows = Array.from(units).map(unit => {
+    const n = nadhomMap[unit] || {};
+    const q = quranMap[unit] || {};
+    const aktif = (activeByUnit[unit] || []).length;
+    const aktifSetor = (setorByUnit[unit] || new Set()).size;
+    const frekRawNadhom = n.frekuensi_setoran_label ?? n["Frekuensi Setoran"] ?? "-";
+    const frekRawQuran = q["Frekuensi Setoran"] ?? "-";
+    const frekNadhom = Number(String(frekRawNadhom).replace(",", ".").match(/[0-9]+(?:\.[0-9]+)?/)?.[0] || 0);
+    const frekQuran = Number(String(frekRawQuran).replace(",", ".").match(/[0-9]+(?:\.[0-9]+)?/)?.[0] || 0);
+    const frekText = (frekNadhom || frekQuran)
+      ? `${frekNadhom.toFixed(1)}x Nadhom + ${frekQuran.toFixed(1)}x Qur'an / minggu`
+      : "-";
+
+    // Skor pengurutan: total intensitas kedua jenis setoran.
+    const frekNum = frekNadhom + frekQuran;
+    const transaksi = Number(n.jumlah_transaksi_setoran ?? 0) + Number(q["Jumlah Transaksi"] ?? 0);
+
+    return {
+      unit,
+      aktif,
+      aktifSetor,
+      hariAktif: Number(hariMap[unit] ?? 0),
+      frekText,
+      frekNum,
+      transaksi,
+      quranKhatam: q["% Khatam"] ?? 0,
+      nadhomKhatam: n.persen_menuju_khatam ?? 0
+    };
+  }).sort((a, b) =>
+    b.frekNum - a.frekNum ||
+    b.transaksi - a.transaksi ||
+    b.aktifSetor - a.aktifSetor ||
+    a.unit.localeCompare(b.unit, "id", { numeric: true })
+  );
+
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:10px;">(tidak ada data)</td></tr>`;
+    return;
+  }
+
+  const esc = (v) => escapeHtml(String(v ?? "-"));
+  tbody.innerHTML = rows.map((r, i) => `
+    <tr>
+      <td style="text-align:center; padding:8px; border:1px solid #1a73e8; font-weight:700;">${i + 1}</td>
+      <td style="text-align:left; padding:8px; border:1px solid #1a73e8; font-weight:600;">${esc(r.unit)}</td>
+      <td style="text-align:center; padding:8px; border:1px solid #1a73e8;">${r.aktif}</td>
+      <td style="text-align:center; padding:8px; border:1px solid #1a73e8;">${r.hariAktif}</td>
+      <td style="text-align:center; padding:8px; border:1px solid #1a73e8; font-weight:700;">${esc(r.frekText)}</td>
+      <td style="text-align:center; padding:8px; border:1px solid #1a73e8; font-weight:700;">${esc(r.quranKhatam)}%</td>
+      <td style="text-align:center; padding:8px; border:1px solid #1a73e8; font-weight:700;">${esc(r.nadhomKhatam)}%</td>
+    </tr>
+  `).join("");
+
+  const totalAktif = santriAktif.length;
+  const avgFreq = rows.length
+    ? (rows.reduce((sum, r) => sum + r.frekNum, 0) / rows.length).toFixed(1)
+    : "0.0";
+
+  const quranSetoranTotal = quranUnit.reduce((sum, r) => sum + Number(r["Total Setoran"] ?? 0), 0);
+  const quranTargetTotal = quranUnit.reduce((sum, r) => sum + Number(r["Total Batas Khatam"] ?? 0), 0);
+  const nadhomSetoranTotal = frekuensiNadhom.reduce((sum, r) => sum + Number(r.total_setoran ?? 0), 0);
+  const nadhomTargetTotal = frekuensiNadhom.reduce((sum, r) => sum + Number(r.total_batas_khatam ?? 0), 0);
+  const totalPct = (a, b) => b > 0 ? Math.min(100, (a / b) * 100).toFixed(1) : "0.0";
+
+  tbody.insertAdjacentHTML("beforeend", `
+    <tr style="background:#eef6ff; font-weight:700;">
+      <td colspan="2" style="text-align:center; padding:8px; border:1px solid #1a73e8;">TOTAL / RATA-RATA</td>
+      <td style="text-align:center; padding:8px; border:1px solid #1a73e8;">${totalAktif}</td>
+      <td style="text-align:center; padding:8px; border:1px solid #1a73e8;">-</td>
+      <td style="text-align:center; padding:8px; border:1px solid #1a73e8;">${avgFreq}x / minggu</td>
+      <td style="text-align:center; padding:8px; border:1px solid #1a73e8;">${totalPct(quranSetoranTotal, quranTargetTotal)}%</td>
+      <td style="text-align:center; padding:8px; border:1px solid #1a73e8;">${totalPct(nadhomSetoranTotal, nadhomTargetTotal)}%</td>
+    </tr>
+  `);
 }
 
 // ==================== RENDER TABLE DENGAN ALIGNMENT ====================
@@ -6844,6 +7009,7 @@ async function downloadPDFAll(selectedIds = []) {
     const pageHeight = doc.internal.pageSize.getHeight();
 
     const allTables = [
+      { id: "tblRekapAktivitasHarian", title: "Rekap Aktivitas Harian" },
       { id: "tblKelas", title: "Rekap Prosentase Kelas" },
       { id: "tblUnit", title: "Rekap Prosentase Unit Ndalem" },
       { id: "tblStatus", title: "Status Khatam & Lancar (Santri)" },      
@@ -7098,17 +7264,11 @@ async function downloadPDFAll(selectedIds = []) {
       let titleText = "";
       const tableId = getTableIdFromDescription(lines);
       if (tableId) {
-        const tableEl = document.getElementById(tableId);
-        if (tableEl) {
-          const accordion = tableEl.closest(".accordion-content");
-          if (accordion) {
-            const infoBox = accordion.querySelector(".laporan-info");
-            if (infoBox) {
-              const titleEl = infoBox.querySelector(".laporan-info-title");
-              if (titleEl) {
-                titleText = titleEl.innerText.trim();
-              }
-            }
+        const infoBox = getInfoBoxForTable(tableId);
+        if (infoBox) {
+          const titleEl = infoBox.querySelector(".laporan-info-title");
+          if (titleEl) {
+            titleText = titleEl.innerText.trim();
           }
         }
       }
@@ -7177,6 +7337,8 @@ async function downloadPDFAll(selectedIds = []) {
 
     function getTableIdFromDescription(lines) {
       const tableMapping = {
+        "Rekap Aktivitas Harian": "tblRekapAktivitasHarian",
+        "Keterangan Rekap Aktivitas Harian": "tblRekapAktivitasHarian",
         "Rekap Prosentase Kelas": "tblKelas",
         "Rekap Prosentase Unit Ndalem": "tblUnit",
         "Status Khatam & Lancar": "tblStatus",        
@@ -7185,7 +7347,7 @@ async function downloadPDFAll(selectedIds = []) {
         "Setoran Nadhom Unit": "tblFrekuensiSetoran",
         "Setoran Qur'an Siswa": "tblLaporanQuranSantri",
         "Setoran Qur'an Unit": "tblLaporanQuranUnit",
-		"Siswa Belum Setoran": "tblBelum"
+        "Siswa Belum Setoran": "tblBelum"
       };
 
       for (const [key, value] of Object.entries(tableMapping)) {
@@ -7196,14 +7358,25 @@ async function downloadPDFAll(selectedIds = []) {
       return null;
     }
 
-    function getDescriptionFromWeb(tableId) {
+    function getInfoBoxForTable(tableId) {
       const table = document.getElementById(tableId);
-      if (!table) return [];
+      if (!table) return null;
 
       const accordion = table.closest(".accordion-content");
-      if (!accordion) return [];
+      if (accordion) {
+        return accordion.querySelector(".laporan-info");
+      }
 
-      const infoBox = accordion.querySelector(".laporan-info");
+      // Rekap Aktivitas Harian berada di blok khusus, bukan accordion.
+      if (tableId === "tblRekapAktivitasHarian") {
+        return document.querySelector("#rekapAktivitasHarian .laporan-info");
+      }
+
+      return null;
+    }
+
+    function getDescriptionFromWeb(tableId) {
+      const infoBox = getInfoBoxForTable(tableId);
       if (!infoBox) return [];
 
       const lines = [];
@@ -7240,7 +7413,16 @@ async function downloadPDFAll(selectedIds = []) {
 
       const headers = Array.from(tableEl.querySelectorAll("thead th")).map(th => cleanPdfText(th.innerText));
       const rows = Array.from(tableEl.querySelectorAll("tbody tr")).map(tr =>
-        Array.from(tr.querySelectorAll("td")).map(td => cleanPdfText(td.innerText))
+        (() => {
+          const row = [];
+          tr.querySelectorAll("td").forEach(td => {
+            const text = cleanPdfText(td.innerText);
+            const colspan = Number(td.getAttribute("colspan") || 1);
+            row.push(text);
+            for (let i = 1; i < colspan; i++) row.push("");
+          });
+          return row;
+        })()
       );
 
       if (!rows.length) continue;
@@ -7315,6 +7497,9 @@ async function downloadPDFAll(selectedIds = []) {
         leftAlignColumns.add(1);
         leftAlignColumns.add(2);
         leftAlignColumns.add(3);
+      } else if (id === "tblRekapAktivitasHarian") {
+        // Kolom Unit Ndalem (1) rata kiri
+        leftAlignColumns.add(1);
       } else if (id === "tblKelas") {
         // Kolom Kelas (1) rata kiri
         leftAlignColumns.add(1);
