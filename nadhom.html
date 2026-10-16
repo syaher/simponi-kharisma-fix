@@ -539,6 +539,9 @@ textarea:focus {
     transition:all .25s ease;
     pointer-events:none;
     min-width:240px;
+    width:max-content;
+    max-width:min(560px, calc(100% - 24px));
+    overflow-wrap:break-word;
     text-align:center;
 }
 
@@ -767,12 +770,12 @@ textarea:focus {
     max-width: 140px;
   }
   
-  /* Notification popup adjustment */
+  /* Notifikasi tetap di tengah layar di semua device (tidak dipindah ke atas) */
   .notification-popup {
-    top: 10px;
-    right: 10px;
-    left: 10px;
-    max-width: none;
+    top: 50%;
+    left: 50%;
+    right: auto;
+    max-width: calc(100% - 20px);
   }
 }
 
