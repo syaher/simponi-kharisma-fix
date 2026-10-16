@@ -2807,6 +2807,117 @@ table tbody tr:hover {
   border:2px solid #1a73e8 !important;
 }
 
+.no-data {
+  font-size:13px;
+  color:#777;
+  margin:4px 0;
+}
+
+/* Baris daftar "masih wajib mengulang" yang bisa diklik */
+.ulang-row {
+  width:100%;
+  text-align:left;
+  font:inherit;
+  cursor:pointer;
+  background:#fdf6ec;
+  border:1px solid #f3d19e;
+  border-left:3px solid #e6a23c;
+  border-radius:4px;
+  padding:8px 10px;
+  margin-bottom:6px;
+}
+.ulang-row:hover,
+.ulang-row:focus-visible {
+  background:#fbead0;
+  outline:none;
+}
+.ulang-hint {
+  font-size:11px;
+  color:#a06b12;
+  margin-top:4px;
+}
+
+/* Picker surat Al-Qur'an: grid chip, bukan dropdown panjang */
+.surat-chips {
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  max-height:190px;
+  overflow-y:auto;
+  padding:2px;
+}
+[data-surat-cari] {
+  margin-bottom:6px;
+}
+.surat-chip {
+  font:inherit;
+  cursor:pointer;
+  background:#f2f8f5;
+  border:1px solid #b7d9c8;
+  border-radius:16px;
+  padding:5px 11px;
+  font-size:13px;
+  line-height:1.3;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+.surat-chip:hover,
+.surat-chip:focus-visible {
+  background:#e0f0e8;
+  outline:none;
+}
+.surat-chip.aktif {
+  background:#2e9e6b;
+  border-color:#2e9e6b;
+  color:#fff;
+}
+.surat-chip .n {
+  font-size:11px;
+  opacity:.75;
+}
+.surat-chip.aktif .n {
+  opacity:.9;
+}
+.surat-picker-info {
+  font-size:12px;
+  color:#4b6b57;
+  margin:0 0 6px 0;
+}
+
+/* Pencarian dropdown Unit / Penyimak / Nama Santri: memakai chip yang sama dengan picker surat */
+.label-row {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:8px;
+}
+.label-row label {
+  margin-bottom:0;
+}
+.cari-toggle {
+  font:inherit;
+  line-height:0;
+  padding:5px 8px;
+  border:1px solid #b7d9c8;
+  border-radius:14px;
+  background:#f2f8f5;
+  color:#20724a;
+  cursor:pointer;
+}
+.cari-toggle:hover,
+.cari-toggle:focus-visible {
+  background:#e0f0e8;
+  outline:none;
+}
+[data-cari] {
+  margin-bottom:6px;
+}
+[data-cari-chips] {
+  max-height:150px;
+}
+
 /* Baris TOTAL / RATA-RATA */
 #tblRekapAktivitasHarian tbody tr:last-child td {
   background:#d9ecff !important;
@@ -2864,24 +2975,61 @@ table tbody tr:hover {
         <!-- =================== FORM INPUT =================== -->
         <div class="input-section">
           <h3>📝 Input Setoran Santri</h3>
+
+          <!-- Daftar setoran Al-Qur'an yang masih wajib diulang (per unit), diletakkan di atas form -->
+          <div id="belumLancarQuranCard" style="margin:0 0 16px 0;border-bottom:1px solid #e5e5e5;padding-bottom:12px;">
+            <h4 style="margin:0 0 6px 0;">
+              🔁 Wajib Mengulang (Al-Qur'an)
+              <span id="belumLancarQuranCount" style="background:#e6a23c;color:#fff;border-radius:10px;padding:1px 8px;font-size:12px;">0</span>
+            </h4>
+            <p style="font-size:12px;color:#666;margin:0 0 8px 0;">
+              Dihitung dari setoran Al-Qur'an <b>terakhir</b> tiap santri per juz. Selama setoran terakhirnya <b>Tidak Lancar</b>, santri masih wajib mengulang, <b>total ayatnya tidak ditambahkan</b> karena masih wajib mengulang (belum menambah progres khatam), dan ayat baru dihitung setelah ditandai Lancar.
+            </p>
+            <div id="belumLancarQuranUnit" style="font-size:12px;color:#444;margin:0 0 6px 0;"></div>
+            <div id="belumLancarQuranList">
+              <p class="no-data"><b>Pilih unit dulu untuk melihat daftar.</b></p>
+            </div>
+          </div>
+
           <form id="santriForm">
 
             <div class="form-group">
-              <label for="unit">Unit Ndalem:</label>
+              <div class="label-row">
+                <label for="unit">Unit Ndalem:</label>
+                <button type="button" class="cari-toggle" data-cari-buka="unit" title="Cari unit" aria-label="Cari unit">
+                  <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="16.2" y1="16.2" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                </button>
+              </div>
+              <input type="text" data-cari="unit" placeholder="Cari unit..." style="display:none;">
+              <div class="surat-chips" data-cari-chips="unit" style="display:none;"></div>
               <select id="unit" required>
                 <option value="">Pilih Unit</option>
               </select>
             </div>
 
             <div class="form-group">
-              <label for="penyimak">Penyimak:</label>
+              <div class="label-row">
+                <label for="penyimak">Penyimak:</label>
+                <button type="button" class="cari-toggle" data-cari-buka="penyimak" title="Cari penyimak" aria-label="Cari penyimak">
+                  <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="16.2" y1="16.2" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                </button>
+              </div>
+              <input type="text" data-cari="penyimak" placeholder="Cari nama penyimak..." style="display:none;">
+              <div class="surat-chips" data-cari-chips="penyimak" style="display:none;"></div>
               <select id="penyimak" required>
                 <option value="">Pilih Penyimak</option>
               </select>
             </div>
 
             <div class="form-group">
-              <label for="nama">Nama Santri:</label>
+              <div class="label-row">
+                <label for="nama">Nama Santri:</label>
+                <button type="button" class="cari-toggle" data-cari-buka="nama" title="Cari nama santri" aria-label="Cari nama santri">
+                  <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="16.2" y1="16.2" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                </button>
+              </div>
+              <input type="text" data-cari="nama" placeholder="Cari nama santri atau kelas..." style="display:none;">
+              <div class="surat-chips" data-cari-chips="nama" style="display:none;"></div>
               <select id="nama" required>
                 <option value="">Pilih Unit dulu</option>
               </select>
@@ -2892,6 +3040,14 @@ table tbody tr:hover {
               <select id="kitab" class="arabic" required>
                 <option value="">Pilih Kitab</option>
               </select>
+            </div>
+
+            <!-- Picker cepat per surat (hanya Al-Qur'an) -->
+            <div class="form-group" id="suratPickerGroup" data-surat-picker style="display:none;">
+              <label>Pilih Surat:</label>
+              <input type="text" data-surat-cari placeholder="Cari nama surat, mis. An-Naba...">
+              <p class="surat-picker-info" data-surat-chips-info></p>
+              <div class="surat-chips" data-surat-chips></div>
             </div>
 
             <div class="form-group">
@@ -2926,6 +3082,9 @@ table tbody tr:hover {
               <span class="btn-loading" style="display:none;">Menyimpan...</span>
             </button>
           </form>
+
+          <!-- Info progres Al-Qur'an santri terpilih -->
+          <div id="quranProgresInfo" style="display:none;margin-top:12px;"></div>
         </div>
 
         <!-- =================== DATA TABEL =================== -->
@@ -3882,6 +4041,13 @@ table tbody tr:hover {
           <select id="editKitab" class="arabic" required></select>
         </div>
 
+        <div class="form-group" data-surat-picker style="display:none;">
+          <label>Pilih Surat:</label>
+          <input type="text" data-surat-cari placeholder="Cari nama surat, mis. An-Naba">
+          <p class="surat-picker-info" data-surat-chips-info></p>
+          <div class="surat-chips" data-surat-chips></div>
+        </div>
+
         <div class="form-group">
           <label for="editDariAyat">Dari Bait/Ayat:</label>
           <select id="editDariAyat" class="arabic" required></select>
@@ -3996,10 +4162,12 @@ const SOROGAN_UNIT_PER_LOAD = 5;
       loadingScreen.style.display = "flex";
       mainContent.style.display = "none";
 
+      pasangPencarianDropdown();
       await loadUnits();
 	  await loadPenyimak(); 
       await loadKitab();
       await loadData();
+      await loadBelumLancarQuranUnit();
 
       loadingScreen.style.display = "none";
       mainContent.style.display = "block";
@@ -4031,6 +4199,8 @@ const SOROGAN_UNIT_PER_LOAD = 5;
  // ===================== LOAD NAMA SANTRI (tanpa memuat ulang penyimak) =====================
 unitSelect.addEventListener("change", async () => {
   const unit = unitSelect.value;
+
+  loadBelumLancarQuranUnit().catch(err => console.error("Panel mengulang:", err));
 
   // NOTE: jangan panggil loadPenyimak di sini karena kita memuat penyimak sekali di init()
   namaSelect.innerHTML = `<option value="">Memuat...</option>`;
@@ -4092,7 +4262,7 @@ const KITAB_GROUPS_BY_ID = {
 async function loadKitab() {
     const { data, error } = await client
         .from("nadhom_kitab")
-        .select("id, judul_arab, nama_kitab")
+        .select("id, judul_arab, nama_kitab, kategori")
         .order("id");
     
     if (error) {
@@ -4105,6 +4275,36 @@ async function loadKitab() {
     data.forEach(k => {
         kitabMap.set(k.id, k);
     });
+
+    // tandai kitab Al-Qur'an dari kolom kategori (fallback: nama kitab)
+    QURAN_KITAB_IDS.clear();
+    data.forEach(k => {
+        const kat = String(k.kategori || "").trim().toLowerCase();
+        const nama = `${k.nama_kitab || ""} ${k.judul_arab || ""}`.toLowerCase();
+        const cocokKategori = kat.includes("quran") || kat.includes("qur'an");
+        const cocokNama = /qur|juz/.test(nama);
+        if (cocokKategori || (kat === "" && cocokNama)) {
+            QURAN_KITAB_IDS.add(parseInt(k.id));
+        }
+    });
+    if (QURAN_KITAB_IDS.size === 0) {
+        (KITAB_GROUPS_BY_ID["Al-Qur'an"] || []).forEach(id => QURAN_KITAB_IDS.add(id));
+    }
+
+    // Kelompok Al-Qur'an dibuat dinamis supaya juz baru (mis. Juz 30) tampil tanpa ubah kode.
+    KITAB_QURAN_DIAGUNAKAN.clear();
+    data.forEach(k => {
+        if (adalahJuzAmmaLama(k, QURAN_KITAB_IDS.has(parseInt(k.id)))) KITAB_QURAN_DIAGUNAKAN.add(parseInt(k.id));
+    });
+    const idQuranDiDatabase = data.filter(k => QURAN_KITAB_IDS.has(k.id)).map(k => k.id);
+    const idQuranLama = KITAB_GROUPS_BY_ID["Al-Qur'an"] || [];
+    KITAB_GROUPS_BY_ID["Al-Qur'an"] = [...new Set([...idQuranDiDatabase, ...idQuranLama])]
+        .map(id => parseInt(id))
+        .filter(id => !KITAB_QURAN_DIAGUNAKAN.has(id))
+        .sort((a, b) => a - b);
+    if (KITAB_QURAN_DIAGUNAKAN.size) {
+        console.info("Kitab Al-Qur'an yang disembunyikan dari form input/edit:", [...KITAB_QURAN_DIAGUNAKAN]);
+    }
     
     // Simpan semua kitab data
     kitabData = data;
@@ -4119,11 +4319,12 @@ async function loadKitab() {
     }
     
     let hasOption = false;
+    const sudahTampil = new Set();
     
     // Looping setiap group
     for (const [groupName, idList] of Object.entries(KITAB_GROUPS_BY_ID)) {
-        // Filter ID yang ada di group ini dan benar-benar tersedia di database
-        const availableIds = idList.filter(id => kitabMap.has(id));
+        // Filter ID yang ada di group ini, benar-benar tersedia di database, dan belum pernah tampil
+        const availableIds = idList.filter(id => kitabMap.has(id) && !sudahTampil.has(id));
         
         if (availableIds.length === 0) continue;
         
@@ -4138,6 +4339,7 @@ async function loadKitab() {
         
         // Tambahkan kitab dalam group (urutan sesuai ID di array)
         availableIds.forEach(id => {
+            sudahTampil.add(id);
             const kitab = kitabMap.get(id);
             const opt = document.createElement("option");
             opt.value = kitab.id;
@@ -4175,7 +4377,356 @@ kitabSelect.addEventListener("change", async () => {
   }
 
   baitData = data;
-  renderBaitOptions(dariSelect, sampaiSelect, data);
+  renderBaitOptions(dariSelect, sampaiSelect, data, null, null, isQuranKitabId(kitabId));
+
+  if (isQuranKitabId(kitabId)) await terapkanProgresQuran();
+  else sembunyikanInfoProgresQuran();
+});
+
+namaSelect.addEventListener("change", async () => {
+  if (isQuranKitabId(kitabSelect.value)) await terapkanProgresQuran();
+});
+
+// ===================== INFO PROGRES AL-QUR'AN DI FORM =====================
+function sembunyikanInfoProgresQuran() {
+  const wadah = document.getElementById("quranProgresInfo");
+  if (wadah) wadah.style.display = "none";
+}
+
+function tampilkanInfoProgresQuran(warna, border, isiHtml) {
+  const wadah = document.getElementById("quranProgresInfo");
+  if (!wadah) return;
+  wadah.style.cssText = `display:block;margin-top:12px;padding:8px 10px;border-radius:4px;font-size:13px;background:#fff;border-left:3px solid ${border};color:${warna};`;
+  wadah.innerHTML = isiHtml;
+}
+
+function teksBait(idBait) {
+  const hit = (baitData || []).find(b => String(b.id) === String(idBait));
+  return hit?.teks_arab || "";
+}
+
+// ===================== PROGRES OTOMATIS AL-QUR'AN =====================
+// Acuan = setoran terakhir santri pada kitab ini (tanggal mana pun, sama seperti panel "Masih Wajib Mengulang").
+// Lancar       -> mulai dari ayat setelah batas akhir sebelumnya.
+// Tidak Lancar -> mengulang rentang sebelumnya.
+async function terapkanProgresQuran() {
+  const stambuk = namaSelect.value;
+  const kitabId = kitabSelect.value;
+
+  if (!stambuk || !isQuranKitabId(kitabId) || !baitData.length) {
+    sembunyikanInfoProgresQuran();
+    return;
+  }
+
+  const namaJuz = optionBait(kitabSelect, kitabId)?.textContent?.trim() || "juz ini";
+  const { data, error } = await client
+    .from("setoran_nadhom")
+    .select("tanggal, status_lancar, dari_ayat, sampai_ayat")
+    .eq("stambuk", stambuk)
+    .eq("id_kitab", parseInt(kitabId))
+    .order("tanggal", { ascending: false })
+    .order("created_at", { ascending: false })
+    .limit(1);
+
+  if (error) {
+    console.error("Gagal ambil progres Quran:", error);
+    sembunyikanInfoProgresQuran();
+    return;
+  }
+
+  const terakhir = data?.[0];
+
+  if (!terakhir) {
+    // belum pernah setor: mulai dari ayat pertama kitab ini
+    dariSelect.value = baitData[0].id;
+    sampaiSelect.value = baitData[0].id;
+    applyBaitRangeState(dariSelect, sampaiSelect);
+    tampilkanInfoProgresQuran("#0d3b75", "#1a73e8",
+      `🆕 Santri ini belum punya setoran Al-Qur'an di <b>${escapeTeks(namaJuz)}</b>. Form otomatis dimulai dari ayat pertama.`);
+    return;
+  }
+
+  const lancar = String(terakhir.status_lancar || "").trim().toLowerCase() === "lancar";
+
+  if (!lancar) {
+    // Tidak Lancar: ulangi rentang sebelumnya
+    const punyaBaris = id => baitData.some(b => String(b.id) === String(id));
+    if (punyaBaris(terakhir.dari_ayat) && punyaBaris(terakhir.sampai_ayat)) {
+      dariSelect.value = terakhir.dari_ayat;
+      sampaiSelect.value = terakhir.sampai_ayat;
+      applyBaitRangeState(dariSelect, sampaiSelect);
+    }
+
+    const rentang = `<span dir="rtl" class="arabic">${escapeTeks(teksBait(terakhir.dari_ayat))} &#8592; ${escapeTeks(teksBait(terakhir.sampai_ayat))}</span>`;
+    tampilkanInfoProgresQuran("#8a6d3b", "#e6a23c",
+      `🔁 <b>Belum lancar</b> pada ${rentang} di ${escapeTeks(namaJuz)} &mdash; sejak ${escapeTeks(hariSejak(terakhir.tanggal))} (${escapeTeks(terakhir.tanggal || "-")}). Form sudah kembali ke rentang ini. Setoran <b>Tidak Lancar tidak menambah progres khatam</b>; ayat baru dihitung setelah santri ditandai Lancar.`);
+    return;
+  }
+
+  // Lancar: ayat berikutnya = urut batas akhir + 1 (mengikuti urutan juz, bukan nomor ayat)
+  const baitAkhir = baitData.find(b => String(b.id) === String(terakhir.sampai_ayat));
+  const urutAkhir = baitAkhir ? parseInt(baitAkhir.urut) : NaN;
+
+  if (isNaN(urutAkhir)) {
+    sembunyikanInfoProgresQuran();
+    return;
+  }
+
+  const idBerikutnya = baitIdByUrut(baitData, urutAkhir + 1);
+  if (idBerikutnya == null) {
+    const baitTerakhir = baitData[baitData.length - 1];
+    dariSelect.value = baitTerakhir.id;
+    sampaiSelect.value = baitTerakhir.id;
+    applyBaitRangeState(dariSelect, sampaiSelect);
+    tampilkanInfoProgresQuran("#67c23a", "#67c23a",
+      `📖 Setoran terakhir lancar di <span dir="rtl" class="arabic">${escapeTeks(teksBait(terakhir.sampai_ayat))}</span> dan itu ayat terakhir ${escapeTeks(namaJuz)}.`);
+    showNotification("📖 Progres sudah berada di ayat terakhir kitab ini.", "success", 3500);
+    return;
+  }
+
+  dariSelect.value = idBerikutnya;
+  sampaiSelect.value = idBerikutnya;
+  applyBaitRangeState(dariSelect, sampaiSelect);
+  tampilkanInfoProgresQuran("#67c23a", "#67c23a",
+    `✅ Setoran terakhir lancar di <span dir="rtl" class="arabic">${escapeTeks(teksBait(terakhir.sampai_ayat))}</span>. Form melanjutkan ke <span dir="rtl" class="arabic">${escapeTeks(teksBait(idBerikutnya))}</span>.`);
+}
+
+// ===================== DAFTAR SANTRI AL-QUR'AN YANG MASIH WAJIB MENGULANG (PER UNIT) =====================
+function escapeTeks(nilai) {
+  return String(nilai ?? "").replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[c]));
+}
+
+function namaPenyimakForm(idPenyimak) {
+  if (!idPenyimak) return "-";
+  const opsi = [...document.getElementById("penyimak").options].find(o => String(o.value) === String(idPenyimak));
+  return opsi?.textContent?.trim() || "-";
+}
+
+// Sumber angka capaian sama dengan tab Rekap (view v_laporan_quran_santri)
+async function ambilCapaianKhatamQuran(stambukList) {
+  if (stambukList.length === 0) return new Map();
+
+  const { data, error } = await client
+    .from("v_laporan_quran_santri")
+    .select('"Stambuk","Juz Quran","Total Setoran","Total Batas Khatam"')
+    .in("Stambuk", stambukList);
+
+  if (error) {
+    console.error("Gagal ambil capaian khatam:", error);
+    return new Map();
+  }
+
+  return new Map((data || []).map(c => [`${c.Stambuk}|${c["Juz Quran"]}`, c]));
+}
+
+function setoranLebihBaru(a, b) {
+  const ta = String(a.tanggal || ""), tb = String(b.tanggal || "");
+  if (ta !== tb) return ta > tb;
+  return String(a.created_at || "") > String(b.created_at || "");
+}
+
+function hariSejak(tanggal) {
+  const lalu = new Date(`${String(tanggal || "")}T00:00:00`);
+  if (Number.isNaN(lalu.getTime())) return "-";
+  const hari = Math.floor((Date.now() - lalu.getTime()) / 86400000);
+  if (hari <= 0) return "hari ini";
+  if (hari === 1) return "kemarin";
+  return `${hari} hari lalu`;
+}
+
+async function loadBelumLancarQuranUnit() {
+  const wadah = document.getElementById("belumLancarQuranList");
+  const badge = document.getElementById("belumLancarQuranCount");
+  const labelUnit = document.getElementById("belumLancarQuranUnit");
+  if (!wadah || !badge) return;
+
+  daftarMengulangQuran = [];
+
+  const unit = unitSelect?.value || "";
+
+  if (!unit) {
+    badge.textContent = "0";
+    if (labelUnit) labelUnit.textContent = "";
+    wadah.innerHTML = `<p class="no-data"><b>Pilih unit dulu untuk melihat daftar.</b></p>`;
+    return;
+  }
+
+  if (labelUnit) labelUnit.textContent = `Unit: ${unit}`;
+
+  // Juz Amma dikeluarkan dari daftar: setoran lamanya tidak bisa diulang lewat form lagi.
+  const idKitabQuran = [...QURAN_KITAB_IDS].filter(id => !KITAB_QURAN_DIAGUNAKAN.has(id));
+  if (idKitabQuran.length === 0) {
+    badge.textContent = "0";
+    wadah.innerHTML = `<p class="no-data">Daftar kitab belum termuat.</p>`;
+    return;
+  }
+
+  wadah.innerHTML = `<p class="no-data">Memuat...</p>`;
+
+  const { data, error } = await client
+    .from("setoran_nadhom")
+    .select(`
+      id, stambuk, id_kitab, tanggal, created_at, keterangan, id_penyimak, status_lancar, dari_ayat, sampai_ayat,
+      santri_kharisma!inner (Nama_Lengkap, Kelas, Unit_Ndalem),
+      nadhom_kitab (nama_kitab),
+      dari_bait:nadhom_bait!fk_dari_bait (teks_arab),
+      sampai_bait:nadhom_bait!fk_sampai_bait (teks_arab)
+    `)
+    .eq("santri_kharisma.Unit_Ndalem", unit)
+    .eq("santri_kharisma.Status", "aktif")
+    .in("id_kitab", idKitabQuran)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Gagal ambil daftar wajib mengulang:", error);
+    badge.textContent = "0";
+    wadah.innerHTML = `<p class="no-data">Gagal memuat daftar.</p>`;
+    return;
+  }
+
+  // Satu entri per santri per juz: pakai setoran paling baru, bukan seluruh riwayat.
+  const terbaru = new Map();
+  // Setoran Al-Qur'an paling baru per santri lintas semua juz, untuk mendeteksi yang sudah lanjut.
+  const terbaruLintasJuz = new Map();
+
+  for (const r of (data || [])) {
+    const kunci = `${r.stambuk}|${r.id_kitab}`;
+    const simpanan = terbaru.get(kunci);
+    if (!simpanan || setoranLebihBaru(r, simpanan)) terbaru.set(kunci, r);
+
+    const lintas = terbaruLintasJuz.get(r.stambuk);
+    if (!lintas || setoranLebihBaru(r, lintas)) terbaruLintasJuz.set(r.stambuk, r);
+  }
+
+  const perlu = [...terbaru.values()]
+    .filter(r =>
+      r.status_lancar === "Tidak Lancar" &&
+      // Riwayat lama yang terloncat tidak ditampilkan begitu santri sudah ngaji lagi di juz berikutnya.
+      terbaruLintasJuz.get(r.stambuk) === r
+    )
+    .sort((a, b) =>
+      String(a.nadhom_kitab?.nama_kitab || "").localeCompare(String(b.nadhom_kitab?.nama_kitab || "")) ||
+      String(a.santri_kharisma?.Nama_Lengkap || "").localeCompare(String(b.santri_kharisma?.Nama_Lengkap || ""))
+    );
+
+  daftarMengulangQuran = perlu;
+
+  badge.textContent = perlu.length;
+
+  if (perlu.length === 0) {
+    wadah.innerHTML = `<p class="no-data">Semua santri unit ini lancar pada setoran Al-Qur'an terakhirnya.</p>`;
+    return;
+  }
+
+  const capaian = await ambilCapaianKhatamQuran([...new Set(perlu.map(r => r.stambuk).filter(Boolean))]);
+
+  wadah.innerHTML = perlu.map((r, i) => {
+    const c = capaian.get(`${r.stambuk}|${r.nadhom_kitab?.nama_kitab || ""}`);
+    let sisaTeks = "-";
+    let sisaWarna = "#666";
+
+    if (c) {
+      const batas = Number(c["Total Batas Khatam"] || 0);
+      const setor = Number(c["Total Setoran"] || 0);
+      const sisa = Math.max(0, batas - setor);
+
+      if (sisa === 0) {
+        sisaTeks = "Sudah khatam";
+        sisaWarna = "#67c23a";
+      } else {
+        sisaTeks = `Sisa khatam: ${sisa} ayat (${setor}/${batas})`;
+        if (sisa <= 10) sisaWarna = "#e6a23c";
+      }
+    }
+
+    return `
+    <button type="button" class="ulang-row" data-idx="${i}">
+      <b>${escapeTeks(r.santri_kharisma?.Nama_Lengkap || r.stambuk)}</b>
+      <span style="font-size:12px;color:#666;">
+        · ${escapeTeks(r.santri_kharisma?.Kelas || "-")}
+        · ${escapeTeks(r.nadhom_kitab?.nama_kitab || "-")}
+        · ${escapeTeks(namaPenyimakForm(r.id_penyimak))}
+      </span>
+      <div dir="rtl" class="arabic" style="font-size:14px;margin-top:2px;">
+        ${escapeTeks(r.dari_bait?.teks_arab || "-")} &#8592; ${escapeTeks(r.sampai_bait?.teks_arab || "-")}
+      </div>
+      <div style="font-size:12px;color:#666;margin-top:2px;">
+        Tidak lancar sejak ${escapeTeks(hariSejak(r.tanggal))} · ${escapeTeks(r.tanggal || "-")}
+      </div>
+      <div style="font-size:12px;font-weight:600;margin-top:2px;color:${sisaWarna};">${escapeTeks(sisaTeks)}</div>
+      ${r.keterangan ? `<div style="font-size:12px;color:#8a6d3b;margin-top:2px;">${escapeTeks(r.keterangan)}</div>` : ""}
+      <div class="ulang-hint">👆 Klik untuk mengulang &mdash; form terisi otomatis, penguji tetap memilih Lancar / Tidak Lancar dan menyimpan sendiri.</div>
+    </button>`;
+  }).join("");
+}
+
+let daftarMengulangQuran = [];
+
+// Handler change unit & kitab bersifat async, jadi tunggu opsi benar-benar terisi.
+function tungguOpsiTerisi(sel, nilai, batasWaktu = 8000) {
+  return new Promise(resolve => {
+    const mulai = Date.now();
+    const cek = () => {
+      if ([...sel.options].some(o => String(o.value) === String(nilai))) return resolve(true);
+      if (Date.now() - mulai > batasWaktu) return resolve(false);
+      setTimeout(cek, 120);
+    };
+    cek();
+  });
+}
+
+async function isiFormMengulang(r) {
+  const unitRow = r.santri_kharisma?.Unit_Ndalem || "";
+
+  if (unitRow && unitSelect.value !== unitRow) {
+    unitSelect.value = unitRow;
+    unitSelect.dispatchEvent(new Event("change"));
+  }
+
+  if (await tungguOpsiTerisi(namaSelect, r.stambuk)) {
+    namaSelect.value = r.stambuk;
+    namaSelect.dispatchEvent(new Event("change"));
+  }
+
+  if (r.id_kitab != null && String(kitabSelect.value) !== String(r.id_kitab)) {
+    kitabSelect.value = r.id_kitab;
+    kitabSelect.dispatchEvent(new Event("change"));
+  }
+
+  if (!(await tungguOpsiTerisi(dariSelect, r.dari_ayat))) {
+    showNotification("❌ Ayat yang harus diulang tidak ada di daftar bait. Pilih manual lalu simpan.", "error", 4500);
+    return;
+  }
+
+  dariSelect.value = r.dari_ayat;
+  sampaiSelect.value = r.sampai_ayat ?? r.dari_ayat;
+  applyBaitRangeState(dariSelect, sampaiSelect);
+
+  document.getElementById("keterangan").value = "";
+  document.querySelectorAll('input[name="status_lancar"]').forEach(el => { el.checked = false; });
+
+  form.scrollIntoView({ behavior: "smooth", block: "start" });
+
+  showNotification(
+    `📝 Form siap untuk mengulang <b>${escapeTeks(r.santri_kharisma?.Nama_Lengkap || r.stambuk)}</b> &mdash; ${escapeTeks(r.nadhom_kitab?.nama_kitab || "")}. Pilih <b>Lancar / Tidak Lancar</b>, lalu klik <b>Simpan Setoran</b>.`,
+    "success",
+    5000
+  );
+}
+
+document.getElementById("belumLancarQuranList")?.addEventListener("click", (e) => {
+  const tombol = e.target.closest(".ulang-row");
+  if (!tombol) return;
+
+  const r = daftarMengulangQuran[Number(tombol.dataset.idx)];
+  if (!r) return;
+
+  tombol.disabled = true;
+  isiFormMengulang(r)
+    .catch(err => { console.error("Gagal mengisi form:", err); showNotification("❌ Gagal mengisi form.", "error", 4000); })
+    .finally(() => { tombol.disabled = false; });
 });
 
 // ===================== SIMPAN DATA =====================
@@ -4202,8 +4753,16 @@ form.addEventListener("submit", async (e) => {
       return;
     }
 
-    // Hitung total ayat (kalau memang berupa urutan, abaikan kalau bukan angka)
-    const total = (!isNaN(sampai) && !isNaN(dari)) ? (sampai - dari + 1) : null;
+    // Hitung total ayat: Quran memakai posisi urut, Nadhom tetap memakai selisih seperti sebelumnya
+    let total = (!isNaN(sampai) && !isNaN(dari)) ? (sampai - dari + 1) : null;
+    if (isQuranKitabId(kitab)) {
+      const totalQuran = hitungTotalQuran(dariSelect, sampaiSelect);
+      if (totalQuran != null) total = totalQuran;
+      // Aturan 16 Okt 2026: setoran Al-Qur'an yang belum lancar tidak boleh menambah progres khatam.
+      // Rentang ayatnya tetap tersimpan lewat dari_ayat/sampai_ayat, hanya total_ayat-nya yang dinolkan
+      // sampai santri yang sama dinyatakan Lancar pada rentang tersebut.
+      if (statusLancar !== "Lancar") total = 0;
+    }
 
     // Payload yang dikirim ke Supabase
     const payload = {
@@ -4220,6 +4779,12 @@ form.addEventListener("submit", async (e) => {
 
     const { error } = await client.from("setoran_nadhom").insert([payload]);
     if (error) throw error;
+
+    // Ambil keterangan sebelum form direset (untuk notifikasi Tidak Lancar)
+    const namaSantri = optionBait(namaSelect, stambuk)?.textContent?.trim() || stambuk;
+    const ayatDari = dariSelect.options[dariSelect.selectedIndex]?.textContent?.trim() || "";
+    const ayatSampai = sampaiSelect.options[sampaiSelect.selectedIndex]?.textContent?.trim() || "";
+    const quranTidakLancar = isQuranKitabId(kitab) && statusLancar === "Tidak Lancar";
 
     // ✅ Simpan pilihan yang akan dipertahankan
     const selectedUnit = unitSelect.value;
@@ -4247,8 +4812,17 @@ form.addEventListener("submit", async (e) => {
     kitabSelect.dispatchEvent(event);
 
     // ✅ Tampilkan notifikasi sukses
-    showNotification("✅ Setoran berhasil disimpan!");
+    if (quranTidakLancar) {
+      showNotification(
+        `🔁 <b>${escapeTeks(namaSantri)}</b> belum lancar &mdash; ${escapeTeks(ayatDari)} &#8592; ${escapeTeks(ayatSampai)}. Progres khatam <b>belum bertambah</b>; setoran berikutnya otomatis mengulang ayat ini sampai ditandai Lancar.`,
+        "error",
+        6500
+      );
+    } else {
+      showNotification("✅ Setoran berhasil disimpan!");
+    }
 
+    // Panel "wajib mengulang" ikut diperbarui oleh change handler unit di atas
     await loadData();
 
   } catch (err) {
@@ -5011,11 +5585,12 @@ document.querySelectorAll('input[name="edit_status_lancar"]').forEach(radio => {
   
 
   await loadPenyimakToEdit(data.id_penyimak);
-  await loadKitabToEdit(data.id_kitab, data.dari_bait?.nomor_bait, data.sampai_bait?.nomor_bait);
+  // pilih baris edit memakai ID bait, bukan nomor_bait (nomor ayat bisa berulang antar surat)
+  await loadKitabToEdit(data.id_kitab, data.dari_bait?.id, data.sampai_bait?.id);
 };
 
 
-async function loadKitabToEdit(selectedKitab, dariNomor, sampaiNomor) {
+async function loadKitabToEdit(selectedKitab, dariId, sampaiId) {
   const kitabSelect = document.getElementById("editKitab");
   const dariSel = document.getElementById("editDariAyat");
   const sampaiSel = document.getElementById("editSampaiAyat");
@@ -5023,6 +5598,8 @@ async function loadKitabToEdit(selectedKitab, dariNomor, sampaiNomor) {
   // isi pilihan kitab
   kitabSelect.innerHTML = `<option value="">Pilih Kitab</option>`;
   kitabData.forEach(k => {
+    // Juz Amma tidak ditawarkan lagi, kecuali baris yang sedang diedit memang memakainya.
+    if (KITAB_QURAN_DIAGUNAKAN.has(parseInt(k.id)) && parseInt(k.id) !== parseInt(selectedKitab)) return;
     const opt = document.createElement("option");
     opt.value = k.id;
     opt.textContent = k.judul_arab;
@@ -5032,16 +5609,16 @@ async function loadKitabToEdit(selectedKitab, dariNomor, sampaiNomor) {
     kitabSelect.appendChild(opt);
   });
 
-  // ambil bait sesuai kitab terpilih
+  // ambil bait sesuai kitab terpilih, diurutkan berdasarkan urut (bukan nomor_bait)
   const { data, error } = await client
     .from("nadhom_bait")
-    .select("id, nomor_bait, teks_arab")
+    .select("id, nomor_bait, teks_arab, urut")
     .eq("id_kitab", selectedKitab)
-    .order("nomor_bait");
+    .order("urut", { ascending: true });
 
   if (error) return console.error("Gagal load bait edit:", error);
 
-  renderBaitOptions(dariSel, sampaiSel, data, dariNomor, sampaiNomor);
+  renderBaitOptions(dariSel, sampaiSel, data, dariId, sampaiId, isQuranKitabId(selectedKitab));
 }
 
 
@@ -5049,12 +5626,11 @@ document.getElementById("editKitab").addEventListener("change", async (e) => {
   const kitabId = e.target.value;
   if (!kitabId) return;
 
-  // ambil id juga! sebelumnya hanya nomor_bait & teks_arab sehingga option.value jadi undefined
   const { data, error } = await client
     .from("nadhom_bait")
-    .select("id, nomor_bait, teks_arab")
+    .select("id, nomor_bait, teks_arab, urut")
     .eq("id_kitab", kitabId)
-    .order("nomor_bait");
+    .order("urut", { ascending: true });
 
   if (error) {
     console.error("Gagal load bait setelah ganti kitab:", error);
@@ -5065,7 +5641,7 @@ document.getElementById("editKitab").addEventListener("change", async (e) => {
   const sampaiSel = document.getElementById("editSampaiAyat");
 
   // isi ulang dengan helper (renderBaitOptions akan membuat option.value = b.id)
-  renderBaitOptions(dariSel, sampaiSel, data);
+  renderBaitOptions(dariSel, sampaiSel, data, null, null, isQuranKitabId(kitabId));
 
   // pilih bait pertama sebagai default agar form tetap valid (jika ada data)
   if (data && data.length > 0) {
@@ -5077,8 +5653,7 @@ document.getElementById("editKitab").addEventListener("change", async (e) => {
     sampaiSel.value = "";
   }
 
-  // (debug) lihat apa yang diisi
-  console.log("editKitab change -> bait count:", data?.length, "dari:", dariSel.value, "sampai:", sampaiSel.value);
+  if (isQuranKitabId(kitabId)) tandaiChipSuratAktif(dariSel, sampaiSel);
 });
 
 
@@ -5117,18 +5692,28 @@ document.getElementById("editForm").addEventListener("submit", async (e) => {
       return;
     }
 
-    // ✅ Hitung total ayat berdasarkan nomor bait (bukan id)
-    const dariNomor = parseInt(
-      document
-        .querySelector(`#editDariAyat option[value='${dariVal}']`)
-        ?.textContent.match(/\((\d+)\)/)?.[1] || 0
-    );
-    const sampaiNomor = parseInt(
-      document
-        .querySelector(`#editSampaiAyat option[value='${sampaiVal}']`)
-        ?.textContent.match(/\((\d+)\)/)?.[1] || 0
-    );
-    const total = sampaiNomor && dariNomor ? (sampaiNomor - dariNomor + 1) : Math.abs(sampai - dari) + 1;
+    // Quran: total dari selisih urut. Nadhom: tetap dari nomor bait seperti sebelumnya.
+    const dariSel = document.getElementById("editDariAyat");
+    const sampaiSel = document.getElementById("editSampaiAyat");
+    let total;
+
+    if (isQuranKitabId(kitabId)) {
+      total = hitungTotalQuran(dariSel, sampaiSel) ?? (Math.abs(sampai - dari) + 1);
+      // Sama seperti form input: Al-Qur'an yang belum lancar tidak menghitung progres khatam.
+      if (String(statusLancar || "").trim().toLowerCase() !== "lancar") total = 0;
+    } else {
+      const dariNomor = parseInt(
+        document
+          .querySelector(`#editDariAyat option[value='${dariVal}']`)
+          ?.textContent.match(/\((\d+)\)/)?.[1] || 0
+      );
+      const sampaiNomor = parseInt(
+        document
+          .querySelector(`#editSampaiAyat option[value='${sampaiVal}']`)
+          ?.textContent.match(/\((\d+)\)/)?.[1] || 0
+      );
+      total = sampaiNomor && dariNomor ? (sampaiNomor - dariNomor + 1) : Math.abs(sampai - dari) + 1;
+    }
 
     // ✅ Siapkan payload sesuai kolom tabel Supabase
     const payload = {
@@ -5174,64 +5759,498 @@ document.getElementById("editForm").addEventListener("submit", async (e) => {
   init();
 });
 
-function renderBaitOptions(dariSel, sampaiSel, data, selectedDari = null, selectedSampai = null) {
-  dariSel.innerHTML = `<option value="">Pilih Batas Awal</option>`;
-  sampaiSel.innerHTML = `<option value="">Pilih Batas Akhir</option>`;
+// ===================== AL-QUR'AN: IDENTITAS & URUTAN AYAT =====================
+// dari_ayat / sampai_ayat tetap menyimpan ID nadhom_bait.
+// Urutan ayat (termasuk lintas surat) memakai kolom urut, bukan ID dan bukan nomor_bait.
+const QURAN_KITAB_IDS = new Set();
 
-  data.forEach(b => {
-    const opt1 = document.createElement("option");
-    const opt2 = document.createElement("option");
+// Juz Amma = katalog Al-Qur'an lama (1 baris per surat, bukan per ayat).
+// Tidak bisa dipilih lagi di form input/edit, tapi setoran lamanya tetap dihitung di prosentase rekap.
+const KITAB_JUZ_AMMA_LAMA_ID = 18;
+const KITAB_QURAN_DIAGUNAKAN = new Set();
 
-    // value harus id (b.id) => ini yang diparsing di submit
-    opt1.value = b.id;
-    opt2.value = b.id;
-
-    opt1.textContent = `${b.teks_arab} (${b.nomor_bait})`;
-    opt2.textContent = `${b.teks_arab} (${b.nomor_bait})`;
-
-    opt1.classList.add("arabic");
-    opt2.classList.add("arabic");
-
-    // Terima selectedDari/Sampai baik berupa nomor_bait atau id
-    if (selectedDari && (String(selectedDari) === String(b.nomor_bait) || String(selectedDari) === String(b.id))) opt1.selected = true;
-    if (selectedSampai && (String(selectedSampai) === String(b.nomor_bait) || String(selectedSampai) === String(b.id))) opt2.selected = true;
-
-    dariSel.appendChild(opt1);
-    sampaiSel.appendChild(opt2);
-  });
-
-  // aktifkan aturan otomatis dari ↔ sampai
-  setupBaitSelection(dariSel, sampaiSel);
+function adalahJuzAmmaLama(kitab, adalahQuran) {
+  if (!kitab) return false;
+  const teks = `${kitab.nama_kitab || ""} ${kitab.judul_arab || ""}`;
+  if (/juz\s*'?\s*amma/i.test(teks) || /جزء\s*عم/.test(teks)) return true;
+  return Boolean(adalahQuran) && parseInt(kitab.id) === KITAB_JUZ_AMMA_LAMA_ID;
 }
 
+function isQuranKitabId(id) {
+  return id != null && id !== "" && QURAN_KITAB_IDS.has(parseInt(id));
+}
 
+function optionBait(sel, value) {
+  return [...sel.options].find(o => o.value && String(o.value) === String(value));
+}
+
+function urutOfOption(opt) {
+  if (!opt || opt.dataset.urut === "" || opt.dataset.urut == null) return null;
+  const n = parseInt(opt.dataset.urut);
+  return Number.isNaN(n) ? null : n;
+}
+
+// Total ayat Quran = selisih posisi urut, bukan selisih ID database.
+function hitungTotalQuran(dariSel, sampaiSel) {
+  const optDari = optionBait(dariSel, dariSel.value);
+  const optSampai = optionBait(sampaiSel, sampaiSel.value);
+  const uDari = urutOfOption(optDari);
+  const uSampai = urutOfOption(optSampai);
+  if (uDari == null || uSampai == null) return null;
+  return Math.abs(uSampai - uDari) + 1;
+}
+
+function baitIdByUrut(data, urut) {
+  const hit = data.find(b => parseInt(b.urut) === urut);
+  return hit ? hit.id : null;
+}
+
+// Nama surat di katalog ditulis Arab di kolom teks_arab, jadi label Latin_need dipakai untuk chip & optgroup.
+// Kunci lookup = nama Arab tanpa harakat (dinormalisasi), jadi variasi penulisan tetap cocok.
+const DAFTAR_SURAT_LATIN = [
+  ["الفاتحة", "Al-Fatihah"], ["البقرة", "Al-Baqarah"], ["آل عمران", "Ali 'Imran"],
+  ["النساء", "An-Nisa"], ["المائدة", "Al-Ma'idah"], ["الانعام", "Al-An'am"],
+  ["الاعراف", "Al-A'raf"], ["الانفال", "Al-Anfal"], ["التوبة", "At-Taubah"],
+  ["يونس", "Yunus"], ["هود", "Hud"], ["يوسف", "Yusuf"], ["الرعد", "Ar-Ra'd"],
+  ["ابراهيم", "Ibrahim"], ["الحجر", "Al-Hijr"], ["النحل", "An-Nahl"],
+  ["الاسراء", "Al-Isra'"], ["الكهف", "Al-Kahf"], ["مريم", "Maryam"], ["طه", "Ta-Ha"],
+  ["الانبياء", "Al-Anbiya'"], ["الحج", "Al-Haj"], ["المؤمنون", "Al-Mu'minun"],
+  ["النور", "An-Nur"], ["الفرقان", "Al-Furqan"], ["الشعراء", "Ash-Shu'ara'"],
+  ["النمل", "An-Naml"], ["القصص", "Al-Qashash"], ["العنكبوت", "Al-'Ankabut"],
+  ["الروم", "Ar-Rum"], ["لقمان", "Luqman"], ["السجدة", "As-Sajdah"],
+  ["الاحزاب", "Al-Ahzab"], ["سبأ", "Saba'"], ["فاطر", "Fatir"], ["يس", "Yasin"],
+  ["الصافات", "Ash-Shaffat"], ["ص", "Sad"], ["الزمر", "Az-Zumar"], ["غافر", "Ghafir"],
+  ["فصلت", "Fussilat"], ["الشورى", "Ash-Shura"], ["الزخرف", "Az-Zukhruf"],
+  ["الدخان", "Ad-Dukhan"], ["الجاثية", "Al-Jathiyah"], ["الاحقاف", "Al-Ahqaf"],
+  ["محمد", "Muhammad"], ["الفتح", "Al-Fath"], ["الحجرات", "Al-Hujurat"], ["ق", "Qaf"],
+  ["الذاريات", "Adh-Dhariyat"], ["الطور", "Ath-Thur"], ["النجم", "An-Najm"],
+  ["القمر", "Al-Qamar"], ["الرحمن", "Ar-Rahman"], ["الواقعة", "Al-Waqi'ah"],
+  ["الحديد", "Al-Hadid"], ["المجادلة", "Al-Mujadilah"], ["الحشر", "Al-Hasyr"],
+  ["الممتحنة", "Al-Mumtahanah"], ["الصف", "Ash-Shaf"], ["الجمعة", "Al-Jumu'ah"],
+  ["المنافقون", "Al-Munafiqun"], ["التغابن", "At-Taghabun"], ["الطلاق", "Ath-Thalaq"],
+  ["التحريم", "At-Tahrim"], ["الملك", "Al-Mulk"], ["القلم", "Al-Qalam"],
+  ["الحاقة", "Al-Haqqah"], ["المعارج", "Al-Ma'arij"], ["نوح", "Nuh"],
+  ["الجن", "Al-Jinn"], ["المزمل", "Al-Muzzammil"], ["المدثر", "Al-Muddaththir"],
+  ["القيامة", "Al-Qiyamah"], ["الانسان", "Al-Insan"], ["المرسلات", "Al-Mursalat"],
+  ["النبأ", "An-Naba'"], ["النازعات", "An-Nazi'at"], ["عبس", "'Abasa"],
+  ["التكوير", "At-Takwir"], ["الانفطار", "Al-Infitar"], ["المطففين", "Al-Muthaffifin"],
+  ["الانشقاق", "Al-Inshiqaq"], ["البروج", "Al-Buruj"], ["الطارق", "Ath-Thariq"],
+  ["الاعلى", "Al-A'la"], ["الغاشية", "Al-Ghashiyah"], ["الفجر", "Al-Fajr"],
+  ["البلد", "Al-Balad"], ["الشمس", "Ash-Shams"], ["الليل", "Al-Lail"],
+  ["الضحى", "Adh-Dhuha"], ["الشرح", "Ash-Sharh"], ["التين", "At-Tin"],
+  ["العلق", "Al-'Alaq"], ["القدر", "Al-Qadr"], ["البينة", "Al-Bayyinah"],
+  ["الزلزلة", "Az-Zalzalah"], ["العاديات", "Al-'Adiyat"], ["القارعة", "Al-Qari'ah"],
+  ["التكاثر", "At-Takathur"], ["العصر", "Al-'Ashr"], ["الهمزة", "Al-Humazah"],
+  ["الفيل", "Al-Fil"], ["قريش", "Quraisy"], ["الماعون", "Al-Ma'un"],
+  ["الكوثر", "Al-Kauthar"], ["الكافرون", "Al-Kafirun"], ["النصر", "An-Nasr"],
+  ["المسد", "Al-Lahab"], ["الاخلاص", "Al-Ikhlas"], ["الفلق", "Al-Falaq"],
+  ["الناس", "An-Nas"],
+  // ejaan lain yang sering muncul di data (rasm/penulisan berbeda), nomor ditulis eksplisit
+  ["اسراءيل", "Al-Isra'", 17], ["الشعرا", "Ash-Shu'ara'", 26],
+  ["النبء", "An-Naba'", 78], ["عم", "An-Naba'", 78], ["سبء", "Saba'", 34],
+  ["تبت", "Al-Lahab", 111],
+  ["العلي", "Al-A'la", 87], ["اطين", "At-Tin", 95],
+  ["الماون", "Al-Ma'un", 107], ["اللهب", "Al-Lahab", 111], ["لاناس", "An-Nas", 114],
+  ["المنشرح", "Ash-Sharh", 94]
+];
+
+// Teks katalog bisa "آل عمران - آية ١" atau "سُورَةُ البَقَرَة ٢٢٠": ambil nama suratnya saja.
+function namaArabSurat(teks) {
+  return String(teks || "")
+    .replace(/[0-9\u0660-\u0669]/g, " ")
+    .replace(/[\u064B-\u0652\u0653\u0670\u0640\u06E9\u06D6-\u06ED]/g, "")
+    .replace(/\u0622\u064A\u0629|\u0627\u064A\u0629/g, " ")
+    .replace(/[^\u0600-\u06FF\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function kunciSurat(teks) {
+  return namaArabSurat(teks)
+    .replace(/[\u0622\u0623\u0625\u0671]/g, "\u0627")
+    .replace(/\u0624/g, "\u0648")
+    .replace(/\u0626/g, "\u064A")
+    .replace(/\u0629/g, "\u0647")
+    .replace(/\u0649/g, "\u064A")
+    .replace(/\s+/g, "")
+    .replace(/^\u0633\u0648\u0631\u0647/, "")
+    .replace(/^\u0633\u0648\u0631/, "");
+}
+
+const NAMA_SURAT_LATIN = {};
+DAFTAR_SURAT_LATIN.forEach((s, i) => {
+  const kunci = kunciSurat(s[0]);
+  if (kunci) NAMA_SURAT_LATIN[kunci] = { latin: s[1], nomor: s[2] || i + 1 };
+});
+
+const namaSuratBelumTerpetakan = new Set();
+
+// Label grup surat: nama Latin + nomor surat; kalau nama Arabnya tidak dikenali, pakai nama Arab tanpa angka ayat.
+function labelSurat(teksArab) {
+  const bersih = namaArabSurat(teksArab);
+  const hit = NAMA_SURAT_LATIN[kunciSurat(teksArab)];
+  if (hit) return `${hit.nomor}. ${hit.latin}`;
+  if (bersih && !namaSuratBelumTerpetakan.has(bersih)) {
+    namaSuratBelumTerpetakan.add(bersih);
+    console.warn("Nama surat belum ada di daftar Latin (label memakai teks Arab):", bersih);
+  }
+  return bersih || "Surat";
+}
+
+// Batas surat dikenali dari nomor_bait yang mengecil / kembali ke 1 saat urut terus berjalan.
+function kelompokSurat(data) {
+  const groups = [];
+  let nomorSebelumnya = null;
+
+  data.forEach(b => {
+    const nomor = parseInt(b.nomor_bait);
+    const mulaiSuratBaru = groups.length === 0
+      || (!isNaN(nomor) && nomorSebelumnya != null && nomor <= nomorSebelumnya);
+
+    if (mulaiSuratBaru) groups.push({ label: labelSurat(b.teks_arab), teks: b.teks_arab, rows: [] });
+    groups[groups.length - 1].rows.push(b);
+    if (!isNaN(nomor)) nomorSebelumnya = nomor;
+  });
+
+  return groups;
+}
+
+function buatOpsiAyat(b, isQuran, selectedValue) {
+  const opt = document.createElement("option");
+  // value selalu id (identitas baris), urutan memakai urut
+  opt.value = b.id;
+  opt.dataset.urut = b.urut ?? "";
+  // Quran: teks_arab sudah memuat nama surat + nomor ayat, jangan pakai format bait
+  opt.textContent = isQuran ? `${b.teks_arab}` : `${b.teks_arab} (${b.nomor_bait})`;
+  opt.classList.add("arabic");
+  if (selectedValue != null && String(selectedValue) === String(b.id)) opt.selected = true;
+  return opt;
+}
+
+function renderBaitOptions(dariSel, sampaiSel, data, selectedDari = null, selectedSampai = null, isQuran = false) {
+  const placeholder = isQuran ? "Pilih Ayat Awal" : "Pilih Batas Awal";
+  const placeholderSampai = isQuran ? "Pilih Ayat Akhir" : "Pilih Batas Akhir";
+
+  dariSel.innerHTML = `<option value="">${placeholder}</option>`;
+  sampaiSel.innerHTML = `<option value="">${placeholderSampai}</option>`;
+
+  if (isQuran) {
+    kelompokSurat(data).forEach(g => {
+      const grupDari = document.createElement("optgroup");
+      const grupSampai = document.createElement("optgroup");
+      grupDari.label = g.label;
+      grupSampai.label = g.label;
+      g.rows.forEach(b => {
+        grupDari.appendChild(buatOpsiAyat(b, true, selectedDari));
+        grupSampai.appendChild(buatOpsiAyat(b, true, selectedSampai));
+      });
+      dariSel.appendChild(grupDari);
+      sampaiSel.appendChild(grupSampai);
+    });
+  } else {
+    data.forEach(b => {
+      dariSel.appendChild(buatOpsiAyat(b, false, selectedDari));
+      sampaiSel.appendChild(buatOpsiAyat(b, false, selectedSampai));
+    });
+  }
+
+  // aktifkan aturan otomatis dari ↔ sampai
+  renderSuratChips(dariSel, sampaiSel, data, isQuran);
+  bindBaitSelection(dariSel, sampaiSel);
+  applyBaitRangeState(dariSel, sampaiSel);
+}
 
 // ===================== BATAS LOGIKA DARI/SAMPAI =====================
-function setupBaitSelection(dariSel, sampaiSel) {
-  if (!dariSel || !sampaiSel) return;
+function bindBaitSelection(dariSel, sampaiSel) {
+  if (!dariSel || !sampaiSel || dariSel.dataset.baitBound === "1") return;
+  dariSel.dataset.baitBound = "1";
 
-  // Saat "Dari Bait" berubah
   dariSel.addEventListener("change", () => {
-    const dari = parseInt(dariSel.value);
-    if (isNaN(dari)) return;
-
-    // Otomatis isi "Sampai" dengan nilai yang sama
-    sampaiSel.value = dari;
-
-    // Filter opsi supaya hanya menampilkan bait >= dari
-    for (const opt of sampaiSel.options) {
-      if (opt.value && parseInt(opt.value) < dari) {
-        opt.disabled = true;
-        opt.style.display = "none";
-      } else {
-        opt.disabled = false;
-        opt.style.display = "block";
-      }
-    }
-
-    // Fokus ke dropdown "Sampai"
+    if (!dariSel.value) return;
+    // Otomatis isi "Sampai" dengan ayat yang sama
+    sampaiSel.value = dariSel.value;
+    applyBaitRangeState(dariSel, sampaiSel);
     sampaiSel.focus();
   });
+}
+
+function applyBaitRangeState(dariSel, sampaiSel) {
+  const optDari = optionBait(dariSel, dariSel.value);
+  const dariUrut = urutOfOption(optDari);
+  const dariId = parseInt(dariSel.value);
+
+  for (const opt of sampaiSel.options) {
+    if (!opt.value) continue;
+
+    const terlaluAwal = dariUrut != null
+      ? (urutOfOption(opt) ?? 0) < dariUrut
+      : (!isNaN(dariId) && parseInt(opt.value) < dariId);
+
+    opt.disabled = terlaluAwal;
+    opt.style.display = terlaluAwal ? "none" : "block";
+  }
+
+  // grup surat yang seluruh ayatnya sudah dilewati disembunyikan
+  // memakai getElementsByTagName + index loop karena properti optgroup.options tidak ada di semua engine
+  const grupSampai = sampaiSel.getElementsByTagName("optgroup");
+  for (let gi = 0; gi < grupSampai.length; gi++) {
+    const opsinya = grupSampai[gi].getElementsByTagName("option");
+    let tersisa = 0;
+    for (let oi = 0; oi < opsinya.length; oi++) {
+      if (!opsinya[oi].disabled) tersisa++;
+    }
+    grupSampai[gi].style.display = tersisa === 0 ? "none" : "";
+  }
+
+  tandaiChipSuratAktif(dariSel, sampaiSel);
+}
+
+// ===================== PICKER CEPAT PER SURAT (AL-QUR'AN) =====================
+// Dropdown ayat terlalu panjang untuk dicari manual, jadi tersedia chip bernama Latin per surat
+// plus kotak pencarian. Klik chip hanya mengisi Dari/Sampai: penguji tetap memilih status dan menekan Simpan.
+// Data surat disimpan per wadah karena form input dan popup edit punya picker sendiri.
+const suratPerWadah = new WeakMap();
+
+function wadahSuratChips(dariSel) {
+  const form = dariSel?.closest(".form-group")?.parentElement;
+  const wadah = form?.querySelector("[data-surat-chips]");
+  return {
+    grup: wadah?.closest("[data-surat-picker]"),
+    wadah,
+    info: form?.querySelector("[data-surat-chips-info]"),
+    cari: form?.querySelector("[data-surat-cari]")
+  };
+}
+
+function teksInfoSurat(isi, kata) {
+  if (!isi) return "";
+  if (!String(kata || "").trim()) {
+    return `${isi.groups.length} surat · ${isi.totalBaris} baris ayat di katalog ini. `
+      + "Klik nama surat untuk mengisi Dari → Sampai, lalu sesuaikan bila perlu.";
+  }
+  const tampil = isi.groups.reduce((n, g, i) =>
+    n + (cocokChipSurat(g, kata) ? 1 : 0), 0);
+  return tampil === 0
+    ? `Tidak ada surat dengan nama "${String(kata).trim()}".`
+    : `${tampil} dari ${isi.groups.length} surat cocok dengan "${String(kata).trim()}".`;
+}
+
+// Pencarian toleran tanda baca, harakat, dan vokal rangkap: "naba", "nisaa", "المائدة", "المَائِدَة" semuanya cocok.
+function ransumCariSurat(teks) {
+  return String(teks || "")
+    .toLowerCase()
+    .replace(/[\u064B-\u0652\u0653\u0670\u0640\u06E9\u06D6-\u06ED]/g, "")
+    .replace(/[\u0622\u0623\u0625\u0671]/g, "\u0627")
+    .replace(/[^0-9a-z\u0600-\u06FF]/g, "")
+    .replace(/([aeiou])\1+/g, "$1");
+}
+
+function cocokChipSurat(g, kata) {
+  const q = ransumCariSurat(kata);
+  if (!q) return true;
+  // cari di label Latin, teks Arab asli, dan ejaan Arab tanpa harakat
+  return ransumCariSurat(`${g.label} ${g.teks || ""} ${kunciSurat(g.teks)}`).includes(q);
+}
+
+function saringSuratChips(wadah, info, kata) {
+  const isi = suratPerWadah.get(wadah);
+  if (!isi) return;
+  for (let i = 0; i < wadah.children.length; i++) {
+    const chip = wadah.children[i];
+    const g = isi.groups[Number(chip.dataset.idx)];
+    chip.style.display = g && cocokChipSurat(g, kata) ? "" : "none";
+  }
+  if (info) info.textContent = teksInfoSurat(isi, kata);
+}
+
+function renderSuratChips(dariSel, sampaiSel, data, isQuran) {
+  const { grup, wadah, info, cari } = wadahSuratChips(dariSel);
+  if (!grup || !wadah) return;
+
+  const groups = isQuran ? kelompokSurat(data) : [];
+  const isi = { groups, totalBaris: data.length };
+  suratPerWadah.set(wadah, isi);
+
+  if (cari) cari.value = "";
+
+  if (groups.length === 0) {
+    grup.style.display = "none";
+    wadah.innerHTML = "";
+    if (info) info.textContent = "";
+    return;
+  }
+
+  if (info) info.textContent = teksInfoSurat(isi, "");
+
+  wadah.innerHTML = "";
+  groups.forEach((g, i) => {
+    const tombol = document.createElement("button");
+    tombol.type = "button";
+    tombol.dataset.idx = String(i);
+    tombol.className = "surat-chip";
+    tombol.textContent = g.label;
+    const jumlah = document.createElement("span");
+    jumlah.className = "n";
+    jumlah.textContent = ` (${g.rows.length})`;
+    tombol.appendChild(jumlah);
+    wadah.appendChild(tombol);
+  });
+
+  grup.style.display = "";
+
+  if (wadah.dataset.chipsBound !== "1") {
+    wadah.dataset.chipsBound = "1";
+    wadah.addEventListener("click", e => {
+      const tombol = e.target.closest(".surat-chip");
+      if (!tombol) return;
+      pilihSuratQuran(Number(tombol.dataset.idx), wadah, dariSel, sampaiSel);
+    });
+  }
+
+  if (cari && cari.dataset.chipsFilterBound !== "1") {
+    cari.dataset.chipsFilterBound = "1";
+    cari.addEventListener("input", () => saringSuratChips(wadah, info, cari.value));
+  }
+
+  tandaiChipSuratAktif(dariSel, sampaiSel);
+}
+
+function pilihSuratQuran(idx, wadah, dariSel, sampaiSel) {
+  const g = (suratPerWadah.get(wadah)?.groups || [])[idx];
+  if (!g || g.rows.length === 0) return;
+
+  const optDari = optionBait(dariSel, g.rows[0].id);
+  const optSampai = optionBait(sampaiSel, g.rows[g.rows.length - 1].id);
+  if (!optDari || !optSampai) {
+    showNotification("❌ Surat ini belum ada di daftar ayat.", "error", 4000);
+    return;
+  }
+
+  dariSel.value = g.rows[0].id;
+  sampaiSel.value = g.rows[g.rows.length - 1].id;
+  // sengaja tidak dispatchEvent("change") agar bindBaitSelection tidak menimpa "Sampai"
+  applyBaitRangeState(dariSel, sampaiSel);
+}
+
+function tandaiChipSuratAktif(dariSel, sampaiSel) {
+  const { wadah } = wadahSuratChips(dariSel);
+  if (!wadah || wadah.children.length === 0) return;
+
+  const groups = suratPerWadah.get(wadah)?.groups || [];
+  const urutDari = urutOfOption(optionBait(dariSel, dariSel.value));
+  const urutSampai = urutOfOption(optionBait(sampaiSel, sampaiSel.value));
+
+  for (let ci = 0; ci < wadah.children.length; ci++) {
+    const chip = wadah.children[ci];
+    const g = groups[Number(chip.dataset.idx)];
+    let cocok = false;
+    if (g && urutDari != null && urutSampai != null) {
+      const awal = parseInt(g.rows[0].urut);
+      const akhir = parseInt(g.rows[g.rows.length - 1].urut);
+      cocok = !isNaN(awal) && !isNaN(akhir) && urutDari >= awal && urutSampai <= akhir;
+    }
+    chip.className = cocok ? "surat-chip aktif" : "surat-chip";
+  }
+}
+
+// ===================== PENCARIAN DROPDOWN: UNIT, PENYIMAK, NAMA SANTRI =====================
+// Daftar santri bisa panjang, jadi tiap dropdown itu mendapat kotak pencarian + chip seperti picker surat.
+// Chip hanya memilih opsi di <select> aslinya lalu mengirim event change, jadi alur muat data tidak berubah.
+const pencarianDropdown = new WeakMap();
+
+// Chip baru ditampilkan saat ada kata diketik (dan ada yang cocok), jadi form tetap rapi seperti semula.
+const daftarPencarianDropdown = [];
+
+function renderChipDropdown(sel) {
+  const cfg = pencarianDropdown.get(sel);
+  if (!cfg) return;
+
+  const kata = ransumCariSurat(cfg.kata);
+  cfg.wadah.innerHTML = "";
+  cfg.wadah.style.display = "none";
+  if (!kata) return;
+
+  const opsi = sel.getElementsByTagName("option");
+  const nilaiAktif = String(sel.value || "");
+  let isiTampil = 0;
+
+  for (let i = 0; i < opsi.length; i++) {
+    const o = opsi[i];
+    const nilai = String(o.value || "");
+    const label = (o.textContent || "").trim();
+    if (!nilai || o.disabled || !label) continue;
+    if (!ransumCariSurat(`${label} ${nilai}`).includes(kata)) continue;
+    isiTampil++;
+
+    const tombol = document.createElement("button");
+    tombol.type = "button";
+    tombol.className = nilai === nilaiAktif ? "surat-chip aktif" : "surat-chip";
+    tombol.textContent = label;
+    tombol.dataset.nilai = nilai;
+    cfg.wadah.appendChild(tombol);
+  }
+
+  cfg.wadah.style.display = isiTampil ? "" : "none";
+}
+
+function pasangPencarianDropdown() {
+  const input = document.querySelectorAll("[data-cari]");
+  for (let i = 0; i < input.length; i++) {
+    const kotak = input[i];
+    const sel = document.getElementById(kotak.getAttribute("data-cari"));
+    const wadah = document.querySelector(`[data-cari-chips="${sel?.id}"]`);
+    const tombolCari = document.querySelector(`[data-cari-buka="${sel?.id}"]`);
+    if (!sel || !wadah || !tombolCari || pencarianDropdown.has(sel)) continue;
+
+    const cfg = { wadah, kata: "", tutup: () => {} };
+    pencarianDropdown.set(sel, cfg);
+    daftarPencarianDropdown.push(cfg);
+
+    const tutup = () => {
+      cfg.kata = "";
+      kotak.value = "";
+      kotak.style.display = "none";
+      renderChipDropdown(sel);
+    };
+    cfg.tutup = tutup;
+
+    const bukaCari = () => {
+      // satu kotak cari saja yang terbuka supaya form tidak penuh
+      daftarPencarianDropdown.forEach(lain => { if (lain !== cfg) lain.tutup(); });
+      kotak.style.display = "";
+      // fokus() dipakai supaya keyboard layar muncul di HP dan user tinggal mengetik
+      kotak.focus();
+    };
+
+    tombolCari.addEventListener("click", () => {
+      if (kotak.style.display === "none" || cfg.kata) bukaCari();
+      else tutup();
+    });
+
+    // klik chip masih butuh daftar tetap terlihat, jadi hanya collapse saat kotak cari kosong
+    kotak.addEventListener("blur", () => {
+      if (!cfg.kata && wadah.style.display === "none") tutup();
+    });
+
+    kotak.addEventListener("input", () => {
+      cfg.kata = kotak.value;
+      renderChipDropdown(sel);
+    });
+
+    wadah.addEventListener("click", e => {
+      const tombol = e.target.closest(".surat-chip");
+      if (!tombol) return;
+      sel.value = tombol.dataset.nilai;
+      // event change di bawah yang merender ulang chip (sekaligus memuat santri / progres ayat)
+      sel.dispatchEvent(new Event("change", { bubbles: true }));
+      kotak.blur();
+      tutup();
+    });
+
+    // daftar opsi berubah tiap kali unit dipilih atau data dimuat ulang
+    new MutationObserver(() => renderChipDropdown(sel)).observe(sel, { childList: true });
+    renderChipDropdown(sel);
+  }
 }
 
 let notificationTimer = null;
@@ -9128,7 +10147,6 @@ document.querySelector('[data-tab="soroganTab"]')?.addEventListener("click", asy
   await loadSoroganData();
   setupSoroganFilters();
 });
-</script>
 </script>
 <div class="app-footer">
   <img src="https://img.shields.io/badge/version-v2.3-orange" alt="Version">
