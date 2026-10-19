@@ -2921,6 +2921,31 @@ table tbody tr:hover {
   max-height:150px;
 }
 
+/* Sub-tab di dalam form: Qur'an / Hadits / Nadhom */
+.setoran-tab-buttons {
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin:0 0 14px 0;
+}
+.setoran-tab-btn {
+  flex:1 1 auto;
+  font:inherit;
+  font-size:0.9rem;
+  font-weight:600;
+  padding:8px 10px;
+  border:1px solid #cdd9ed;
+  border-radius:8px;
+  background:#f5f7fb;
+  color:#444;
+  cursor:pointer;
+}
+.setoran-tab-btn.active {
+  background:#1a73e8;
+  border-color:#1a73e8;
+  color:#fff;
+}
+
 /* Baris TOTAL / RATA-RATA */
 #tblRekapAktivitasHarian tbody tr:last-child td {
   background:#d9ecff !important;
@@ -2967,8 +2992,8 @@ table tbody tr:hover {
 
       <!-- =================== TAB NAVIGATION =================== -->
       <div class="tab-buttons">
-        <button class="tab-btn active" data-tab="rekapTab">Qur'an-Hadis-Nadhom</button>
-		<button class="tab-btn" data-tab="soroganTab">Sorogan Kitab</button>
+        <button class="tab-btn active" data-tab="rekapTab">Setoran</button>
+		<button class="tab-btn" data-tab="soroganTab">Sorogan</button>
         <button class="tab-btn" data-tab="laporanTab">Rekap</button>
       </div>
 
@@ -2978,6 +3003,13 @@ table tbody tr:hover {
         <!-- =================== FORM INPUT =================== -->
         <div class="input-section">
           <h3>📝 Input Setoran Santri</h3>
+
+          <!-- Sub-tab kategori: memfilter dropdown Kitab, tabel rekap, dan isi otomatis setoran terakhir -->
+          <div class="setoran-tab-buttons" id="setoranTabButtons">
+            <button type="button" class="setoran-tab-btn active" data-kategori="quran">Qur'an</button>
+            <button type="button" class="setoran-tab-btn" data-kategori="nadhom">Nadhom</button>
+            <button type="button" class="setoran-tab-btn" data-kategori="hadits">Hadits</button>
+          </div>
 
           <!-- Daftar setoran Al-Qur'an yang masih wajib diulang (per unit), diletakkan di atas form -->
           <div id="belumLancarQuranCard" style="margin:0 0 16px 0;border-bottom:1px solid #e5e5e5;padding-bottom:12px;">
@@ -3039,7 +3071,12 @@ table tbody tr:hover {
             </div>
 
             <div class="form-group">
-              <label for="kitab">Kitab:</label>
+              <div class="label-row">
+                <label for="kitab">Kitab:</label>
+                <button type="button" class="cari-toggle" data-cari-buka="kitab" title="Cari kitab" aria-label="Cari kitab"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="16.2" y1="16.2" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+              </div>
+              <input type="text" data-cari="kitab" placeholder="Cari kitab..." style="display:none;">
+              <div class="surat-chips" data-cari-chips="kitab" style="display:none;"></div>
               <select id="kitab" class="arabic" required>
                 <option value="">Pilih Kitab</option>
               </select>
@@ -3054,14 +3091,24 @@ table tbody tr:hover {
             </div>
 
             <div class="form-group">
-              <label for="dariAyat">Dari:</label>
+              <div class="label-row">
+                <label for="dariAyat">Dari:</label>
+                <button type="button" class="cari-toggle" data-cari-buka="dariAyat" title="Cari bait/ayat" aria-label="Cari bait/ayat"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="16.2" y1="16.2" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+              </div>
+              <input type="text" data-cari="dariAyat" placeholder="Cari bait / ayat..." style="display:none;">
+              <div class="surat-chips" data-cari-chips="dariAyat" style="display:none;"></div>
               <select id="dariAyat" class="arabic" required>
                 <option value="">Pilih Kitab dulu</option>
               </select>
             </div>
 
             <div class="form-group">
-              <label for="sampaiAyat">Sampai:</label>
+              <div class="label-row">
+                <label for="sampaiAyat">Sampai:</label>
+                <button type="button" class="cari-toggle" data-cari-buka="sampaiAyat" title="Cari bait/ayat" aria-label="Cari bait/ayat"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="16.2" y1="16.2" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+              </div>
+              <input type="text" data-cari="sampaiAyat" placeholder="Cari bait / ayat..." style="display:none;">
+              <div class="surat-chips" data-cari-chips="sampaiAyat" style="display:none;"></div>
               <select id="sampaiAyat" class="arabic" required>
                 <option value="">Pilih Kitab dulu</option>
               </select>
@@ -3122,7 +3169,12 @@ table tbody tr:hover {
 		</div>
 
 		  <div class="filter-group">
-			<label for="filterUnit">Pilih Unit Ndalem:</label>
+			<div class="label-row">
+			  <label for="filterUnit">Pilih Unit Ndalem:</label>
+			  <button type="button" class="cari-toggle" data-cari-buka="filterUnit" title="Cari unit" aria-label="Cari unit"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="16.2" y1="16.2" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+			</div>
+			<input type="text" data-cari="filterUnit" placeholder="Cari unit..." style="display:none;">
+			<div class="surat-chips" data-cari-chips="filterUnit" style="display:none;"></div>
 			<select id="filterUnit">
 			  <option value="Semua">Semua Unit</option>
 			</select>
@@ -3210,28 +3262,48 @@ table tbody tr:hover {
     <h3>📝 Input Sorogan Kitab</h3>
     <form id="soroganForm">
       <div class="form-group">
-        <label for="soroganUnit">Unit Ndalem:</label>
+        <div class="label-row">
+          <label for="soroganUnit">Unit Ndalem:</label>
+          <button type="button" class="cari-toggle" data-cari-buka="soroganUnit" title="Cari unit" aria-label="Cari unit"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="16.2" y1="16.2" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+        </div>
+        <input type="text" data-cari="soroganUnit" placeholder="Cari unit..." style="display:none;">
+        <div class="surat-chips" data-cari-chips="soroganUnit" style="display:none;"></div>
         <select id="soroganUnit" required>
           <option value="">Pilih Unit</option>
         </select>
       </div>
 
       <div class="form-group">
-        <label for="soroganPenyimak">Penyimak:</label>
+        <div class="label-row">
+          <label for="soroganPenyimak">Penyimak:</label>
+          <button type="button" class="cari-toggle" data-cari-buka="soroganPenyimak" title="Cari penyimak" aria-label="Cari penyimak"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="16.2" y1="16.2" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+        </div>
+        <input type="text" data-cari="soroganPenyimak" placeholder="Cari nama penyimak..." style="display:none;">
+        <div class="surat-chips" data-cari-chips="soroganPenyimak" style="display:none;"></div>
         <select id="soroganPenyimak" required>
           <option value="">Pilih Penyimak</option>
         </select>
       </div>
 
       <div class="form-group">
-        <label for="soroganNama">Nama Santri:</label>
+        <div class="label-row">
+          <label for="soroganNama">Nama Santri:</label>
+          <button type="button" class="cari-toggle" data-cari-buka="soroganNama" title="Cari nama santri" aria-label="Cari nama santri"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="16.2" y1="16.2" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+        </div>
+        <input type="text" data-cari="soroganNama" placeholder="Cari nama santri atau kelas..." style="display:none;">
+        <div class="surat-chips" data-cari-chips="soroganNama" style="display:none;"></div>
         <select id="soroganNama" required>
           <option value="">Pilih Unit dulu</option>
         </select>
       </div>
 
       <div class="form-group">
-        <label for="soroganKitab">Kitab:</label>
+        <div class="label-row">
+          <label for="soroganKitab">Kitab:</label>
+          <button type="button" class="cari-toggle" data-cari-buka="soroganKitab" title="Cari kitab" aria-label="Cari kitab"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="16.2" y1="16.2" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+        </div>
+        <input type="text" data-cari="soroganKitab" placeholder="Cari kitab..." style="display:none;">
+        <div class="surat-chips" data-cari-chips="soroganKitab" style="display:none;"></div>
         <select id="soroganKitab" class="arabic" required>
           <option value="">Pilih Kitab</option>
         </select>
@@ -3286,7 +3358,12 @@ table tbody tr:hover {
     </div>
 
     <div class="filter-group">
-      <label for="soroganFilterUnit">Pilih Unit Ndalem:</label>
+      <div class="label-row">
+        <label for="soroganFilterUnit">Pilih Unit Ndalem:</label>
+        <button type="button" class="cari-toggle" data-cari-buka="soroganFilterUnit" title="Cari unit" aria-label="Cari unit"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="16.2" y1="16.2" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+      </div>
+      <input type="text" data-cari="soroganFilterUnit" placeholder="Cari unit..." style="display:none;">
+      <div class="surat-chips" data-cari-chips="soroganFilterUnit" style="display:none;"></div>
       <select id="soroganFilterUnit">
         <option value="Semua">Semua Unit</option>
       </select>
@@ -4040,7 +4117,12 @@ table tbody tr:hover {
         </div>
 
         <div class="form-group">
-          <label for="editKitab">Kitab Nadhom:</label>
+          <div class="label-row">
+            <label for="editKitab">Kitab Nadhom:</label>
+            <button type="button" class="cari-toggle" data-cari-buka="editKitab" title="Cari kitab" aria-label="Cari kitab"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="16.2" y1="16.2" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+          </div>
+          <input type="text" data-cari="editKitab" placeholder="Cari kitab..." style="display:none;">
+          <div class="surat-chips" data-cari-chips="editKitab" style="display:none;"></div>
           <select id="editKitab" class="arabic" required></select>
         </div>
 
@@ -4052,12 +4134,22 @@ table tbody tr:hover {
         </div>
 
         <div class="form-group">
-          <label for="editDariAyat">Dari Bait/Ayat:</label>
+          <div class="label-row">
+            <label for="editDariAyat">Dari Bait/Ayat:</label>
+            <button type="button" class="cari-toggle" data-cari-buka="editDariAyat" title="Cari bait/ayat" aria-label="Cari bait/ayat"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="16.2" y1="16.2" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+          </div>
+          <input type="text" data-cari="editDariAyat" placeholder="Cari bait / ayat..." style="display:none;">
+          <div class="surat-chips" data-cari-chips="editDariAyat" style="display:none;"></div>
           <select id="editDariAyat" class="arabic" required></select>
         </div>
 
         <div class="form-group">
-          <label for="editSampaiAyat">Sampai Bait:</label>
+          <div class="label-row">
+            <label for="editSampaiAyat">Sampai Bait:</label>
+            <button type="button" class="cari-toggle" data-cari-buka="editSampaiAyat" title="Cari bait/ayat" aria-label="Cari bait/ayat"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="16.2" y1="16.2" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+          </div>
+          <input type="text" data-cari="editSampaiAyat" placeholder="Cari bait / ayat..." style="display:none;">
+          <div class="surat-chips" data-cari-chips="editSampaiAyat" style="display:none;"></div>
           <select id="editSampaiAyat" class="arabic" required></select>
         </div>
 
@@ -4067,7 +4159,12 @@ table tbody tr:hover {
         </div>
 
         <div class="form-group">
-          <label for="editPenyimak">Penyimak:</label>
+          <div class="label-row">
+            <label for="editPenyimak">Penyimak:</label>
+            <button type="button" class="cari-toggle" data-cari-buka="editPenyimak" title="Cari penyimak" aria-label="Cari penyimak"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="16.2" y1="16.2" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+          </div>
+          <input type="text" data-cari="editPenyimak" placeholder="Cari nama penyimak..." style="display:none;">
+          <div class="surat-chips" data-cari-chips="editPenyimak" style="display:none;"></div>
           <select id="editPenyimak" required>
             <option value="">Pilih Penyimak</option>
           </select>
@@ -4127,12 +4224,16 @@ document.addEventListener("click", (e) => {
   let santriData = [];
   let kitabData = [];
   let baitData = [];
-  let currentRows = []; // data global yang sedang ditampilkan
+  let currentRows = []; // data global yang sedang ditampilkan (sudah difilter per tab kategori)
   let currentSort = { column: null, ascending: true };
   
   let allUnitsGlobal = [];
-let renderedUnitCount = 5;
-const UNIT_PER_LOAD = 5;
+  let renderedUnitCount = 5;
+  const UNIT_PER_LOAD = 5;
+  // Baris per tabel unit sebelum tombol "tampilkan semua" muncul (tabel panjang bikin HP berat)
+  const ROWS_PER_TABLE = 25;
+  // Isinya hanya hasil pencarian nama; null = pakai currentRows
+  let barisHasilCari = null;
 let soroganCurrentRows = [];
 let soroganCurrentSort = { column: null, ascending: true };
 let soroganAllUnits = [];
@@ -4273,12 +4374,6 @@ async function loadKitab() {
         return;
     }
     
-    // Buat mapping id ke data kitab
-    const kitabMap = new Map();
-    data.forEach(k => {
-        kitabMap.set(k.id, k);
-    });
-
     // tandai kitab Al-Qur'an dari kolom kategori (fallback: nama kitab)
     QURAN_KITAB_IDS.clear();
     data.forEach(k => {
@@ -4311,62 +4406,96 @@ async function loadKitab() {
     
     // Simpan semua kitab data
     kitabData = data;
-    
-    // Kosongkan dropdown
+
+    // Peta kategori kitab untuk sub-tab Qur'an / Hadits / Nadhom
+    catatKategoriKitab(data);
+
+    renderKitabDropdown();
+}
+
+// ===================== DROPDOWN KITAB PER TAB KATEGORI =====================
+function renderKitabDropdown() {
+    const kitabMap = new Map((kitabData || []).map(k => [k.id, k]));
+    const nilaiLama = String(kitabSelect.value || "");
+
     kitabSelect.innerHTML = `<option value="">Pilih Kitab</option>`;
-    
-    // Kumpulkan semua ID yang diizinkan dari semua group
-    const allowedIds = new Set();
-    for (const idList of Object.values(KITAB_GROUPS_BY_ID)) {
-        idList.forEach(id => allowedIds.add(id));
-    }
-    
+
     let hasOption = false;
     const sudahTampil = new Set();
-    
-    // Looping setiap group
-    for (const [groupName, idList] of Object.entries(KITAB_GROUPS_BY_ID)) {
-        // Filter ID yang ada di group ini, benar-benar tersedia di database, dan belum pernah tampil
-        const availableIds = idList.filter(id => kitabMap.has(id) && !sudahTampil.has(id));
-        
-        if (availableIds.length === 0) continue;
-        
-        // Tambahkan separator (label group)
+
+    const labelGroup = (teks) => {
         const groupLabel = document.createElement("option");
-        groupLabel.textContent = `——— ${groupName} ———`;
+        groupLabel.textContent = `——— ${teks} ———`;
+        groupLabel.value = "";
         groupLabel.disabled = true;
         groupLabel.style.backgroundColor = "#f0f0f0";
         groupLabel.style.fontWeight = "bold";
         groupLabel.style.color = "#1a73e8";
         kitabSelect.appendChild(groupLabel);
-        
-        // Tambahkan kitab dalam group (urutan sesuai ID di array)
+    };
+
+    const buatOpsiKitab = (kitab) => {
+        const opt = document.createElement("option");
+        opt.value = kitab.id;
+        opt.textContent = kitab.judul_arab;
+        opt.dataset.latin = kitab.nama_kitab || "";
+        opt.style.fontFamily = "'Scheherazade New', serif";
+        opt.style.direction = "rtl";
+        opt.style.paddingRight = "20px";
+        kitabSelect.appendChild(opt);
+        hasOption = true;
+    };
+
+    const bolehTampil = (id) =>
+        kategoriKitab(id) === kategoriSetoranAktif && !KITAB_QURAN_DIAGUNAKAN.has(parseInt(id));
+
+    for (const [groupName, idList] of Object.entries(KITAB_GROUPS_BY_ID)) {
+        const availableIds = idList.filter(id => kitabMap.has(id) && !sudahTampil.has(id) && bolehTampil(id));
+        if (availableIds.length === 0) continue;
+
+        labelGroup(groupName);
         availableIds.forEach(id => {
             sudahTampil.add(id);
-            const kitab = kitabMap.get(id);
-            const opt = document.createElement("option");
-            opt.value = kitab.id;
-            opt.textContent = kitab.judul_arab;
-            opt.style.fontFamily = "'Scheherazade New', serif";
-            opt.style.direction = "rtl";
-            opt.style.paddingRight = "20px";
-            kitabSelect.appendChild(opt);
-            hasOption = true;
+            buatOpsiKitab(kitabMap.get(id));
         });
     }
-    
-    // ⚠️ TIDAK ADA KITAB LAIN - hanya yang di group saja yang tampil
-    
-    if (!hasOption) {
-        kitabSelect.innerHTML = `<option value="">(Tidak ada kitab)</option>`;
+
+    // Kitab berkategori sama yang belum terdaftar di group tetap ikut tampil,
+    // supaya tidak ada lagi kitab yang hilang diam-diam seperti Juz 30 dulu.
+    const sisa = (kitabData || [])
+        .filter(k => bolehTampil(k.id) && !sudahTampil.has(k.id))
+        .sort((a, b) => a.id - b.id);
+    if (sisa.length) {
+        labelGroup("Lainnya");
+        sisa.forEach(k => {
+            sudahTampil.add(k.id);
+            buatOpsiKitab(k);
+        });
     }
+
+    if (!hasOption) {
+        kitabSelect.innerHTML = `<option value="">(Belum ada kitab di tab ini)</option>`;
+        return;
+    }
+
+    kitabSelect.value = [...kitabSelect.options].some(o => o.value && o.value === nilaiLama) ? nilaiLama : "";
 }
 
-kitabSelect.addEventListener("change", async () => {
+// ===================== BAIT / AYAT SESUAI KITAB TERPILIH =====================
+async function muatBaitKitabTerpilih() {
   const kitabId = kitabSelect.value;
 
   dariSelect.innerHTML = `<option value="">Memuat...</option>`;
   sampaiSelect.innerHTML = `<option value="">Memuat...</option>`;
+
+  if (!kitabId) {
+    baitData = [];
+    dariSelect.innerHTML = `<option value="">Pilih Kitab dulu</option>`;
+    sampaiSelect.innerHTML = `<option value="">Pilih Kitab dulu</option>`;
+    renderSuratChips(dariSelect, sampaiSelect, [], false);
+    sembunyikanInfoProgresQuran();
+    return;
+  }
 
   const { data, error } = await client
     .from("nadhom_bait")
@@ -4384,10 +4513,113 @@ kitabSelect.addEventListener("change", async () => {
 
   if (isQuranKitabId(kitabId)) await terapkanProgresQuran();
   else sembunyikanInfoProgresQuran();
-});
+}
+
+kitabSelect.addEventListener("change", muatBaitKitabTerpilih);
 
 namaSelect.addEventListener("change", async () => {
-  if (isQuranKitabId(kitabSelect.value)) await terapkanProgresQuran();
+  if (sedangIsiDariPanel) return;
+  await isiSetoranTerakhir();
+});
+
+// ===================== ISI AUTOMATIS KITAB TERAKHIR PER TAB =====================
+// santri dipilih -> Kitab terisi kitab kategori tab aktif yang paling terakhir disetorkan.
+async function isiSetoranTerakhir() {
+  const stambuk = namaSelect.value;
+  if (!stambuk) return;
+
+  const idTab = idKitabTabAktif();
+  if (!idTab.length) return;
+
+  const { data, error } = await client
+    .from("setoran_nadhom")
+    .select("id_kitab, tanggal, status_lancar")
+    .eq("stambuk", stambuk)
+    .in("id_kitab", idTab)
+    .order("tanggal", { ascending: false })
+    .order("created_at", { ascending: false })
+    .limit(1);
+
+  if (error) {
+    console.error("Gagal ambil setoran terakhir tab ini:", error);
+    return;
+  }
+
+  const terakhir = data?.[0];
+
+  if (!terakhir) {
+    // Santri ini belum punya setoran apa pun di tab aktif. Ayatnya harus dimuat ulang supaya
+    // tidak mewarisi pilihan santri sebelumnya, lalu kabari penguji lewat kotak info.
+    await muatBaitKitabTerpilih();
+
+    if (!isQuranKitabId(kitabSelect.value)) {
+      const nama = optionBait(namaSelect, stambuk)?.textContent?.trim() || "Santri ini";
+      const langkah = kitabSelect.value
+        ? "<b>pilih ayat awal &amp; akhirnya</b> sendiri"
+        : "<b>pilih kitab</b> dulu, lalu ayat awal &amp; akhirnya sendiri";
+      tampilkanInfoProgresQuran("#0d3b75", "#1a73e8",
+        `🆕 <b>${escapeTeks(nama)}</b> belum pernah setoran di tab <b>${NAMA_TAB_SETORAN[kategoriSetoranAktif] || kategoriSetoranAktif}</b> &mdash; ${langkah}.`);
+    }
+    return;
+  }
+
+  const nilai = String(terakhir.id_kitab);
+  if (![...kitabSelect.options].some(o => o.value && o.value === nilai)) return;
+
+  if (String(kitabSelect.value) === nilai) {
+    await muatBaitKitabTerpilih();
+    return;
+  }
+
+  kitabSelect.value = nilai;
+  await muatBaitKitabTerpilih();
+
+  if (kategoriSetoranAktif !== "quran") {
+    const namaKitab = optionBait(kitabSelect, nilai)?.textContent?.trim() || "kitab terakhir";
+    tampilkanInfoProgresQuran("#0d3b75", "#1a73e8",
+      `📌 Kitab terisi otomatis dari setoran terakhir di tab ini: <b>${escapeTeks(namaKitab)}</b> (${escapeTeks(terakhir.tanggal || "-")}).`);
+  }
+}
+
+// ===================== SUB-TAB QUR'AN / HADITS / NADHOM =====================
+function pasangStatusTabSetoran() {
+  document.querySelectorAll("#setoranTabButtons .setoran-tab-btn").forEach(b => {
+    b.className = "setoran-tab-btn" + (b.dataset.kategori === kategoriSetoranAktif ? " active" : "");
+  });
+}
+
+function gantiTabSetoran(kategori) {
+  if (!TAB_SETORAN.includes(kategori) || kategori === kategoriSetoranAktif) return;
+  kategoriSetoranAktif = kategori;
+  pasangStatusTabSetoran();
+
+  // Panel wajib mengulang hanya berlaku untuk Al-Qur'an
+  const kartu = document.getElementById("belumLancarQuranCard");
+  if (kartu) kartu.style.display = kategori === "quran" ? "" : "none";
+
+  renderKitabDropdown();
+  baitData = [];
+  dariSelect.innerHTML = `<option value="">Pilih Kitab dulu</option>`;
+  sampaiSelect.innerHTML = `<option value="">Pilih Kitab dulu</option>`;
+  const grupSurat = document.getElementById("suratPickerGroup");
+  if (grupSurat) grupSurat.style.display = "none";
+  sembunyikanInfoProgresQuran();
+
+  // checklist kitab + tabel rekap dibangun ulang mengikuti tab aktif
+  initKitabChecklistHarian()
+    .then(() => {
+      setupFilterListenersHarian();
+      return applyHarianFilters();
+    })
+    .catch(err => console.error("Refresh tampilan per tab:", err));
+
+  isiSetoranTerakhir().catch(err => console.error("Isi otomatis setoran terakhir:", err));
+}
+
+document.getElementById("setoranTabButtons")?.addEventListener("click", (e) => {
+  const tombol = e.target.closest(".setoran-tab-btn");
+  if (!tombol) return;
+  gantiTabSetoran(tombol.dataset.kategori);
 });
 
 // ===================== INFO PROGRES AL-QUR'AN DI FORM =====================
@@ -4442,10 +4674,10 @@ async function terapkanProgresQuran() {
   if (!terakhir) {
     // belum pernah setor: mulai dari ayat pertama kitab ini
     dariSelect.value = baitData[0].id;
-    sampaiSelect.value = baitData[0].id;
+    sampaiSelect.value = "";
     applyBaitRangeState(dariSelect, sampaiSelect);
     tampilkanInfoProgresQuran("#0d3b75", "#1a73e8",
-      `🆕 Santri ini belum punya setoran Al-Qur'an di <b>${escapeTeks(namaJuz)}</b>. Form otomatis dimulai dari ayat pertama.`);
+      `🆕 Santri ini belum punya setoran Al-Qur'an di <b>${escapeTeks(namaJuz)}</b>. Form otomatis dimulai dari ayat pertama &mdash; <b>pilih Ayat Akhir</b> dulu sebelum menyimpan.`);
     return;
   }
 
@@ -4479,19 +4711,19 @@ async function terapkanProgresQuran() {
   if (idBerikutnya == null) {
     const baitTerakhir = baitData[baitData.length - 1];
     dariSelect.value = baitTerakhir.id;
-    sampaiSelect.value = baitTerakhir.id;
+    sampaiSelect.value = "";
     applyBaitRangeState(dariSelect, sampaiSelect);
     tampilkanInfoProgresQuran("#67c23a", "#67c23a",
-      `📖 Setoran terakhir lancar di <span dir="rtl" class="arabic">${escapeTeks(teksBait(terakhir.sampai_ayat))}</span> dan itu ayat terakhir ${escapeTeks(namaJuz)}.`);
+      `📖 Setoran terakhir lancar di <span dir="rtl" class="arabic">${escapeTeks(teksBait(terakhir.sampai_ayat))}</span> dan itu ayat terakhir ${escapeTeks(namaJuz)}. <b>Pilih Ayat Akhir</b> dulu sebelum menyimpan.`);
     showNotification("📖 Progres sudah berada di ayat terakhir kitab ini.", "success", 3500);
     return;
   }
 
   dariSelect.value = idBerikutnya;
-  sampaiSelect.value = idBerikutnya;
+  sampaiSelect.value = "";
   applyBaitRangeState(dariSelect, sampaiSelect);
   tampilkanInfoProgresQuran("#67c23a", "#67c23a",
-    `✅ Setoran terakhir lancar di <span dir="rtl" class="arabic">${escapeTeks(teksBait(terakhir.sampai_ayat))}</span>. Form melanjutkan ke <span dir="rtl" class="arabic">${escapeTeks(teksBait(idBerikutnya))}</span>.`);
+    `✅ Setoran terakhir lancar di <span dir="rtl" class="arabic">${escapeTeks(teksBait(terakhir.sampai_ayat))}</span>. Form melanjutkan dari <span dir="rtl" class="arabic">${escapeTeks(teksBait(idBerikutnya))}</span> &mdash; <b>pilih Ayat Akhir</b> dulu sebelum menyimpan.`);
 }
 
 // ===================== DAFTAR SANTRI AL-QUR'AN YANG MASIH WAJIB MENGULANG (PER UNIT) =====================
@@ -4727,9 +4959,13 @@ document.getElementById("belumLancarQuranList")?.addEventListener("click", (e) =
   if (!r) return;
 
   tombol.disabled = true;
+  sedangIsiDariPanel = true;
   isiFormMengulang(r)
     .catch(err => { console.error("Gagal mengisi form:", err); showNotification("❌ Gagal mengisi form.", "error", 4000); })
-    .finally(() => { tombol.disabled = false; });
+    .finally(() => {
+      sedangIsiDariPanel = false;
+      tombol.disabled = false;
+    });
 });
 
 // ===================== SIMPAN DATA =====================
@@ -4842,17 +5078,16 @@ form.addEventListener("submit", async (e) => {
 async function loadData() {
 
   const filterSelect = document.getElementById("filterUnit");
-  const tableContainer = document.querySelector(".table-container");
 
   // 1️⃣ Ambil data
   const { data, error } = await client
     .from("setoran_nadhom")
     .select(`
-      id, tanggal, total_ayat, keterangan,status_lancar,
+      id, id_kitab, tanggal, total_ayat, keterangan,status_lancar,
       created_at, updated_at,
       id_penyimak,
       santri_kharisma (Nama_Lengkap, Kelas, Unit_Ndalem),
-      nadhom_kitab (nama_kitab, judul_arab),
+      nadhom_kitab (id, nama_kitab, judul_arab, kategori),
       dari_bait:nadhom_bait!fk_dari_bait (id, nomor_bait, teks_arab),
       sampai_bait:nadhom_bait!fk_sampai_bait (id, nomor_bait, teks_arab)
     `)
@@ -4883,13 +5118,13 @@ async function loadData() {
   // =============================
   // SIMPAN GLOBAL
   // =============================
-  currentRows = merged;
+  currentRows = saringPerTabSetoran(merged);
 
   allUnitsGlobal = [
     ...new Set(
       merged.map(d => d.santri_kharisma?.Unit_Ndalem || "-")
     )
-  ].sort();
+  ].sort(urutTeks);
 
   // isi dropdown pertama kali
   if (filterSelect.options.length === 1) {
@@ -4901,7 +5136,8 @@ async function loadData() {
     });
   }
 
-  renderedUnitCount = 5;
+  renderedUnitCount = UNIT_PER_LOAD;
+  barisHasilCari = null;
 
   renderPaginatedUnits();
 
@@ -4912,62 +5148,86 @@ async function loadData() {
 }
 
 // ===================== RENDER UNIT BERTAHAP =====================
+// Satu-satunya tempat render tabel rekap: filter tab, shift, kitab, urutkan, dan cari nama hanya
+// mengganti isi currentRows / barisHasilCari lalu memanggil fungsi ini.
 function renderPaginatedUnits() {
 
   const tableContainer = document.querySelector(".table-container");
   const selectedUnit =
     document.getElementById("filterUnit").value || "Semua";
 
-  tableContainer.innerHTML = "";
+  const sumberBaris = barisHasilCari || currentRows;
+  const lagiMencari = !!barisHasilCari;
 
-  // kalau pilih unit tertentu
-  if (selectedUnit !== "Semua") {
+  const semuaUnit = [...new Set(
+    sumberBaris.map(d => d.santri_kharisma?.Unit_Ndalem || "-")
+  )].sort(urutTeks);
 
-    const filtered = currentRows.filter(
-      d => d.santri_kharisma?.Unit_Ndalem === selectedUnit
-    );
+  // pilih unit tertentu: tabelnya satu, jadi tidak perlu paginasi unit
+  const unitDitampilkan = selectedUnit === "Semua"
+    ? semuaUnit.slice(0, renderedUnitCount)
+    : semuaUnit;
 
-    tableContainer.innerHTML =
-      renderTable(selectedUnit, filtered);
-
+  if (sumberBaris.length === 0) {
+    tableContainer.innerHTML = `
+      <div class="unit-section">
+        <p class="no-data">${lagiMencari ? "Data tidak ditemukan" : "Belum ada setoran di tab ini."}</p>
+      </div>`;
     return;
   }
 
-  // tampil hanya beberapa unit dulu
-  const unitsToRender =
-    allUnitsGlobal.slice(0, renderedUnitCount);
+  const bagian = unitDitampilkan.map(unit =>
+    renderTable(unit, sumberBaris.filter(d => (d.santri_kharisma?.Unit_Ndalem || "-") === unit), ROWS_PER_TABLE)
+  );
 
-  unitsToRender.forEach(unit => {
-
-    const filtered = currentRows.filter(
-      d => d.santri_kharisma?.Unit_Ndalem === unit
-    );
-
-    tableContainer.innerHTML +=
-      renderTable(unit, filtered);
-  });
-
-  // tombol load more
-  if (renderedUnitCount < allUnitsGlobal.length) {
-
-    tableContainer.innerHTML += `
+  if (selectedUnit === "Semua" && renderedUnitCount < semuaUnit.length) {
+    const sisa = semuaUnit.length - unitDitampilkan.length;
+    bagian.push(`
       <div style="text-align:center;margin:20px 0;">
-        <button id="btnLoadMore"
-          class="btn-primary">
-          Tabel Selanjutnya
-        </button>
-      </div>
-    `;
-
-    document
-      .getElementById("btnLoadMore")
-      .onclick = () => {
-
-        renderedUnitCount += UNIT_PER_LOAD;
-
-        renderPaginatedUnits();
-      };
+        <button id="btnLoadMore" class="btn-primary">Tabel Selanjutnya (${sisa} unit lagi)</button>
+      </div>`);
   }
+
+  // sekali assign: lebih murah daripada innerHTML += di dalam loop
+  tableContainer.innerHTML = bagian.join("");
+
+  const tombolLanjut = document.getElementById("btnLoadMore");
+  if (tombolLanjut) {
+    tombolLanjut.onclick = () => {
+      const jumlahSebelum = unitDitampilkan.length;
+      renderedUnitCount += UNIT_PER_LOAD;
+      renderPaginatedUnits();
+      // bawa user ke tabel yang baru muncul
+      const bagianBaru = tableContainer.querySelectorAll(".unit-section");
+      bagianBaru[Math.min(jumlahSebelum, bagianBaru.length - 1)]
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+  }
+
+  pasangTombolSemuaBaris(tableContainer, sumberBaris, unitDitampilkan);
+}
+
+// Urutkan sesuai abjad + angka dihitung (Al-qur'an (9) sebelum (10)), bukan urutan kode karakter.
+// Tanda baca/spasi dibuang dulu supaya ejaan berbeda ("Al-qur'an" dan "Al-quran") tetap sebaris.
+function urutTeks(a, b) {
+  const p = penggalUrut(a);
+  const q = penggalUrut(b);
+  const n = Math.max(p.length, q.length);
+  for (let i = 0; i < n; i++) {
+    if (p[i] === undefined) return -1;
+    if (q[i] === undefined) return 1;
+    if (p[i] === q[i]) continue;
+    if (/^\d/.test(p[i]) && /^\d/.test(q[i])) return Number(p[i]) - Number(q[i]);
+    return p[i] < q[i] ? -1 : 1;
+  }
+  return 0;
+}
+
+function penggalUrut(teks) {
+  return String(teks || "")
+    .toLowerCase()
+    .replace(/[^0-9a-z\u0600-\u06FF]+/g, "")
+    .match(/\d+|\D+/g) || [];
 }
 
 function setupSearchButtons() {
@@ -5009,7 +5269,7 @@ document.getElementById("filterUnit").addEventListener("change", async () => {
 });
 
 // ===================== RENDER TABLE - DIPERBAIKI =====================
-function renderTable(unitName, rows) {
+function renderTable(unitName, rows, batasTampil) {
   if (!rows || rows.length === 0) {
     return `
       <div class="unit-section">
@@ -5067,7 +5327,10 @@ function renderTable(unitName, rows) {
 
   const shownTotals = {};
 
-  rows.forEach((r, i) => {
+  // total tetap dihitung dari SEMUA baris, hanya tampilannya yang dipotong
+  const rowsDitampilkan = batasTampil && rows.length > batasTampil ? rows.slice(0, batasTampil) : rows;
+
+  rowsDitampilkan.forEach((r, i) => {
     const nama  = r.santri_kharisma?.Nama_Lengkap || "-";
     const kitab = r.nadhom_kitab?.judul_arab || "-";
     const key   = `${nama}|${kitab}`;
@@ -5124,10 +5387,35 @@ function renderTable(unitName, rows) {
   html += `
           </tbody>
         </table>
-      </div>
+      </div>`;
+
+  if (rowsDitampilkan.length < rows.length) {
+    html += `
+      <div style="text-align:center;padding:8px 0;">
+        <button type="button" class="btn-secondary" data-tampilkan-semua>Tampilkan semua ${rows.length} baris</button>
+      </div>`;
+  }
+
+  html += `
     </div>`;
 
   return html;
+}
+
+// Tombol "tampilkan semua baris": hanya mengganti bagian unit terkait, paginasi unit tidak berubah
+function pasangTombolSemuaBaris(container, sumberBaris, unitDitampilkan) {
+  const bagian = container.querySelectorAll(".unit-section");
+  for (let i = 0; i < bagian.length; i++) {
+    const tombol = bagian[i].querySelector("[data-tampilkan-semua]");
+    if (!tombol) continue;
+    const unit = unitDitampilkan[i];
+    tombol.onclick = () => {
+      const rows = sumberBaris.filter(d => (d.santri_kharisma?.Unit_Ndalem || "-") === unit);
+      const pengganti = document.createElement("div");
+      pengganti.innerHTML = renderTable(unit, rows);
+      bagian[i].parentNode.replaceChild(pengganti.firstElementChild, bagian[i]);
+    };
+  }
 }
 
 // Fungsi pencarian nama santri
@@ -5139,59 +5427,19 @@ function handleSearchNama() {
     .toLowerCase()
     .trim();
 
-  const tableContainer =
-    document.querySelector(".table-container");
-
   // kosong = kembali paginasi awal
   if (!keyword) {
+    barisHasilCari = null;
     renderPaginatedUnits();
     return;
   }
 
-  // cari di SEMUA DATA
-  const filtered = currentRows.filter(r => {
-
-    const nama =
-      r.santri_kharisma?.Nama_Lengkap
-      ?.toLowerCase() || "";
-
-    return nama.includes(keyword);
-  });
-
-  // kelompokkan unit
-  const units = [
-    ...new Set(
-      filtered.map(
-        d => d.santri_kharisma?.Unit_Ndalem || "-"
-      )
-    )
-  ];
-
-  tableContainer.innerHTML = "";
-
-  units.forEach(unit => {
-
-    const unitRows = filtered.filter(
-      d => d.santri_kharisma?.Unit_Ndalem === unit
-    );
-
-    tableContainer.innerHTML +=
-      renderTable(unit, unitRows);
-  });
-
-  if (filtered.length === 0) {
-    tableContainer.innerHTML = `
-      <div class="unit-section">
-        <div class="unit-header">
-          Hasil Pencarian
-        </div>
-
-        <p class="no-data">
-          Data tidak ditemukan
-        </p>
-      </div>
-    `;
-  }
+  // cari di SEMUA DATA tab aktif, hasilnya dipakai renderer yang sama (ikut ber-paginasi)
+  barisHasilCari = currentRows.filter(r =>
+    (r.santri_kharisma?.Nama_Lengkap?.toLowerCase() || "").includes(keyword)
+  );
+  renderedUnitCount = UNIT_PER_LOAD;
+  renderPaginatedUnits();
 }
 
  // ===============================
@@ -5276,7 +5524,8 @@ function getSortValue(row, column, groupedTotals) {
   }
 }
 
-function sortTable(column, rows = currentRows) {
+function sortTable(column, rows) {
+  rows = rows || barisHasilCari || currentRows;
   if (!rows || rows.length === 0) return;
 
   // toggle arah (A-Z ↔ Z-A)
@@ -5338,28 +5587,12 @@ function sortTable(column, rows = currentRows) {
     }
   });
 
-  // render ulang hasil sorting (sama seperti loadData render logic)
-  const selectedUnit = document.getElementById("filterUnit").value || "Semua";
-  const tableContainer = document.querySelector(".table-container");
-  tableContainer.innerHTML = "";
+  // hasil urut disimpan supaya paginasi "Tabel Selanjutnya" tetap memakai urutan ini
+  if (barisHasilCari) barisHasilCari = sorted;
+  else currentRows = sorted;
 
-  if (selectedUnit === "Semua") {
-    const allUnits = [
-      ...new Set(sorted.map((d) => d.santri_kharisma?.Unit_Ndalem || "-"))
-    ].sort();
-
-    allUnits.forEach((unit) => {
-      const filtered = sorted.filter(
-        (d) => d.santri_kharisma?.Unit_Ndalem === unit
-      );
-      tableContainer.innerHTML += renderTable(unit, filtered);
-    });
-  } else {
-    const filtered = sorted.filter(
-      (d) => d.santri_kharisma?.Unit_Ndalem === selectedUnit
-    );
-    tableContainer.innerHTML = renderTable(selectedUnit, filtered);
-  }
+  renderedUnitCount = UNIT_PER_LOAD;
+  renderPaginatedUnits();
 }
 
 // Header click handler (single handler, replace any other duplicate handlers)
@@ -5390,18 +5623,29 @@ document.getElementById("btnDesc").addEventListener("click", () => {
   // ===================== INITIALIZE KITAB CHECKLIST FOR HARIAN TAB =====================
   async function initKitabChecklistHarian() {
     try {
-      const { data: kitabRes, error } = await client
-        .from("nadhom_kitab")
-        .select("nama_kitab, judul_arab");
+      // pakai daftar kitab yang sudah dimuat loadKitab(); query hanya sebagai cadangan
+      let kitabList = kitabData;
+      if (!kitabList || !kitabList.length) {
+        const { data, error } = await client
+          .from("nadhom_kitab")
+          .select("id, nama_kitab, judul_arab, kategori")
+          .order("id");
 
-      if (error) {
-        console.error("Gagal ambil kitab:", error);
-        return;
+        if (error) {
+          console.error("Gagal ambil kitab:", error);
+          return;
+        }
+        kitabList = data || [];
       }
 
-      // Buat array dengan nama_kitab yang unik untuk checkbox
-      const kitabUnik = [...new Set((kitabRes || []).map(k => k.nama_kitab))].sort();
-      
+      const pakaiFilterTab = KITAB_KATEGORI_BY_ID.size > 0;
+      const kitabUnik = [...new Set(
+        (kitabList || [])
+          .filter(k => !pakaiFilterTab || kategoriKitab(k.id) === kategoriSetoranAktif)
+          .map(k => k.nama_kitab)
+          .filter(nama => nama)
+      )].sort(urutTeks); // A-Z sesuai abjad, bukan urutan kode karakter
+
       // Render dengan nama_kitab (akan ditampilkan di checklist)
       renderChecklistHarian("kitabChecklistHarian", kitabUnik, "kitab");
       initChecklistCollapsiblesHarian();
@@ -5428,7 +5672,8 @@ document.getElementById("btnDesc").addEventListener("click", () => {
 
     if (!header || !body) return;
 
-    header.addEventListener('click', () => {
+    // pakai onclick (bukan addEventListener) supaya aman dipanggil ulang saat ganti tab
+    header.onclick = () => {
       if (body.style.display === 'none') {
         body.style.display = 'block';
         triangle.style.transform = 'rotate(180deg)';
@@ -5436,7 +5681,7 @@ document.getElementById("btnDesc").addEventListener("click", () => {
         body.style.display = 'none';
         triangle.style.transform = 'rotate(0deg)';
       }
-    });
+    };
   }
 
   // Handle filter changes (shift + kitab)
@@ -5461,14 +5706,13 @@ document.getElementById("btnDesc").addEventListener("click", () => {
     const selectedShift = document.querySelector('input[name="shift"]:checked')?.value || 'semua';
     const selectedKitabs = [...document.querySelectorAll('#kitabChecklistHarian input:checked')].map(i => i.value);
 
-    const tableContainer = document.querySelector(".table-container");
     const { data, error } = await client
       .from("setoran_nadhom")
       .select(`
-        id, tanggal, total_ayat, keterangan, status_lancar,
+        id, id_kitab, tanggal, total_ayat, keterangan, status_lancar,
         created_at, updated_at, id_penyimak,
         santri_kharisma (Nama_Lengkap, Kelas, Unit_Ndalem),
-        nadhom_kitab (nama_kitab, judul_arab),
+        nadhom_kitab (id, nama_kitab, judul_arab, kategori),
         dari_bait:nadhom_bait!fk_dari_bait (id, nomor_bait, teks_arab),
         sampai_bait:nadhom_bait!fk_sampai_bait (id, nomor_bait, teks_arab)
       `)
@@ -5492,8 +5736,8 @@ document.getElementById("btnDesc").addEventListener("click", () => {
       };
     });
 
-    // Apply filters
-    let filtered = merged;
+    // Apply filters (termasuk tab kategori aktif)
+    let filtered = saringPerTabSetoran(merged);
 
     // Filter by shift (berdasarkan kelas)
     if (selectedShift !== 'semua') {
@@ -5509,23 +5753,11 @@ document.getElementById("btnDesc").addEventListener("click", () => {
       filtered = filtered.filter(d => selectedKitabs.includes(d.nadhom_kitab?.nama_kitab));
     }
 
-    // Render filtered data
-    const allUnits = [...new Set(filtered.map(d => d.santri_kharisma?.Unit_Ndalem || "-"))].sort();
-    tableContainer.innerHTML = "";
-
-    const selectedUnit = document.getElementById("filterUnit")?.value || "Semua";
-    
-    if (selectedUnit === "Semua") {
-      allUnits.forEach(unit => {
-        const unitFiltered = filtered.filter(d => d.santri_kharisma?.Unit_Ndalem === unit);
-        tableContainer.innerHTML += renderTable(unit, unitFiltered);
-      });
-    } else {
-      const unitFiltered = filtered.filter(d => d.santri_kharisma?.Unit_Ndalem === selectedUnit);
-      tableContainer.innerHTML = renderTable(selectedUnit, unitFiltered);
-    }
-
+    // Render memakai renderer yang sama dengan paginasi (baris hasil filter tersimpan di currentRows)
     currentRows = filtered;
+    barisHasilCari = null;
+    renderedUnitCount = UNIT_PER_LOAD;
+    renderPaginatedUnits();
   }
 
   // ===================== BUTTON UTILITY =====================
@@ -5606,6 +5838,7 @@ async function loadKitabToEdit(selectedKitab, dariId, sampaiId) {
     const opt = document.createElement("option");
     opt.value = k.id;
     opt.textContent = k.judul_arab;
+    opt.dataset.latin = k.nama_kitab || "";
     opt.style.fontFamily = "'Scheherazade New', serif";
     opt.style.direction = "rtl";
     if (parseInt(k.id) === parseInt(selectedKitab)) opt.selected = true;
@@ -5649,7 +5882,8 @@ document.getElementById("editKitab").addEventListener("change", async (e) => {
   // pilih bait pertama sebagai default agar form tetap valid (jika ada data)
   if (data && data.length > 0) {
     dariSel.value = data[0].id;
-    sampaiSel.value = data[0].id;
+    // Al-Qur'an: batas akhir harus dipilih sendiri, sama seperti form input
+    sampaiSel.value = isQuranKitabId(kitabId) ? "" : data[0].id;
   } else {
     // kalau tidak ada bait
     dariSel.value = "";
@@ -5781,6 +6015,66 @@ function adalahJuzAmmaLama(kitab, adalahQuran) {
 
 function isQuranKitabId(id) {
   return id != null && id !== "" && QURAN_KITAB_IDS.has(parseInt(id));
+}
+
+// ===================== TAB SETORAN: KATEGORI KITAB (Qur'an / Hadits / Nadhom) =====================
+// Sumber = kolom kategori di nadhom_kitab. Pencocokan toleran ejaan (hadits/hadist/hadith);
+// baris yang kategorinya masih kosong ditebak dari nama kitab, lalu dianggap nadhom.
+const TAB_SETORAN = ["quran", "hadits", "nadhom"];
+const NAMA_TAB_SETORAN = { quran: "Qur'an", hadits: "Hadits", nadhom: "Nadhom" };
+let kategoriSetoranAktif = "quran";
+let sedangIsiDariPanel = false;
+const KITAB_KATEGORI_BY_ID = new Map();
+const KITAB_KATEGORI_BY_NAMA = new Map();
+
+function kategoriDariTeks(kategori, kitab) {
+  const kasar = String(kategori || "").toLowerCase().replace(/[^a-z]/g, "");
+  if (kasar.includes("qur")) return "quran";
+  if (kasar.includes("hadit") || kasar.includes("hadis")) return "hadits";
+  if (kasar) return "nadhom";
+  const nama = `${kitab?.nama_kitab || ""} ${kitab?.judul_arab || ""}`.toLowerCase();
+  return /qur|juz/.test(nama) ? "quran" : "nadhom";
+}
+
+function catatKategoriKitab(data) {
+  KITAB_KATEGORI_BY_ID.clear();
+  KITAB_KATEGORI_BY_NAMA.clear();
+  const tanpaKategori = [];
+  (data || []).forEach(k => {
+    const kat = kategoriDariTeks(k.kategori, k);
+    KITAB_KATEGORI_BY_ID.set(parseInt(k.id), kat);
+    const nama = String(k.nama_kitab || "").trim().toLowerCase();
+    if (nama) KITAB_KATEGORI_BY_NAMA.set(nama, kat);
+    if (!String(k.kategori || "").trim()) tanpaKategori.push(`${k.id}:${k.nama_kitab}`);
+  });
+  if (tanpaKategori.length) {
+    console.info("Kitab tanpa kolom kategori (ditebak dari nama, cek kalau masuk tab yang salah):", tanpaKategori);
+  }
+}
+
+function kategoriKitab(id) {
+  const n = parseInt(id);
+  return Number.isNaN(n) ? null : (KITAB_KATEGORI_BY_ID.get(n) || null);
+}
+
+function kategoriSetoran(row) {
+  const join = row?.nadhom_kitab;
+  if (join && (join.kategori || join.nama_kitab)) return kategoriDariTeks(join.kategori, join);
+  return kategoriKitab(row?.id_kitab);
+}
+
+function saringPerTabSetoran(rows) {
+  const daftar = rows || [];
+  if (!KITAB_KATEGORI_BY_ID.size) return daftar;
+  return daftar.filter(r => kategoriSetoran(r) === kategoriSetoranAktif);
+}
+
+function idKitabTabAktif() {
+  const hasil = [];
+  KITAB_KATEGORI_BY_ID.forEach((kat, id) => {
+    if (kat === kategoriSetoranAktif) hasil.push(id);
+  });
+  return hasil.sort((a, b) => a - b);
 }
 
 function optionBait(sel, value) {
@@ -5944,8 +6238,12 @@ function renderBaitOptions(dariSel, sampaiSel, data, selectedDari = null, select
       grupDari.label = g.label;
       grupSampai.label = g.label;
       g.rows.forEach(b => {
-        grupDari.appendChild(buatOpsiAyat(b, true, selectedDari));
-        grupSampai.appendChild(buatOpsiAyat(b, true, selectedSampai));
+        const od = buatOpsiAyat(b, true, selectedDari);
+        const os = buatOpsiAyat(b, true, selectedSampai);
+        od.dataset.latin = `${g.label} ayat ${b.nomor_bait}`;
+        os.dataset.latin = `${g.label} ayat ${b.nomor_bait}`;
+        grupDari.appendChild(od);
+        grupSampai.appendChild(os);
       });
       dariSel.appendChild(grupDari);
       sampaiSel.appendChild(grupSampai);
@@ -5958,6 +6256,7 @@ function renderBaitOptions(dariSel, sampaiSel, data, selectedDari = null, select
   }
 
   // aktifkan aturan otomatis dari ↔ sampai
+  dariSel.dataset.quran = isQuran ? "1" : "";
   renderSuratChips(dariSel, sampaiSel, data, isQuran);
   bindBaitSelection(dariSel, sampaiSel);
   applyBaitRangeState(dariSel, sampaiSel);
@@ -5970,8 +6269,8 @@ function bindBaitSelection(dariSel, sampaiSel) {
 
   dariSel.addEventListener("change", () => {
     if (!dariSel.value) return;
-    // Otomatis isi "Sampai" dengan ayat yang sama
-    sampaiSel.value = dariSel.value;
+    // Al-Qur'an: "Sampai" sengaja dikosongkan supaya penguji memilih batas akhirnya sendiri
+    sampaiSel.value = dariSel.dataset.quran === "1" ? "" : dariSel.value;
     applyBaitRangeState(dariSel, sampaiSel);
     sampaiSel.focus();
   });
@@ -6181,14 +6480,16 @@ function renderChipDropdown(sel) {
     const o = opsi[i];
     const nilai = String(o.value || "");
     const label = (o.textContent || "").trim();
+    // dropdown kitab memakai teks Arab; nama Latin disimpan di data-latin supaya bisa dicari
+    const latin = (o.dataset && o.dataset.latin) ? String(o.dataset.latin) : "";
     if (!nilai || o.disabled || !label) continue;
-    if (!ransumCariSurat(`${label} ${nilai}`).includes(kata)) continue;
+    if (!ransumCariSurat(`${label} ${latin} ${nilai}`).includes(kata)) continue;
     isiTampil++;
 
     const tombol = document.createElement("button");
     tombol.type = "button";
     tombol.className = nilai === nilaiAktif ? "surat-chip aktif" : "surat-chip";
-    tombol.textContent = label;
+    tombol.textContent = latin ? `${latin} — ${label}` : label;
     tombol.dataset.nilai = nilai;
     cfg.wadah.appendChild(tombol);
   }
@@ -9834,6 +10135,7 @@ async function loadSoroganKitabToEdit(selectedId) {
       const opt = document.createElement("option");
       opt.value = kitab.id;
       opt.textContent = kitab.judul_arab;
+      opt.dataset.latin = kitab.nama_kitab || "";
       opt.style.fontFamily = "'Scheherazade New', 'Amiri', 'Traditional Arabic', serif";
       opt.style.fontSize = "18px";
       opt.style.direction = "rtl";
@@ -10037,6 +10339,7 @@ async function loadSoroganKitab() {
             const opt = document.createElement("option");
             opt.value = kitab.id;
             opt.textContent = kitab.judul_arab;
+            opt.dataset.latin = kitab.nama_kitab || "";
             opt.style.fontFamily = "'Scheherazade New', 'Amiri', 'Traditional Arabic', serif";
             opt.style.fontSize = "18px";
             opt.style.direction = "rtl";
