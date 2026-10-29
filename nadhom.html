@@ -5163,15 +5163,21 @@ function renderPaginatedUnits() {
     sumberBaris.map(d => d.santri_kharisma?.Unit_Ndalem || "-")
   )].sort(urutTeks);
 
-  // pilih unit tertentu: tabelnya satu, jadi tidak perlu paginasi unit
+  // unit terpilih: hanya tabel unit itu yang tampil, jadi cari nama pun ikut terbatas unit ini
   const unitDitampilkan = selectedUnit === "Semua"
     ? semuaUnit.slice(0, renderedUnitCount)
-    : semuaUnit;
+    : semuaUnit.filter(u => u === selectedUnit);
 
-  if (sumberBaris.length === 0) {
+  if (unitDitampilkan.length === 0) {
+    let kosong = "Belum ada setoran di tab ini.";
+    if (lagiMencari) kosong = "Data tidak ditemukan"
+      + (selectedUnit === "Semua" ? "" : " di unit " + escapeTeks(selectedUnit));
+    else if (selectedUnit !== "Semua") kosong = "Belum ada setoran di unit <b>"
+      + escapeTeks(selectedUnit) + "</b> pada tab ini.";
+
     tableContainer.innerHTML = `
       <div class="unit-section">
-        <p class="no-data">${lagiMencari ? "Data tidak ditemukan" : "Belum ada setoran di tab ini."}</p>
+        <p class="no-data">${kosong}</p>
       </div>`;
     return;
   }
@@ -5261,11 +5267,13 @@ function setupSearchButtons() {
 }
 
 // Event filter
-document.getElementById("filterUnit").addEventListener("change", async () => {
-  await loadData();
+document.getElementById("filterUnit").addEventListener("change", () => {
+  // Baris semua unit sudah ada di currentRows, jadi cukup render ulang (tidak ambil data lagi ke server)
+  renderedUnitCount = UNIT_PER_LOAD;
   // Reset shift dan kitab filter ketika unit berubah
   document.querySelector('input[name="shift"][value="semua"]').checked = true;
   document.querySelectorAll('#kitabChecklistHarian input').forEach(cb => cb.checked = false);
+  renderPaginatedUnits();
 });
 
 // ===================== RENDER TABLE - DIPERBAIKI =====================
