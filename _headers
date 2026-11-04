@@ -1,8 +1,28 @@
+# =====================================================
+#  CACHE POLICY — SIMPONI KHARISMA
+#  HTML selalu dicek ulang ke server supaya versi baru langsung terlihat.
+#  Hanya aset stabil (ikon/font/lib/gambar) yang disimpan lama.
+# =====================================================
+
+# Memicu deteksi update: file ini tidak boleh dipakai dari cache.
 /service-worker.js
   Cache-Control: public, max-age=0, must-revalidate
-
 /manifest.json
   Cache-Control: public, max-age=0, must-revalidate
 
-/* 
-  Cache-Control: public, max-age=31536000
+# Aset jarang berubah → simpan 30 hari.
+/libs/*
+  Cache-Control: public, max-age=2592000, immutable
+/fonts/*
+  Cache-Control: public, max-age=2592000, immutable
+/icons/*
+  Cache-Control: public, max-age=2592000, immutable
+/img/*
+  Cache-Control: public, max-age=2592000, immutable
+
+# Sisanya (semua .html, termasuk halaman yang dibuat nanti) → revalidasi tiap buka.
+# Sengaja tidak menaruh ini di atas: Netlify tidak mendokumentasikan prioritas
+# pola spesifik vs /*, dan kalau /* yang menang dampaknya hanya aset ikut dicek
+# ulang (server menjawab 304) — bukan halaman basi seperti max-age=31536000 dulu.
+/*
+  Cache-Control: public, max-age=0, must-revalidate

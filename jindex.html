@@ -48,6 +48,7 @@
   <link rel="apple-touch-icon" href="/icons/icon-192.png">
   <meta name="apple-mobile-web-app-title" content="Simponi Kharisma">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
 </head>
 
@@ -1305,6 +1306,15 @@ button:active {
   font-weight: bold;
   color: #fff;       /* putih, sama dengan background header */
   margin: 0 4px;     /* kasih jarak kanan-kiri */
+}
+
+/* Angka tanpa keterangan mudah disalahpahami: Jumlah = banyak mapel yang sudah
+   dinilai (bukan akumulasi skor), Rata-rata berskala 0–100. */
+.nilai-keterangan {
+  font-weight: normal;
+  font-size: 0.8em;
+  color: #5f6368;
+  margin-left: 3px;
 }
 
 /* Container pagination Nilai */
@@ -5103,7 +5113,7 @@ and (max-width:1024px){
         </select>
       </div>
       <div class="nilai-filter-group nilai-sort-group">
-  <label>Urutan Rata-rata:</label>
+  <label>Urutan Rata-rata: <span class="nilai-keterangan">max 100 : 10</span></label>
 
   <div class="nilai-sort-options">
     <label class="nilai-sort-option">
@@ -5143,6 +5153,21 @@ and (max-width:1024px){
         <select id="nilaiGraphTahun">
           <option value="semua">Semua</option>
         </select>
+      </div>
+      <div class="nilai-filter-group nilai-sort-group">
+        <label>Urutan Rata-rata: <span class="nilai-keterangan">max 100 : 10</span></label>
+
+        <div class="nilai-sort-options">
+          <label class="nilai-sort-option">
+            <input type="checkbox" id="nilaiGraphSortBottom" checked>
+            <span>Terendah</span>
+          </label>
+
+          <label class="nilai-sort-option">
+            <input type="checkbox" id="nilaiGraphSortTop">
+            <span>Teratas</span>
+          </label>
+        </div>
       </div>
     </div>
 	
@@ -5714,22 +5739,12 @@ document.addEventListener("DOMContentLoaded", () => {
 	const NILAI_PAGE_SIZE = 10;
 	let nilaiDict = {};
 	let nilaiChartInstance = null;
-// Hanya santri aktif yang mempunyai minimal satu data di nilai1.
-let nilaiEligibleMap = new Map();
-let nilaiEligibleLoaded = false;
-
-async function loadNilaiEligibleSantri() {
-  const { data, error } = await supabaseClient.from('v_nilai_santri_aktif').select('stambuk, nama_lengkap, kelas, bagian, unit_ndalem');
-  if (error) throw error;
-  nilaiEligibleMap = new Map((data || []).filter(r => r.stambuk).map(r => [normStambuk(r.stambuk), r]));
-  nilaiEligibleLoaded = true;
-  console.log('Santri aktif + punya nilai:', nilaiEligibleMap.size);
-}
 
 	let lastActiveData = [];        // untuk download
 	let lastEditedId = null;        // simpan id terakhir ditambah/diubah
 	let lastFilteredData = null;      // simpan hasil filter terakhir
 	let nilaiSortMode = "bottom";    // default: rata-rata terendah
+	let nilaiGrafikUrut = "bottom";  // ceklis Urutan di tab Grafik, default sama seperti tabel
 	let currentSortColumn = null;
 	let sortDirection = 'asc';
 	let allNilaiData = [];
@@ -7411,8 +7426,10 @@ function getExportFileName(prefix, ext, filters = {}) {
   const merah = (filters.merah || "").replace(/\s+/g, "_");
   const tahun = (filters.tahun || "").replace(/\s+/g, "_");
   const semes = (filters.semester || "").replace(/\s+/g, "_");
+  const jenis = (filters.jenis || "").replace(/\s+/g, "_");
 
   let parts = [prefix];
+  if (jenis) parts.push(jenis);
   if (kelas && kelas.toLowerCase() !== "semua") parts.push(kelas);
   if (unit  && unit.toLowerCase() !== "semua") parts.push(unit);
   if (merah && merah.toLowerCase() !== "semua") parts.push(merah);
@@ -7623,14 +7640,24 @@ let _cachedLogoBase64 = null;
 async function _getLogoBase64() {
   if (_cachedLogoBase64) return _cachedLogoBase64;
   try {
-    const resp = await fetch("https://i.imgur.com/Irgu32G.png");
-    if (!resp.ok) return null;
-    const blob = await resp.blob();
-    _cachedLogoBase64 = await new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result);
-      reader.readAsDataURL(blob);
+    const img = await new Promise((resolve, reject) => {
+      const i = new Image();
+      i.crossOrigin = "Anonymous";
+      i.onload = () => resolve(i);
+      i.onerror = () => reject(new Error("Logo load error"));
+      i.src = "https://i.imgur.com/Irgu32G.png";
     });
+    // Logo asli 1,9 MB dan menempel di SETIAP PDF; 200px tetap tajam (kop dicetak ~16mm = >300 dpi).
+    const maxSize = 200;
+    let w = img.naturalWidth || img.width;
+    let h = img.naturalHeight || img.height;
+    if (w > maxSize) { h = Math.round((maxSize / w) * h); w = maxSize; }
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    // PNG dipakai (bukan JPEG) supaya transparansi logo tetap terjaga di atas kop.
+    canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+    _cachedLogoBase64 = canvas.toDataURL("image/png");
   } catch { _cachedLogoBase64 = null; }
   return _cachedLogoBase64;
 }
@@ -7644,7 +7671,9 @@ async function downloadAbsensiPDF() {
   const doc = new jsPDF({
     orientation: "portrait",
     unit: "mm",
-    format: "a5"
+    format: "a5",
+    // Tanpa compress, stream gambar+tabel 380 santri menghasilkan PDF 36 MB (terukur di browser).
+    compress: true
   });
 
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -9252,12 +9281,12 @@ async function initNilaiModule() {
   try {
     showLoading(true);
     if (!allSantriData || !allSantriData.length) await loadSantri(); // skip jika sudah ada
-    await loadNilaiEligibleSantri();
 
     initNilaiFilters();               // isi dropdown kelas/unit
-    await loadNilaiData(1);           // ambil data awal untuk membentuk dropdown tahun
-    initSemesterTahunDropdowns();     // isi semester/tahun + pilih tahun ajaran berjalan
-    await loadNilaiData(1);           // reload tabel memakai tahun ajaran berjalan
+    await ambilSemuaBarisNilai();     // SATU permintaan baris nilai untuk tabel + dropdown + grafik
+    nilaiDropdownDict = kelompokBarisNilai(nilaiRowsCache);
+    initSemesterTahunDropdowns();     // pilih tahun ajaran berjalan sebelum tabel pertama dirender
+    await loadNilaiData(1);
     bindNilaiTabs();                  // tab Tabel/Grafik
     renderNilaiChart("kelas");        // grafik default memakai tahun ajaran berjalan
   } catch (err) {
@@ -9313,42 +9342,59 @@ function normStambuk(x) {
   return String(x ?? '').trim().replace(/^0+/, '').toLowerCase();
 }
 
+// Seluruh baris nilai dibaca SEKALI lalu dipakai bersama oleh agregat tabel, grafik, export,
+// detail per halaman, dan dropdown semester/tahun. Sebelumnya tiap ketikan di cari-nama dan tiap
+// ganti filter mengambil ulang view-nya, sehingga masuk halaman Nilai dan mencari santri terasa lambat.
+let nilaiRowsCache = null;
+
+function batasCacheNilai() {
+  nilaiRowsCache = null;
+}
+
+async function ambilSemuaBarisNilai() {
+  if (Array.isArray(nilaiRowsCache)) return nilaiRowsCache;
+  const all = [];
+  let from = 0;
+  const pageSize = 1000;
+
+  while (true) {
+    const { data, error } = await supabaseClient
+      .from('v_nilai_santri_aktif_detail')
+      .select('stambuk, nama_lengkap, kelas, bagian, unit_ndalem, mata_pelajaran, semester, tahun_ajaran, nilai')
+      .order('stambuk', { ascending: true })
+      .range(from, from + pageSize - 1);
+
+    if (error) throw error;
+    if (!data || !data.length) break;
+    all.push(...data);
+    if (data.length < pageSize) break;
+    from += pageSize;
+  }
+
+  nilaiRowsCache = all;
+  return all;
+}
+
+// Peta stambuk -> baris nilainya, dari daftar baris mana pun.
+function kelompokBarisNilai(rows) {
+  const dict = {};
+  (rows || []).forEach(row => {
+    const key = normStambuk(row.stambuk);
+    if (!key) return;
+    if (!dict[key]) dict[key] = [];
+    dict[key].push({ ...row, stambuk: key, nilai: toNumber(row.nilai) });
+  });
+  return dict;
+}
+
+// Signature lama dipertahankan (dipakai export & grafik); hasilnya kini dari cache yang sama.
 async function fetchNilaiForStambuksBatched(stambukList = []) {
   if (!Array.isArray(stambukList) || stambukList.length === 0) return {};
+  const semua = kelompokBarisNilai(await ambilSemuaBarisNilai());
   const dict = {};
-  const CHUNK = 200;
-
-  const normList = Array.from(new Set(
-    stambukList.map(s => normStambuk(s)).filter(Boolean)
-  ));
-  if (!normList.length) return dict;
-
-  for (let i = 0; i < normList.length; i += CHUNK) {
-    const chunk = normList.slice(i, i + CHUNK);
-    try {
-      const { data, error } = await supabaseClient
-        .from('v_nilai_santri_aktif_detail')
-        .select('stambuk, nama_lengkap, kelas, bagian, unit_ndalem, mata_pelajaran, semester, tahun_ajaran, nilai, created_at')
-        .in('stambuk', chunk);
-
-      if (error) {
-        console.error("fetchNilaiForStambuksBatched error:", error);
-        continue;
-      }
-
-      (data || []).forEach(row => {
-        const key = normStambuk(row.stambuk);
-        if (!dict[key]) dict[key] = [];
-        dict[key].push({
-          ...row,
-          stambuk: key,
-          nilai: toNumber(row.nilai)
-        });
-      });
-    } catch (err) {
-      console.error("fetchNilaiForStambuksBatched exception:", err);
-    }
-  }
+  new Set(stambukList.map(normStambuk).filter(Boolean)).forEach(key => {
+    if (semua[key]) dict[key] = semua[key];
+  });
   return dict;
 }
 
@@ -9379,16 +9425,16 @@ async function loadNilaiData(page = 1) {
     const semFilter = document.getElementById("nilaiSearchSemester")?.value || "semua";
     const thFilter  = document.getElementById("nilaiSearchTahun")?.value || "semua";
 
-    // 🔹 panggil RPC untuk ambil rata-rata & jumlah mapel
+    // 🔹 rata-rata & total nilai per santri (dari cache baris nilai, bukan request baru)
     const rpcData = await fetchNilaiAggByRpc(
       keyword || null,
       thFilter === 'semua' ? null : thFilter,
       semFilter === 'semua' ? null : semFilter,
-      2000,
+      10000,
       0
     );
 
-    // 🔹 isi dictionary dari hasil RPC (pakai normStambuk supaya konsisten)
+    // 🔹 isi dictionary dari hasil agregat (pakai normStambuk supaya konsisten)
     nilaiDict = {};
     (rpcData || []).forEach(r => {
       const key = normStambuk(r.stambuk);
@@ -9399,36 +9445,32 @@ async function loadNilaiData(page = 1) {
       };
     });
 
-    // 🔹 Gabungkan RPC + MASTER SANTRI AKTIF.
-    // Santri yang belum memiliki nilai bisa tidak muncul di RPC.
-    // Mereka tetap dimasukkan dengan Rerata = 0 sehingga
-    // mode "Rata-rata Terendah" benar-benar menampilkan nilai 0 paling atas.
+    // 🔹 Hanya santri yang benar-benar punya baris nilai pada filter tahun/semester aktif.
+    // Sebelumnya daftar diambil dari master santri, sehingga santri tanpa nilai pada tahun
+    // terpilih ikut tampil dengan Rerata 0 dan memenuhi urutan "Rata-rata Terendah".
     const rpcMap = new Map(
       (rpcData || []).map(r => [normStambuk(r.stambuk), r])
     );
+    const masterMap = new Map(
+      (allSantriData || []).map(s => [normStambuk(s.Stambuk), s])
+    );
 
-    const keywordLower = keyword.toLowerCase();
-
-    // Hanya santri aktif yang mempunyai minimal satu data nilai1.
-    let students = (allSantriData || [])
-      .filter(s => nilaiEligibleMap.has(normStambuk(s.Stambuk)))
-      .filter(s => !keywordLower || String(s.Nama_Lengkap || '').toLowerCase().includes(keywordLower))
-      .filter(s => (kelas === 'semua' || s.Kelas === kelas))
-      .filter(s => (unit === 'semua' || s.Unit_Ndalem === unit))
-      .map(s => {
-        const r = rpcMap.get(normStambuk(s.Stambuk));
-        const eligible = nilaiEligibleMap.get(normStambuk(s.Stambuk));
+    let students = Array.from(rpcMap.values())
+      .map(r => {
+        const s = masterMap.get(normStambuk(r.stambuk)) || {};
         return {
-          Stambuk: s.Stambuk,
-          Nama_Lengkap: s.Nama_Lengkap || eligible?.nama_lengkap || r?.nama_lengkap || '-',
-          Kelas: s.Kelas || eligible?.kelas || r?.kelas || '-',
-          Bagian: s.Bagian || eligible?.bagian || r?.bagian || '-',
-          Unit_Ndalem: s.Unit_Ndalem || eligible?.unit_ndalem || r?.unit_ndalem || '-',
-          Jumlah: Number(r?.total_nilai || 0),
-          Rerata: Number(r?.rata_rata || 0),
+          Stambuk: s.Stambuk || r.stambuk,
+          Nama_Lengkap: s.Nama_Lengkap || r.nama_lengkap || '-',
+          Kelas: s.Kelas || r.kelas || '-',
+          Bagian: s.Bagian || r.bagian || '-',
+          Unit_Ndalem: s.Unit_Ndalem || r.unit_ndalem || '-',
+          Jumlah: Number(r.total_nilai || 0),
+          Rerata: Number(r.rata_rata || 0),
           NilaiList: []
         };
-      });
+      })
+      .filter(s => (kelas === 'semua' || s.Kelas === kelas))
+      .filter(s => (unit === 'semua' || s.Unit_Ndalem === unit));
 
     // 🔹 sort rata-rata: teratas / terendah
     const sortTop = document.getElementById("nilaiSortTop")?.checked === true;
@@ -9464,52 +9506,38 @@ async function loadNilaiData(page = 1) {
     const start = (page - 1) * NILAI_PAGE_SIZE;
     const pageSantri = students.slice(start, start + NILAI_PAGE_SIZE);
 
-    // 🔹 ambil detail nilai untuk stambuk di halaman ini
-    const stambukList = Array.from(new Set(
-      pageSantri.map(s => (s.Stambuk || s.stambuk || '').toString()).filter(Boolean)
-    )).map(normStambuk);
-
     try {
-      const detailsDict = await fetchNilaiForStambuksBatched(stambukList);
+      const semuaBaris = kelompokBarisNilai(await ambilSemuaBarisNilai());
+
+      // Dropdown semester/tahun dibangun dari SELURUH baris nilai, bukan hanya halaman aktif,
+      // supaya pilihannya tidak hilang-muncul setiap pindah halaman atau ganti filter.
+      nilaiDropdownDict = semuaBaris;
 
       pageSantri.forEach(s => {
-  const key = normStambuk(s.Stambuk || s.stambuk || '');
+        const key = normStambuk(s.Stambuk || s.stambuk || '');
+        const rows = semuaBaris[key] || [];
 
-  // ✅ 1️⃣ DEFINISIKAN rows DULU
-  const rows = detailsDict[key] || [];
+        const mapped = rows
+          .filter(r =>
+            (thFilter === 'semua' || String(r.tahun_ajaran) === String(thFilter)) &&
+            (semFilter === 'semua' || String(r.semester) === String(semFilter))
+          )
+          .map(r => ({
+            mapel: r.mata_pelajaran || r.Mata_Pelajaran || r.mapel || '',
+            nilai: r.nilai,
+            semester: r.semester,
+            tahun_ajaran: r.tahun_ajaran
+          }));
 
-  // ✅ 2️⃣ SIMPAN DATA LENGKAP UNTUK DROPDOWN
-  nilaiDropdownDict[key] = rows.map(r => ({
-    semester: r.semester,
-    tahun_ajaran: r.tahun_ajaran
-  }));
+        nilaiDict[key] = nilaiDict[key] || {
+          Rerata: Number(s.Rerata || 0),
+          Jumlah: Number(s.Jumlah || 0),
+          NilaiList: []
+        };
 
-  // ✅ 3️⃣ FILTER KHUSUS UNTUK TABEL
-  const filtered = rows.filter(r =>
-    (thFilter === 'semua' || String(r.tahun_ajaran) == String(thFilter)) &&
-    (semFilter === 'semua' || String(r.semester) == String(semFilter))
-  );
-
-  const mapped = filtered.map(r => ({
-    mapel: r.mata_pelajaran || r.Mata_Pelajaran || r.mapel || '',
-    nilai: isFinite(r.nilai) ? Number(r.nilai) : toNumber(r.nilai),
-    semester: r.semester,
-    tahun_ajaran: r.tahun_ajaran
-  }));
-
-  nilaiDict[key] = nilaiDict[key] || {
-    Rerata: Number(s.Rerata || 0),
-    Jumlah: Number(s.Jumlah || 0),
-    NilaiList: []
-  };
-
-  nilaiDict[key].NilaiList = mapped;
-  s.NilaiList = mapped;
-});
-
-
-
-      console.log("Nilai detail fetched for page:", stambukList.length, "keys:", Object.keys(detailsDict).length);
+        nilaiDict[key].NilaiList = mapped;
+        s.NilaiList = mapped;
+      });
     } catch (err) {
       console.error("Gagal ambil detail mapel untuk stambuk:", err);
     }
@@ -9531,6 +9559,21 @@ async function loadNilaiData(page = 1) {
   }
 }
 
+
+// Nilai disimpan 0–100 di database. Baris per mapel dan Jumlah ditampilkan apa
+// adanya (bilangan bulat, max per mapel 100); hanya RATA-RATA yang dikonversi ke
+// skala rapor 0–10 — itu yang ditandai "max 100 : 10". Data internal, sorting,
+// grafik rata-rata, dan form input tetap memakai angka aslinya.
+// Ambang merah 40 = 4,0 pada skala 10.
+const PEMBAGI_SKALA_NILAI = 10;
+
+function tampilNilai(v, desimal = 2) {
+  const n = Number(v || 0) / PEMBAGI_SKALA_NILAI;
+  return n.toLocaleString("id-ID", {
+    minimumFractionDigits: desimal,
+    maximumFractionDigits: desimal
+  });
+}
 
 function renderNilaiTable(santriList = [], nilaiDictLocal = {}, page = 1, totalPages = 1) {
   const list = document.getElementById('nilai-list');
@@ -9604,7 +9647,7 @@ if (semFilter === "semua") {
       <tr>
         <td>${no1++}</td>
         <td>${escapeHtml(n.mapel)}</td>
-        <td class="${Number(n.nilai) <= 40 ? 'nilai-rendah' : ''}" style="text-align:center">${n.nilai}</td>
+        <td class="${Number(n.nilai) <= 40 ? 'nilai-rendah' : ''}" style="text-align:center">${Math.round(Number(n.nilai) || 0)}</td>
       </tr>
     `;
   });
@@ -9626,7 +9669,7 @@ if (semFilter === "semua") {
       <tr>
         <td>${no2++}</td>
         <td>${escapeHtml(n.mapel)}</td>
-        <td class="${Number(n.nilai) <= 40 ? 'nilai-rendah' : ''}" style="text-align:center">${n.nilai}</td>
+        <td class="${Number(n.nilai) <= 40 ? 'nilai-rendah' : ''}" style="text-align:center">${Math.round(Number(n.nilai) || 0)}</td>
       </tr>
     `;
   });
@@ -9641,7 +9684,7 @@ if (semFilter === "semua") {
       <tr>
         <td>${no++}</td>
         <td>${escapeHtml(n.mapel)}</td>
-        <td class="${Number(n.nilai) <= 40 ? 'nilai-rendah' : ''}" style="text-align:center">${n.nilai}</td>
+        <td class="${Number(n.nilai) <= 40 ? 'nilai-rendah' : ''}" style="text-align:center">${Math.round(Number(n.nilai) || 0)}</td>
       </tr>
     `;
   });
@@ -9662,7 +9705,7 @@ if (semFilter === "semua") {
       <span>
         <span class="nilai-total">Jumlah: ${Math.round(s.Jumlah || 0)}</span>
         <span class="nilai-separator">|</span>
-        <span class="nilai-total">Rata-rata: ${(s.Rerata || 0).toFixed(2)}</span>
+        <span class="nilai-total">Rata-rata: ${tampilNilai(s.Rerata, 2)}<span class="nilai-keterangan">max 100 : 10</span></span>
       </span>
     </div>
 
@@ -9804,12 +9847,18 @@ async function renderNilaiChart(mode = 'kelas') {
   const sem = document.getElementById("nilaiGraphSemester")?.value || "semua";
   const th  = document.getElementById("nilaiGraphTahun")?.value || "semua";
 
+  // aturan ceklis sama seperti tab Tabel: Teratas aktif hanya bila Terendah lepas
+  const grafikTop = document.getElementById("nilaiGraphSortTop")?.checked === true;
+  const grafikBottom = document.getElementById("nilaiGraphSortBottom")?.checked === true;
+  nilaiGrafikUrut = grafikTop && !grafikBottom ? "top" : "bottom";
+
   // 🔹 Update header
   const headerEl = document.getElementById("nilai-chart-header");
   if (headerEl) {
     const semText = sem === "semua" ? "Semua Semester" : `Semester ${sem}`;
     const thText  = th === "semua" ? "Semua Tahun Ajaran" : `Tahun Ajaran ${th}`;
-    headerEl.textContent = `${semText} | ${thText}`;
+    const urutText = nilaiGrafikUrut === "top" ? "Rata-rata Teratas" : "Rata-rata Terendah";
+    headerEl.textContent = `${semText} | ${thText} | ${urutText}`;
   }
 
   // 🔹 Tinggi canvas
@@ -9840,7 +9889,13 @@ async function renderNilaiChart(mode = 'kelas') {
     // 👤 MODE INDIVIDU
     // ===============================
     if (mode === 'individu') {
-      const arr = eligibleData.slice(0, 20).map((d, i) => ({
+      // RPC mengirim rata-rata desc (nama asc); dibalik untuk mode Terendah,
+      // persis seperti kebalikan urutan pada tab Tabel.
+      const terurut = nilaiGrafikUrut === "top"
+        ? eligibleData
+        : [...eligibleData].reverse();
+
+      const arr = terurut.slice(0, 20).map((d, i) => ({
         nama: d.nama_lengkap,
         kelas: d.kelas || '-',
         unit: d.unit_ndalem || '-',
@@ -9852,7 +9907,7 @@ async function renderNilaiChart(mode = 'kelas') {
         `${d.idx}. ${d.nama}`,
         `${d.kelas} - ${d.unit}`
       ]);
-      values = arr.map(d => Number(d.avg.toFixed(2)));
+      values = arr.map(d => Number((d.avg / PEMBAGI_SKALA_NILAI).toFixed(2)));
     }
 
     // ===============================
@@ -9870,10 +9925,11 @@ async function renderNilaiChart(mode = 'kelas') {
 
       const arr = Array.from(map.entries())
         .map(([k, v]) => ({ k, avg: v.count ? v.sum / v.count : 0 }))
-        .sort((a, b) => b.avg - a.avg);
+        .sort((a, b) => (nilaiGrafikUrut === "top" ? b.avg - a.avg : a.avg - b.avg) ||
+          String(a.k).localeCompare(String(b.k)));
 
       labels = arr.map((d, i) => `${i + 1}. ${d.k}`);
-      values = arr.map(d => Number(d.avg.toFixed(2)));
+      values = arr.map(d => Number((d.avg / PEMBAGI_SKALA_NILAI).toFixed(2)));
     }
 
     // ===============================
@@ -9891,10 +9947,11 @@ async function renderNilaiChart(mode = 'kelas') {
 
       const arr = Array.from(map.entries())
         .map(([u, v]) => ({ u, avg: v.count ? v.sum / v.count : 0 }))
-        .sort((a, b) => b.avg - a.avg);
+        .sort((a, b) => (nilaiGrafikUrut === "top" ? b.avg - a.avg : a.avg - b.avg) ||
+          String(a.u).localeCompare(String(b.u)));
 
       labels = arr.map((d, i) => `${i + 1}. ${d.u}`);
-      values = arr.map(d => Number(d.avg.toFixed(2)));
+      values = arr.map(d => Number((d.avg / PEMBAGI_SKALA_NILAI).toFixed(2)));
     }
 
     // ===============================
@@ -9905,7 +9962,7 @@ async function renderNilaiChart(mode = 'kelas') {
       data: {
         labels,
         datasets: [{
-          label: 'Rata-rata Nilai',
+          label: 'Rata-rata Nilai (skala 10)',
           data: values,
           backgroundColor: '#3b82f6'
         }]
@@ -9952,36 +10009,17 @@ async function renderNilaiChart(mode = 'kelas') {
 
 
 // Helper: ambil data agregat nilai via RPC Supabase
+// Helper: agregat rata-rata & total nilai (plus banyak mapel penentu max) per santri, dari cache baris nilai.
 async function fetchNilaiAggByRpc(namaFilter = null, tahunAjaran = null, semester = null, limit = 100, offset = 0) {
   try {
-    let all = [];
-    let from = 0;
-    const pageSize = 1000;
-
-    while (true) {
-      let q = supabaseClient
-        .from('v_nilai_santri_aktif_detail')
-        .select('stambuk, nama_lengkap, kelas, bagian, unit_ndalem, mata_pelajaran, semester, tahun_ajaran, nilai')
-        .range(from, from + pageSize - 1);
-
-      if (tahunAjaran !== null && tahunAjaran !== undefined)
-        q = q.eq('tahun_ajaran', tahunAjaran);
-      if (semester !== null && semester !== undefined)
-        q = q.eq('semester', semester);
-
-      const { data, error } = await q;
-      if (error) throw error;
-      if (!data || !data.length) break;
-
-      all.push(...data);
-      if (data.length < pageSize) break;
-      from += pageSize;
-    }
-
+    const rows = await ambilSemuaBarisNilai();
     const keyword = String(namaFilter || '').trim().toLowerCase();
+
     const map = new Map();
 
-    for (const r of all) {
+    for (const r of rows) {
+      if (tahunAjaran !== null && tahunAjaran !== undefined && String(r.tahun_ajaran) !== String(tahunAjaran)) continue;
+      if (semester !== null && semester !== undefined && String(r.semester) !== String(semester)) continue;
       if (keyword && !String(r.nama_lengkap || '').toLowerCase().includes(keyword)) continue;
 
       const key = normStambuk(r.stambuk);
@@ -10001,14 +10039,15 @@ async function fetchNilaiAggByRpc(namaFilter = null, tahunAjaran = null, semeste
       }
 
       const o = map.get(key);
-      const n = toNumber(r.nilai);
-      o.sum_nilai += n;
+      o.sum_nilai += toNumber(r.nilai);
       o.jumlah_nilai += 1;
     }
 
     let result = Array.from(map.values()).map(o => ({
       ...o,
-      total_nilai: o.jumlah_nilai,
+      // Jumlah = total seluruh nilai (0–100 per mapel), bukan banyaknya mapel;
+      // banyak baris (jumlah_nilai) dipakai sebagai pembagi rata-rata.
+      total_nilai: Math.round(o.sum_nilai),
       rata_rata: o.jumlah_nilai ? o.sum_nilai / o.jumlah_nilai : 0
     }));
 
@@ -10107,6 +10146,22 @@ function initSemesterTahunDropdowns() {
     document.getElementById('nilaiGraphTahun')?.addEventListener('change', () => {
       const active = document.querySelector('.nilai-graph-tab.active')?.dataset.graph || 'kelas';
       renderNilaiChart(active);
+    });
+    const grafikSortTop = document.getElementById('nilaiGraphSortTop');
+    const grafikSortBottom = document.getElementById('nilaiGraphSortBottom');
+    const renderGrafikAktif = () => {
+      const active = document.querySelector('.nilai-graph-tab.active')?.dataset.graph || 'kelas';
+      renderNilaiChart(active);
+    };
+    grafikSortTop?.addEventListener('change', () => {
+      if (grafikSortTop.checked) grafikSortBottom.checked = false;
+      else if (!grafikSortBottom.checked) grafikSortBottom.checked = true;
+      renderGrafikAktif();
+    });
+    grafikSortBottom?.addEventListener('change', () => {
+      if (grafikSortBottom.checked) grafikSortTop.checked = false;
+      else if (!grafikSortTop.checked) grafikSortTop.checked = true;
+      renderGrafikAktif();
     });
   }
 }
@@ -11608,7 +11663,8 @@ async function buildNilaiExportContent(ext = "html") {
   if (sem) filters.semester = `Sem${sem}`;
   if (th)  filters.tahun    = th;
   if (isGrafik && jenisGrafik) {
-    filters.jenis = jenisGrafik.replace(/\s+/g, "-");
+    const urutFile = nilaiGrafikUrut === "top" ? "Teratas" : "Terendah";
+    filters.jenis = `${jenisGrafik.replace(/\s+/g, "-")}-${urutFile}`;
   } else {
     if (unit)  filters.unit  = unit.replace(/\s+/g, "_");
     if (kelas) filters.kelas = kelas.replace(/\s+/g, "_");
@@ -11619,10 +11675,16 @@ async function buildNilaiExportContent(ext = "html") {
   // isi utama
   let bodyContent = "";
   if (isGrafik) {
-    const canvas = document.getElementById("nilai-chart");
-    if (!canvas) throw new Error("Grafik tidak tersedia!");
-    const imgData = canvas.toDataURL("image/png");
-    bodyContent = `<div style="text-align:center;"><img src="${imgData}" style="max-width:100%;border:1px solid #ccc;border-radius:6px;"></div>`;
+    // PDF grafik digambar ulang sebagai vektor (lihat unduhGrafikNilaiVektor),
+    // jadi tidak perlu menyalin canvas jadi gambar PNG. HTML tetap butuh gambarnya.
+    if (ext === "html") {
+      const canvas = document.getElementById("nilai-chart");
+      if (!canvas) throw new Error("Grafik tidak tersedia!");
+      const imgData = canvas.toDataURL("image/png");
+      bodyContent = `<div style="text-align:center;"><img src="${imgData}" style="max-width:100%;border:1px solid #ccc;border-radius:6px;"></div>`;
+    } else if (!nilaiChartInstance?.data?.labels?.length) {
+      throw new Error("Grafik tidak tersedia!");
+    }
   } else {
     // EXPORT TABEL SELALU MENGAMBIL SEMUA DATA SESUAI FILTER, BUKAN HALAMAN AKTIF.
     const keyword = (document.getElementById("nilaiSearchNama")?.value || "").trim();
@@ -11640,13 +11702,14 @@ async function buildNilaiExportContent(ext = "html") {
     );
 
     // EXPORT mengambil seluruh hasil filter, bukan halaman aktif.
-    // Master santri dipakai agar santri dengan rata-rata 0 ikut terdownload.
+    // Hanya santri yang punya baris nilai pada filter aktif — sama seperti tabelnya.
     const rpcMap = new Map(
       (rpcData || []).map(r => [normStambuk(r.stambuk), r])
     );
     const keywordLower = keyword.toLowerCase();
 
     let exportStudents = (allSantriData || [])
+      .filter(s => rpcMap.has(normStambuk(s.Stambuk)))
       .filter(s => !s.Status || String(s.Status).toLowerCase() === "aktif")
       .filter(s => !keywordLower || String(s.Nama_Lengkap || "").toLowerCase().includes(keywordLower))
       .filter(s => (kelasFilter === "semua" || s.Kelas === kelasFilter))
@@ -11714,9 +11777,9 @@ async function buildNilaiExportContent(ext = "html") {
       const rows = (detailsDict[normStambuk(s.Stambuk)] || []).filter(n => (thFilter === "semua" || String(n.tahun_ajaran) === String(thFilter)) && (semFilter === "semua" || String(n.semester) === String(semFilter)));
       const sem1=rows.filter(n=>String(n.semester)==="1"), sem2=rows.filter(n=>String(n.semester)==="2");
       let rowsHtml="";
-      const addRows=(arr,title=null)=>{ if(title && arr.length) rowsHtml += `<tr class="tr-semester-divider"><td colspan="3">${title}</td></tr>`; let no=1; arr.forEach(n=>{const v=Number(n.nilai||0); rowsHtml += `<tr><td>${no++}</td><td>${escapeHtml(n.mata_pelajaran||n.Mata_Pelajaran||n.mapel||"")}</td><td class="${v<=40?"nilai-rendah":""}" style="text-align:center">${v}</td></tr>`;}); };
+      const addRows=(arr,title=null)=>{ if(title && arr.length) rowsHtml += `<tr class="tr-semester-divider"><td colspan="3">${title}</td></tr>`; let no=1; arr.forEach(n=>{const v=Number(n.nilai||0); rowsHtml += `<tr><td>${no++}</td><td>${escapeHtml(n.mata_pelajaran||n.Mata_Pelajaran||n.mapel||"")}</td><td class="${v<=40?"nilai-rendah":""}" style="text-align:center">${Math.round(v)}</td></tr>`;}); };
       if(semFilter==="semua"){addRows(sem1,"SEMESTER 1");addRows(sem2,"SEMESTER 2");}else addRows(rows);
-      return `<div class="nilai-card"><div class="nilai-card-header">${escapeHtml(s.Nama_Lengkap)}<span>Kelas: ${escapeHtml(s.Kelas)} | Bagian: ${escapeHtml(s.Bagian)} | Unit: ${escapeHtml(s.Unit_Ndalem)}</span><span>Jumlah: ${Math.round(s.Jumlah||0)} | Rata-rata: ${(s.Rerata||0).toFixed(2)}</span></div><div class="nilai-card-body"><table class="nilai-subtable"><thead><tr><th>No.</th><th>Mata Pelajaran</th><th>Nilai</th></tr></thead><tbody>${rowsHtml}</tbody></table></div></div>`;
+      return `<div class="nilai-card"><div class="nilai-card-header">${escapeHtml(s.Nama_Lengkap)}<span>Kelas: ${escapeHtml(s.Kelas)} | Bagian: ${escapeHtml(s.Bagian)} | Unit: ${escapeHtml(s.Unit_Ndalem)}</span><span>Jumlah: ${Math.round(s.Jumlah||0)} | Rata-rata: ${tampilNilai(s.Rerata,2)} (max 100 : 10)</span></div><div class="nilai-card-body"><table class="nilai-subtable"><thead><tr><th>No.</th><th>Mata Pelajaran</th><th>Nilai</th></tr></thead><tbody>${rowsHtml}</tbody></table></div></div>`;
     };
     if (!exportStudents.length) throw new Error("Tidak ada data nilai sesuai filter aktif.");
     bodyContent = exportStudents.map(cardHtml).join("");
@@ -11729,6 +11792,7 @@ async function buildNilaiExportContent(ext = "html") {
   if (unit)  filterParts.push(`Unit: ${unit}`);
   if (kelas) filterParts.push(`Kelas: ${kelas}`);
   if (isGrafik && jenisGrafik) filterParts.push(`Jenis Grafik: ${jenisGrafik}`);
+  if (isGrafik) filterParts.push(`Urutan: ${nilaiGrafikUrut === "top" ? "Rata-rata Teratas" : "Rata-rata Terendah"}`);
   let filterInfo = filterParts.join(" | ");
 
   const judul = isGrafik ? "LAPORAN GRAFIK NILAI" : "LAPORAN TABEL NILAI";
@@ -11768,7 +11832,7 @@ ${bodyContent}
 <div class="footer">Admin – Simponi Kharisma – ${today.toLocaleDateString("id-ID")} ${today.toLocaleTimeString("id-ID")}</div>
 </body></html>`;
 
-  return { content, filename, judul };
+  return { content, filename, judul, filterInfo, isGrafik };
 }
 
 async function downloadNilaiHTML() {
@@ -11786,11 +11850,187 @@ async function downloadNilaiHTML() {
   }
 }
 
+/* =====================================================
+   GRAFIK NILAI → PDF VEKTOR
+   Batang dan teks digambar sebagai objek PDF asli, bukan hasil potret
+   html2canvas. Alasannya: chart-nya sendiri sudah canvas (raster), jadi
+   disalin ulang membuat raster-di-dalam-raster yang blur saat diperbesar
+   dan membuat file PDF membengkak. Versi vektor tajam di zoom berapa pun
+   dan hanya puluhan KB.
+   ===================================================== */
+
+function angkaDesimalNilai(v) {
+  return Number(v || 0).toLocaleString("id-ID", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+}
+
+function potongTeksPDF(pdf, teks, maxW) {
+  let t = String(teks);
+  if (pdf.getTextWidth(t) <= maxW) return t;
+  while (t.length > 1 && pdf.getTextWidth(t + "…") > maxW) t = t.slice(0, -1);
+  return t.trim() + "…";
+}
+
+// Semua baris grafik dicetak sebagai vektor pada halaman A4 standar.
+// Jangan memakai format kustom [210, T] dengan T < 210: jsPDF membalik
+// dimensinya (result: halaman 120 x 210) sehingga grafik terpotong di kanan.
+function gambarGrafikBarVektor(pdf, o) {
+  const baris = o.labels.map(lb => (Array.isArray(lb) ? lb.map(String) : [String(lb)]));
+  const maksBarisTeks = Math.max(1, ...baris.map(r => r.length));
+  const tinggiBaris = Math.max(6, maksBarisTeks * 4.2 + 2);
+
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(7.5);
+
+  const labelTerlebar = Math.max(0, ...baris.flat().map(t => pdf.getTextWidth(t)));
+  const labelW = Math.min(o.w * 0.45, Math.max(18, labelTerlebar + 4));
+  const nilaiW = Math.max(0, ...o.values.map(v => pdf.getTextWidth(angkaDesimalNilai(v)))) + 3;
+  const areaX = o.x + labelW;
+  const areaW = Math.max(30, o.w - labelW - nilaiW);
+
+  let mulai = 0;
+  let halamanKe = 0;
+  let bawah = 0;
+
+  while (mulai < baris.length) {
+    if (halamanKe > 0) pdf.addPage();
+    const atas = halamanKe === 0 ? o.y : o.yLanjut;
+    const muat = Math.max(1, Math.floor((o.batasBawah - atas) / tinggiBaris));
+    const akhir = Math.min(baris.length, mulai + muat);
+    bawah = atas + (akhir - mulai) * tinggiBaris;
+
+    for (let t = 0; t <= o.skalaMax + 0.001; t += o.stepGrid) {
+      const gx = areaX + (areaW * t) / o.skalaMax;
+      pdf.setDrawColor(228);
+      pdf.line(gx, atas, gx, bawah);
+      pdf.setTextColor(130);
+      pdf.text(String(Math.round(t * 100) / 100), gx, atas - 1.8, { align: "center" });
+    }
+
+    pdf.setDrawColor(90);
+    pdf.line(areaX, bawah, areaX + areaW, bawah);
+
+    for (let i = mulai; i < akhir; i++) {
+      const lbArr = baris[i];
+      const atasBar = atas + (i - mulai) * tinggiBaris;
+      const v = Number(o.values[i] || 0);
+      const bw = Math.max(0.4, (areaW * Math.min(v, o.skalaMax)) / o.skalaMax);
+
+      pdf.setTextColor(35);
+      lbArr.forEach((line, li) => {
+        const ty = atasBar + tinggiBaris / 2 + (li - (lbArr.length - 1) / 2) * 3.4;
+        pdf.text(potongTeksPDF(pdf, line, labelW - 3), areaX - 2.5, ty, {
+          align: "right",
+          baseline: "middle"
+        });
+      });
+
+      pdf.setFillColor(59, 130, 246);
+      pdf.rect(areaX, atasBar + 1.4, bw, tinggiBaris - 3.4, "F");
+
+      pdf.setTextColor(20);
+      pdf.text(angkaDesimalNilai(v), areaX + bw + 1.8, atasBar + tinggiBaris / 2, {
+        baseline: "middle"
+      });
+    }
+
+    mulai = akhir;
+    halamanKe++;
+  }
+
+  return { bawah, halaman: halamanKe };
+}
+
+async function unduhGrafikNilaiVektor(hasil) {
+  const chart = nilaiChartInstance;
+  const labels = chart.data.labels || [];
+  const values = (chart.data.datasets?.[0]?.data || []).map(Number);
+  if (!labels.length) throw new Error("Grafik belum terisi.");
+
+  const datasetLabel = chart.data.datasets?.[0]?.label || "Rata-rata Nilai";
+  const margin = 10;
+  const lebarKonten = 210 - margin * 2;
+  const kopBawah = 40;
+
+  const pdf = new window.jspdf.jsPDF({
+    orientation: "portrait",
+    unit: "mm",
+    format: "a4",
+    compress: true
+  });
+
+  const logo = await _getLogoBase64();
+  if (logo) {
+    try { pdf.addImage(logo, "PNG", margin, 6, 16, 16); } catch (e) {}
+  }
+
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(13);
+  pdf.setTextColor(0, 51, 102);
+  pdf.text("KHUDAMA' KHARISMA", 105, 11, { align: "center" });
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(9.5);
+  pdf.setTextColor(40);
+  pdf.text("Pondok Pesantren Lirboyo Kota Kediri Jawa Timur", 105, 16.5, { align: "center" });
+  pdf.setFontSize(8);
+  pdf.setTextColor(80);
+  pdf.text("Sekretariat: Kantor KHARISMA Gedung Nafis Lt. 02 Lirboyo Kota Kediri", 105, 21, { align: "center" });
+
+  pdf.setDrawColor(0);
+  pdf.line(margin, kopBawah - 13, 210 - margin, kopBawah - 13);
+
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(11);
+  pdf.setTextColor(20);
+  pdf.text(potongTeksPDF(pdf, hasil.judul, lebarKonten), 105, kopBawah - 7, { align: "center" });
+
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(8.5);
+  pdf.setTextColor(70);
+  const info = [hasil.filterInfo, datasetLabel].filter(Boolean).join("  |  ");
+  pdf.text(potongTeksPDF(pdf, info, lebarKonten), 105, kopBawah - 1.5, { align: "center" });
+
+  const tertinggi = Math.max(0, ...values);
+  const skalaMax = tertinggi <= 10 ? 10 : Math.ceil(tertinggi / 10) * 10;
+
+  const hasilGrafik = gambarGrafikBarVektor(pdf, {
+    x: margin,
+    y: kopBawah + 4,
+    yLanjut: 20,
+    batasBawah: 278,
+    w: lebarKonten,
+    labels,
+    values,
+    skalaMax,
+    stepGrid: skalaMax / 5
+  });
+
+  const tgl = new Date();
+  pdf.setFontSize(7.5);
+  pdf.setTextColor(120);
+  pdf.text(
+    `Admin – Simponi Kharisma – ${tgl.toLocaleDateString("id-ID")} ${tgl.toLocaleTimeString("id-ID")}`,
+    210 - margin,
+    hasilGrafik.bawah + 6,
+    { align: "right" }
+  );
+
+  pdf.save(hasil.filename);
+}
+
 async function downloadNilaiPDF() {
   let tempElement = null;
   try {
-    const { content, filename, judul } = await buildNilaiExportContent("pdf");
+    const hasil = await buildNilaiExportContent("pdf");
+    const { content, filename, judul } = hasil;
     const isTabel = /TABEL/i.test(judul);
+
+    if (!isTabel) {
+      await unduhGrafikNilaiVektor(hasil);
+      return;
+    }
 
     // PDF selalu dirender pada lebar A4 yang tetap, bukan mengikuti lebar HP/PC.
     // Ini membuat kop, logo, tabel dan grafik konsisten di semua perangkat.
@@ -11941,7 +12181,7 @@ function openAddNilai() {
       const { error } = await supabaseClient.from("nilai1").insert([formData]);
       if (error) throw error;
       showPopup("Data nilai berhasil ditambahkan!");
-      // reload current page
+      batasCacheNilai();
       await loadNilaiData(nilaiCurrentPage);
     } catch (err) {
       showError("Gagal tambah nilai: " + (err.message || err));
@@ -11958,6 +12198,7 @@ async function editNilai(id) {
       const { error } = await supabaseClient.from("nilai1").update(formData).eq("id", id);
       if (error) { showError("Gagal update nilai: " + error.message); return; }
       showPopup("Data nilai berhasil diperbarui!");
+      batasCacheNilai();
       await loadNilaiData(nilaiCurrentPage);
     }, data);
   } catch (err) {
@@ -11972,6 +12213,7 @@ async function deleteNilai(id) {
     const { error } = await supabaseClient.from("nilai1").delete().eq("id", id);
     if (error) throw error;
     showPopup("Data nilai berhasil dihapus!");
+    batasCacheNilai();
     await loadNilaiData(nilaiCurrentPage);
   } catch (err) {
     console.error("deleteNilai error:", err);
@@ -12012,7 +12254,9 @@ function openModal(title, onSave, data = {}) {
 }
 
 // ================= HELPER: Load Image → Base64 =================
-async function loadImageToBase64(url, maxSize = 150) {
+// Hasilnya JPEG, bukan PNG: foto santri ada ratusan per laporan dan PNG membuat PDF berpuluh kali lebih besar.
+// 180px dengan kualitas 0.85 tetap tajam saat dicetak (sel foto ~13mm = >300 dpi).
+async function loadImageToBase64(url, maxSize = 180, kualitas = 0.85) {
   try {
     const img = await new Promise((resolve, reject) => {
       const i = new Image();
@@ -12033,9 +12277,12 @@ async function loadImageToBase64(url, maxSize = 150) {
     canvas.width = w;
     canvas.height = h;
     const ctx = canvas.getContext("2d");
+    // JPEG tidak punya transparansi, jadi isi putih dulu agar logo berlatar bening tidak jadi hitam
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, w, h);
     ctx.drawImage(img, 0, 0, w, h);
 
-    return { base64: canvas.toDataURL("image/png"), w, h };
+    return { base64: canvas.toDataURL("image/jpeg", kualitas), w, h, fmt: "JPEG" };
   } catch (err) {
     console.warn("loadImageToBase64 failed:", err?.message || err);
     return null;
@@ -12270,7 +12517,7 @@ drawRow(doc, x, y, "No. Kontak", s.No_Wali); y += lineGap + 6;
       if (foto?.base64) {
         doc.addImage(
           foto.base64,
-          "PNG",
+          foto.fmt,
           photoX + 2,
           photoY + 2,
           photoW - 4,
@@ -12380,7 +12627,7 @@ const unit = Array.from(
 // ================= HEADER =================
 try {
   const logo = await loadImageToBase64("https://i.imgur.com/Irgu32G.png");
-  if (logo) doc.addImage(logo.base64, "PNG", 40, 40, 60, 60);
+  if (logo) doc.addImage(logo.base64, logo.fmt, 40, 40, 60, 60);
 } catch {}
 
 doc.setFont("helvetica", "bold");
@@ -12591,7 +12838,7 @@ async function downloadSantriPDFCustom() {
   try {
     const logoUrl = "https://i.imgur.com/Irgu32G.png";
     const logoData = await loadImageToBase64(logoUrl);
-    if (logoData) doc.addImage(logoData.base64, "PNG", 40, 40, 60, 60);
+    if (logoData) doc.addImage(logoData.base64, logoData.fmt, 40, 40, 60, 60);
   } catch (e) { console.warn("Logo gagal dimuat:", e); }
 
   doc.setFont("helvetica", "bold"); doc.setFontSize(20);
@@ -12830,7 +13077,7 @@ async function downloadSantriPDFCustom() {
           const x = data.cell.x + (data.cell.width - nw) / 2;
           const y = data.cell.y + (data.cell.height - nh) / 2;
           try {
-            doc.addImage(foto.base64, "PNG", x, y, nw, nh);
+            doc.addImage(foto.base64, foto.fmt, x, y, nw, nh);
           } catch {}
         }
       }
@@ -13213,7 +13460,7 @@ async function downloadSantriPDFKoordinasi() {
     const logoData = await loadImageToBase64(logoUrl);
 
     if (logoData) {
-      doc.addImage(logoData.base64, "PNG", 40, 40, 60, 60);
+      doc.addImage(logoData.base64, logoData.fmt, 40, 40, 60, 60);
     }
   } catch (e) {
     console.warn("Logo gagal dimuat:", e);
@@ -13433,7 +13680,7 @@ async function downloadSantriPDFKoordinasi() {
           try {
             doc.addImage(
               foto.base64,
-              "PNG",
+              foto.fmt,
               x,
               y,
               nw,
@@ -14332,7 +14579,7 @@ async function downloadValidasiPDF() {
   // HEADER
   try {
     const logo = await loadImageToBase64('https://i.imgur.com/Irgu32G.png');
-    if (logo) doc.addImage(logo.base64, 'PNG', marginX, 30, 50, 50);
+    if (logo) doc.addImage(logo.base64, logo.fmt, marginX, 30, 50, 50);
   } catch {}
 
   doc.setFont('helvetica', 'bold');
@@ -14477,7 +14724,7 @@ async function downloadValidasiPDF() {
             const x = data.cell.x + (data.cell.width - nw) / 2;
             const y = data.cell.y + (data.cell.height - nh) / 2;
             try {
-              doc.addImage(raw.base64, 'PNG', x, y, nw, nh);
+              doc.addImage(raw.base64, raw.fmt, x, y, nw, nh);
             } catch {}
           }
         }
@@ -15622,7 +15869,7 @@ async function downloadPenasehatPDF() {
       const logoData = await loadImageToBase64(logoUrl);
       if (logoData?.base64 || logoData) {
         const img = logoData.base64 || logoData;
-        pdf.addImage(img, "PNG", 40, 40, 60, 60);
+        pdf.addImage(img, img.includes("image/jpeg") ? "JPEG" : "PNG", 40, 40, 60, 60);
       }
     } catch (e) { console.warn("Logo gagal dimuat:", e); }
 
@@ -17705,58 +17952,101 @@ function closePondokModal() {
    🔄 PWA UPDATE HANDLER (FINAL & BULLETPROOF)
    ===================================================== */
 
-let updateNotificationShown = false;
+let regSW = null;
 const UPDATE_ACCEPTED_KEY = "pwa_update_accepted";
+const JEDA_CEK_UPDATE_MS = 60 * 1000;
+
+/* Dua sumber "ada versi baru":
+   1) service-worker.js berubah → browser fire updatefound (hanya kalau file-nya yang berubah);
+   2) halaman ini membandingkan sidik shell-nya sendiri dengan yang ada di server. Yang kedua
+      inilah yang menangkap perubahan jindex.html, karena _headers memberi HTML
+      max-age=31536000 sehingga tanpa probe ini versi baru tidak terlihat sampai hard reload. */
+
+function sidikDariHeader(res) {
+  return res.ok ? (res.headers.get("etag") || res.headers.get("last-modified")) : null;
+}
+
+async function sidikAplikasi() {
+  const target = `${location.origin}${location.pathname}?cekUpdate=${Date.now()}`;
+  try {
+    const head = await fetch(target, { method: "HEAD", cache: "no-store" });
+    const validator = sidikDariHeader(head);
+    if (validator) return validator;
+
+    const res = await fetch(target, { cache: "no-store" });
+    if (!res.ok) return null;
+    const hash = await crypto.subtle.digest("SHA-256", await res.arrayBuffer());
+    return "sha256:" + Array.from(new Uint8Array(hash), b => b.toString(16).padStart(2, "0")).join("");
+  } catch (err) {
+    return null;
+  }
+}
 
 /* ================= REGISTER SERVICE WORKER ================= */
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
-      const reg = await navigator.serviceWorker.register("/service-worker.js");
-      console.log("✅ SW registered:", reg.scope);
+      regSW = await navigator.serviceWorker.register("/service-worker.js");
+      console.log("✅ SW registered:", regSW.scope);
 
-      // 🔥 JIKA SUDAH ADA SW BARU MENUNGGU
-      if (reg.waiting && navigator.serviceWorker.controller) {
-        showUpdatePopupOnce();
+      if (regSW.waiting && navigator.serviceWorker.controller) {
+        tampilkanTombolUpdate();
       }
 
-      // Deteksi update baru
-      reg.addEventListener("updatefound", () => {
-        const newWorker = reg.installing;
+      regSW.addEventListener("updatefound", () => {
+        const newWorker = regSW.installing;
         if (!newWorker) return;
 
         newWorker.addEventListener("statechange", () => {
-          if (
-            newWorker.state === "installed" &&
-            navigator.serviceWorker.controller
-          ) {
-            showUpdatePopupOnce();
+          if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+            tampilkanTombolUpdate();
           }
         });
       });
 
-      // 🔄 Saat SW baru aktif → reload paksa (fresh)
+      // Reload hanya atas permintaan user, supaya tidak ada reload mendadak di tengah input.
       navigator.serviceWorker.addEventListener("controllerchange", () => {
-        window.location.replace(window.location.href);
+        if (sessionStorage.getItem(UPDATE_ACCEPTED_KEY)) location.reload();
+      });
+
+      await cekAdakahUpdate();
+      setInterval(cekUpdateBerkala, JEDA_CEK_UPDATE_MS);
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) cekUpdateBerkala();
       });
     } catch (err) {
       console.error("❌ SW registration failed:", err);
+      // Tanpa SW (mis. dibuka lokal) tetap kabari kalau isi file berubah.
+      await cekAdakahUpdate();
+      setInterval(cekUpdateBerkala, JEDA_CEK_UPDATE_MS);
     }
   });
 }
 
-/* ================= SHOW POPUP (ONCE ONLY) ================= */
-function showUpdatePopupOnce() {
-  if (updateNotificationShown) return;
-  if (sessionStorage.getItem(UPDATE_ACCEPTED_KEY)) return;
-
-  updateNotificationShown = true;
-  showPopupUpdate("Ada pembaruan aplikasi tersedia");
+function cekUpdateBerkala() {
+  cekAdakahUpdate();
+  regSW?.update().catch(() => {});
 }
 
-/* ================= POPUP UI ================= */
-function showPopupUpdate(msg) {
-  document.getElementById("updatePopup")?.remove();
+let sidikVersiBerjalan = null;
+
+async function cekAdakahUpdate() {
+  if (sessionStorage.getItem(UPDATE_ACCEPTED_KEY)) return;
+
+  const sidik = await sidikAplikasi();
+  if (!sidik) return;
+
+  if (sidikVersiBerjalan === null) {
+    sidikVersiBerjalan = sidik;
+    return;
+  }
+  if (sidik !== sidikVersiBerjalan) tampilkanTombolUpdate();
+}
+
+/* ================= TOMBOL UPDATE ================= */
+function tampilkanTombolUpdate() {
+  if (sessionStorage.getItem(UPDATE_ACCEPTED_KEY)) return;
+  if (document.getElementById("updatePopup")) return;
 
   const div = document.createElement("div");
   div.id = "updatePopup";
@@ -17781,52 +18071,60 @@ function showPopupUpdate(msg) {
 
   div.innerHTML = `
     <div style="font-weight:600;display:flex;align-items:center;gap:8px;">
-      🔔 ${msg}
+      🔔 Ada versi baru aplikasi
     </div>
-    <div style="display:flex;justify-content:flex-end;">
+    <div style="display:flex;justify-content:flex-end;gap:8px;">
+      <button id="btnNantiUpdate"
+        style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,.6);
+               padding:8px 14px;border-radius:8px;cursor:pointer;">
+        Nanti
+      </button>
       <button id="btnReloadApp"
-        style="
-          background:#ea4335;
-          color:#fff;
-          border:none;
-          padding:8px 14px;
-          border-radius:8px;
-          cursor:pointer;
-          font-weight:500;
-        ">
-        Reload Aplikasi
+        style="background:#ea4335;color:#fff;border:none;padding:8px 14px;border-radius:8px;
+               cursor:pointer;font-weight:600;">
+        Update aplikasi
       </button>
     </div>
   `;
 
   document.body.appendChild(div);
-
   requestAnimationFrame(() => {
     div.style.opacity = "1";
     div.style.transform = "translateY(0)";
   });
 
-  /* ================= BUTTON ACTION ================= */
-  div.querySelector("#btnReloadApp").onclick = () => {
-    div.remove();
-    sessionStorage.setItem(UPDATE_ACCEPTED_KEY, "1");
+  div.querySelector("#btnNantiUpdate").onclick = () => div.remove();
+  div.querySelector("#btnReloadApp").onclick = terapkanUpdate;
+}
 
-    // 👉 Aktifkan SW baru
-    if (navigator.serviceWorker.controller) {
-      navigator.serviceWorker.controller.postMessage({
-        type: "SKIP_WAITING",
-      });
-    }
-  };
+async function terapkanUpdate() {
+  sessionStorage.setItem(UPDATE_ACCEPTED_KEY, "1");
+  document.getElementById("updatePopup")?.remove();
 
-  /* ================= AUTO HIDE ================= */
-  setTimeout(() => {
-    if (document.body.contains(div)) {
-      div.style.opacity = "0";
-      div.style.transform = "translateY(20px)";
-      setTimeout(() => div.remove(), 300);
+  const menunggu = regSW?.waiting;
+  if (menunggu) {
+    // SW membuang salinan HTML yang basi lalu mengambil alih → controllerchange → reload.
+    menunggu.postMessage({ type: "MUAT_ULANG" });
+    setTimeout(() => location.reload(), 1500);
+    return;
+  }
+
+  await buangCacheShellManual();
+  location.reload();
+}
+
+async function buangCacheShellManual() {
+  try {
+    for (const nama of await caches.keys()) {
+      const cache = await caches.open(nama);
+      for (const req of await cache.keys()) {
+        const u = new URL(req.url);
+        if (u.pathname === "/" || u.pathname.endsWith(".html")) await cache.delete(req);
+      }
     }
-  }, 30000);
+  } catch (err) {
+    console.warn("Cache shell tidak bisa dibersihkan:", err);
+  }
 }
 
 

@@ -1,8 +1,14 @@
 /* =====================================================
-   🧠 SERVICE WORKER - KHARISMA (FINAL)
+   🧠 SERVICE WORKER - KHARISMA
+   =====================================================
+   Naikkan VERSION setiap deploy yang mengubah tampilan/aplikasi supaya
+   cache lama dibuang. Halaman HTML selalu divalidasi ulang ke server
+   (di _headers, /* dipakai max-age=31536000 sehingga tanpa ini aplikasi
+   baru terlihat setelah hard reload berjam-jam kemudian).
    ===================================================== */
 
-const CACHE_NAME = "kharisma-cache-v19";
+const VERSION = "v20";
+const CACHE_NAME = `kharisma-cache-${VERSION}`;
 const OFFLINE_URL = "/offline.html";
 
 const FILES_TO_CACHE = [
@@ -23,25 +29,33 @@ const FILES_TO_CACHE = [
   "/icons/logo.png",
 ];
 
-/* ================= INSTALL ================= */
+const adalahShell = (request) => {
+  const url = new URL(request.url);
+  if (url.searchParams.has("cekUpdate")) return true;
+  return url.pathname === "/" || url.pathname.endsWith(".html");
+};
+
+/* ================= INSTALL =================
+   Satu per satu (allSettled): satu file yang hilang tidak boleh membatalkan
+   seluruh install, karena SW yang gagal install tidak pernah memunculkan
+   tombol update sama sekali. */
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(FILES_TO_CACHE))
+    caches.open(CACHE_NAME).then((cache) =>
+      Promise.allSettled(FILES_TO_CACHE.map((file) => cache.add(file)))
+    )
   );
-  // ⛔ Jangan skipWaiting otomatis
+  // ⛔ Tanpa skipWaiting otomatis: halaman lama harus tetap jalan sampai user menekan tombol.
 });
 
 /* ================= ACTIVATE ================= */
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     (async () => {
-      // 🔥 Hapus cache versi lama
       const keys = await caches.keys();
       await Promise.all(
         keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))
       );
-
-      // 🚀 Ambil kontrol halaman
       await self.clients.claim();
     })()
   );
@@ -49,10 +63,31 @@ self.addEventListener("activate", (event) => {
 
 /* ================= MESSAGE ================= */
 self.addEventListener("message", (event) => {
-  if (event.data?.type === "SKIP_WAITING") {
+  const tipe = event.data?.type;
+
+  if (tipe === "SKIP_WAITING") {
     self.skipWaiting();
+    return;
+  }
+
+  // Tombol "Update aplikasi": buang salinan shell yang basi, baru ambil alih.
+  if (tipe === "MUAT_ULANG") {
+    event.waitUntil(
+      (async () => {
+        await buangCacheShell();
+        self.skipWaiting();
+      })()
+    );
   }
 });
+
+async function buangCacheShell() {
+  const cache = await caches.open(CACHE_NAME);
+  const requests = await cache.keys();
+  await Promise.all(
+    requests.filter((req) => adalahShell(req)).map((req) => cache.delete(req))
+  );
+}
 
 /* ================= FETCH ================= */
 self.addEventListener("fetch", (event) => {
@@ -60,18 +95,38 @@ self.addEventListener("fetch", (event) => {
 
   const url = new URL(event.request.url);
 
-  // 🚫 Jangan cache API / Auth
-  if (
-    url.hostname.includes("supabase.co") ||
-    url.pathname.startsWith("/auth")
-  ) {
+  // 🚫 Jangan pernah sentuh API / Auth
+  if (url.hostname.includes("supabase.co") || url.pathname.startsWith("/auth")) {
     return;
   }
 
-  // 🔥 HTML → SELALU ambil dari network (biar update terasa)
-  if (event.request.mode === "navigate") {
+  // 🔎 Probe versi dari halaman: selalu ke jaringan, dan JANGAN disimpan ke cache
+  //    (kalau tidak, setiap probe meninggalkan satu entri sampah).
+  if (url.searchParams.has("cekUpdate")) {
+    event.respondWith(fetch(event.request, { cache: "no-store" }));
+    return;
+  }
+
+  // 🔥 HTML: validasi ke server dulu (304 kalau tidak berubah) supaya versi baru
+  //    langsung terpakai; jatuh ke cache/offline hanya saat jaringan mati.
+  if (event.request.mode === "navigate" || url.pathname.endsWith(".html")) {
     event.respondWith(
-      fetch(event.request).catch(() => caches.match(OFFLINE_URL))
+      (async () => {
+        try {
+          const jaringan = await fetch(event.request, { cache: "no-cache" });
+          if (jaringan.ok) {
+            // Clone sinkron, simpan tanpa ditunggu (menunda render ±500 KB tidak perlu).
+            const salinan = jaringan.clone();
+            caches.open(CACHE_NAME)
+              .then((cache) => cache.put(event.request, salinan))
+              .catch(() => {});
+          }
+          return jaringan;
+        } catch (err) {
+          const tersimpan = await caches.match(event.request);
+          return tersimpan || (await caches.match(OFFLINE_URL));
+        }
+      })()
     );
     return;
   }
@@ -81,16 +136,19 @@ self.addEventListener("fetch", (event) => {
     caches.match(event.request).then((cached) => {
       if (cached) return cached;
 
-      return fetch(event.request)
-        .then((response) => {
-          if (response.ok && url.origin === self.location.origin) {
-            caches.open(CACHE_NAME).then((cache) =>
-              cache.put(event.request, response.clone())
-            );
-          }
-          return response;
-        })
-        .catch(() => caches.match(OFFLINE_URL));
+      return fetch(event.request).then((response) => {
+        // response.ok = false untuk gambar/font lintas domain (opaque, status 0).
+        if (!response.ok || url.origin !== self.location.origin) return response;
+
+        // Wajib clone sinkron di sini: response di bawah ini langsung dipakai
+        // halaman, dan begitu body-nya terbaca, clone() akan melempar
+        // "Response body is already used".
+        const salinan = response.clone();
+        caches.open(CACHE_NAME)
+          .then((cache) => cache.put(event.request, salinan))
+          .catch(() => {});
+        return response;
+      });
     })
   );
 });
