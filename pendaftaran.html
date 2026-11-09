@@ -1806,6 +1806,26 @@ const kelasOrder = [
 
 let unitNdalemList = [];
 
+// Ganti kelas tidak pernah tersimpan kalau hanya kolom teks "Kelas" yang dikirim
+// (nilainya kembali seperti lama), jadi "Kelas_id" ikut disamakan dengan kelasnya.
+let kelasRefList = null;
+
+async function idKelasUntuk(namaKelas) {
+  const cari = String(namaKelas || "").trim().toLowerCase();
+  if (!cari) return null;
+
+  if (!kelasRefList) {
+    const { data, error } = await supabase.from('nadhom_kelas').select('id, nama_kelas');
+    kelasRefList = error ? [] : (data || []);
+  }
+
+  const temu = kelasRefList.find(k =>
+    String(k.nama_kelas || "").trim().toLowerCase() === cari
+  );
+  if (!temu) console.warn("Kelas tidak ada di nadhom_kelas:", namaKelas);
+  return temu ? temu.id : null;
+}
+
 async function loadUnitNdalemFromDB() {
   try {
     const { data, error } = await supabase
@@ -2283,6 +2303,8 @@ document.getElementById('formSantri').addEventListener('submit', async (ev) => {
     finalFoto = null;
   }
 
+  const idKelas = await idKelasUntuk(Kelas.value);
+
   const payload = {
     Kelas: Kelas.value || null,
     Bagian: document.getElementById('Bagian').value || null,
@@ -2308,6 +2330,10 @@ document.getElementById('formSantri').addEventListener('submit', async (ev) => {
     Kode_Unit: null,
     Masa_Khidmah: null
   };
+
+  // Kelas dikunci trigger dari Kelas_id, jadi id-nya ikut dikirim — tapi hanya
+  // bila namanya ada di nadhom_kelas, supaya data lama tidak tertimpa null.
+  if (idKelas !== null) payload.Kelas_id = idKelas;
 
   try {
     if (editId) {

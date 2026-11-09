@@ -13825,6 +13825,20 @@ function loadNgajiOptions(selected = "") {
   });
 }
 
+// Ganti kelas tidak pernah tersimpan kalau hanya kolom teks "Kelas" yang dikirim
+// (nilainya kembali seperti lama), jadi "Kelas_id" ikut disamakan dengan kelasnya.
+async function idKelasUntuk(namaKelas) {
+  const cari = String(namaKelas || "").trim().toLowerCase();
+  if (!cari) return null;
+
+  if (kelasList.length === 0) await loadReferensiData();
+
+  const temu = (kelasList || []).find(k =>
+    String(k.nama_kelas || "").trim().toLowerCase() === cari
+  );
+  return temu ? temu.id : null;
+}
+
 async function loadReferensiData() {
   try {
     // 1. Load Kelas dari nadhom_kelas
@@ -14114,6 +14128,13 @@ document.getElementById("santriForm").onsubmit = async function(e) {
   const kelasExists = kelasOrder.includes(formData.Kelas);
   if (!kelasExists) {
     return showToast(`❌ Kelas "${formData.Kelas}" tidak terdaftar di sistem!`, "error");
+  }
+
+  const idKelasBaru = await idKelasUntuk(formData.Kelas);
+  if (idKelasBaru === null) {
+    console.warn("Kelas tidak ada di nadhom_kelas, Kelas_id tidak ikut diubah:", formData.Kelas);
+  } else {
+    formData.Kelas_id = idKelasBaru;
   }
 
   // 5. Validasi Unit: pastikan ada di referensi_unit_ndalem
